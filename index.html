@@ -6,12 +6,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accelerate Strategy – 10-Year Product Board</title>
+    <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  ACCELERATE STRATEGY – 10-Year Product Board                ║
+    ║  Version: v16  |  Erstellt: 2025  |  Autor: Daniel Röckl   ║
+    ║  Getinge AB – Internal Strategy Tool                        ║
+    ╠══════════════════════════════════════════════════════════════╣
+    ║  AUFBAU DER DATEI:                                          ║
+    ║  1. CSS-Variablen (Getinge Brandfarben)                     ║
+    ║  2. Layout & Komponenten CSS                                ║
+    ║  3. HTML-Struktur (Header, Board, Modals, Popups)           ║
+    ║  4. JavaScript (Daten, Funktionen, Event-Handler)           ║
+    ║  5. window.onload (Beispieldaten CLPM)                      ║
+    ╚══════════════════════════════════════════════════════════════╝
+    -->
     <style>
+
+        /* ══════════════════════════════════════════════
+           CSS-VARIABLEN: GETINGE BRAND COLORS
+           Alle Farben zentral definiert
+           ══════════════════════════════════════════════ */
         :root {
             /* Getinge Primary */
+            /* === Getinge Primärfarben === */
             --getinge-blue: #18274a;
             --white: #ffffff;
             /* Getinge Secondary */
+            /* === Getinge Sekundärfarben (Grautöne) === */
             --snow: #e9e4e3;
             --oat: #d4cac8;
             --clay: #bfb1ac;
@@ -19,11 +40,13 @@
             --granite: #595857;
             --midnight: #495a6b;
             /* Getinge Accent */
+            /* === Getinge Akzentfarben === */
             --berry: #e56b78;
             --sun: #f39200;
             --grass: #94b654;
             --ocean: #31b7bc;
             /* UI mappings */
+            /* === UI-Zuordnungen === */
             --primary: #18274a;
             --primary-hover: #0d1a32;
             --bg-color: #e9e4e3;
@@ -33,25 +56,39 @@
             --border: #d4cac8;
             --border-hover: #495a6b;
         }
+        /* === Basis-Reset & Schriftart === */
         * { box-sizing: border-box; font-family: 'Adelle Sans', 'Source Sans 3', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+        /* === Grundlayout: Flex-Spalte für sticky Header === */
+
+        /* ══ GRUNDLAYOUT ══ */
         html, body { margin: 0; padding: 0; height: 100%; }
         body { background-color: #18274a;  color: var(--text-main); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-        .workspace-container { padding: 0; position: relative; width: 100%; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        /* === Haupt-Container & Layout-Bereiche === */
+        .workspace-container { padding: 0; position: relative; width: 100%; display: flex; flex-direction: column; height: 100vh; overflow: clip; }
         .top-bar { padding: 14px 28px 10px 28px; flex-shrink: 0; background: transparent; }
         .board-scroll-area { flex: 1; min-height: 0; overflow: auto; padding: 12px 28px 28px 28px; position: relative; }
 
         /* HEADER */
+        /* === Header-Panel (Titel + KPI-Leiste) === */
+
+        /* ══ HEADER-PANEL ══ */
         .header-panel { background: #ffffff; padding: 12px 28px; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .header-title h1 { margin: 0; font-size: 21px; color: #201f1e; font-weight: 700; }
         .header-title p { margin: 2px 0 0 0; color: var(--text-secondary); font-size: 11px; }
         #board-kpi-strip { display: flex; gap: 16px; font-size: 12px; color: #495a6b; flex-wrap: wrap; }
 
         /* FILTER BAR */
+        /* === Filter-Leiste === */
+
+        /* ══ FILTER-LEISTE ══ */
         .filter-bar { background: #f0eeed; border: 1px solid var(--oat,#d4cac8); padding: 9px 18px; border-radius: 4px; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
         .filter-bar label { font-size: 12px; font-weight: 600; color: var(--text-main); }
         .filter-bar select, .filter-bar input[type="text"] { padding: 5px 9px; border: 1px solid var(--border); border-radius: 2px; background: #fff; color: var(--text-main); font-size: 12px; }
         .filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; opacity: 0.45; }
         .filter-chip.active { border-color: var(--primary); opacity: 1; }
+        .chip-score-high   { background: #e8f0d8; color: #4a6020; border-color: #94b654; }
+        .chip-score-medium { background: #fff4ce; color: #835600; border-color: #f39200; }
+        .chip-score-low    { background: #ede9e8; color: #595857; border-color: #bfb1ac; }
         .chip-idea    { background: #ede9e8; color: #595857; }
         .chip-planned { background: #d0d5e0; color: #18274a; }
         .chip-active  { background: #fff4ce; color: #835600; }
@@ -62,6 +99,9 @@
         .view-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
         /* CONTROL BAR */
+        /* === Control Bar mit Gruppen === */
+
+        /* ══ CONTROL BAR (Gruppen mit Trennlinien) ══ */
         .control-bar { background: var(--surface); padding: 0; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 10px; display: flex; align-items: stretch; flex-wrap: wrap; overflow: hidden; }
         .cb-group { display: flex; flex-direction: column; padding: 7px 14px 8px 14px; gap: 6px; border-right: 1px solid var(--border); }
         .cb-group:last-child { border-right: none; }
@@ -79,10 +119,19 @@
 
 
         /* BOARD */
+        /* === Haupt-Board: CSS Grid 1 Titel + 8 Jahres-Spalten === */
+
+        /* ══ HAUPT-BOARD: CSS Grid — 1 Titel + 8 Jahres-Spalten = 9 Spalten ══ */
         .strategy-board { display: grid; grid-template-columns: 250px repeat(8, minmax(260px, auto)); background: var(--surface); border-radius: 4px; box-shadow: 0 6.4px 14.4px rgba(0,0,0,0.132); position: relative; z-index: 1; width: max-content; }
+        /* === Spalten-Überschriften (sticky) === */
+
+        /* ══ SPALTEN-ÜBERSCHRIFTEN (sticky, bleiben beim Scrollen sichtbar) ══ */
         .board-header { background-color: #18274a; color: #fff; padding: 10px 10px; text-align: center; font-weight: 600; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 10; }
         .bh-group { font-size: 9px; font-weight: 400; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
         .bh-year { font-size: 14px; font-weight: 600; }
+        /* === Produktlinien-Titel-Zelle === */
+
+        /* ══ PRODUKTLINIEN-TITELZELLE ══ */
         .swimlane-title { background-color: #f5f2f1; padding: 18px 14px; font-weight: 700; font-size: 20px; color: #495a6b; border-top: 1px solid var(--border); border-right: 2px solid var(--border-hover); outline: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
         
         .swimlane-drag-handle { cursor: grab; color: #c8c6c4; font-size: 16px; padding: 2px 4px; flex-shrink: 0; user-select: none; line-height: 1; margin-right: 4px; }
@@ -91,6 +140,9 @@
         .swimlane-title.lane-drag-over { border-top: 3px solid var(--primary); }
         .swimlane-title-inner { flex: 1; min-width: 0; }
         .lane-effort-summary { font-size: 10px; font-weight: 600; color: #a0aab4; margin-top: 5px; line-height: 1.7; }
+        /* === Inhaltszellen im Board === */
+
+        /* ══ BOARD-INHALTSZELLEN ══ */
         .lane-cell { padding: 14px; border-top: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 300px; min-width: 260px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; align-content: flex-start; position: relative; transition: background-color 0.2s; }
         .lane-cell.drag-over { background-color: rgba(49,183,188,0.1) !important; }
         .lane-cell:last-child { border-right: none; }
@@ -102,6 +154,9 @@
         .effort-pill { padding: 2px 7px; border-radius: 9px; font-size: 10px; font-weight: 700; background: #edebe9; color: #323130; }
 
         /* CARD */
+        /* === Wrapper: Pre-Study-Tab + Panel + Projektkarte === */
+
+        /* ══ PRE-STUDY: Wrapper, Tab und Panel ══ */
         .card-with-prestudy { display: flex; align-items: stretch; flex-shrink: 0; }
         .prestudy-tab {
             width: 22px; background: #f39200; border-radius: 8px 0 0 8px;
@@ -132,6 +187,9 @@
         .ps-panel-row:last-of-type { border-bottom: none; }
         .ps-panel-lbl { color: #8b7e79; font-weight: 400; }
         .ps-panel-val { color: #18274a; font-weight: 400; }
+        /* === Projektkarte === */
+
+        /* ══ PROJEKTKARTE ══ */
         .project-card { background: var(--surface); border: 1px solid var(--oat,#d4cac8); border-left: 5px solid var(--getinge-blue,#18274a); border-radius: 0 4px 4px 0; padding: 0 11px 11px 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); cursor: move; position: relative; width: 230px; user-select: none; flex-shrink: 0; transition: box-shadow 0.15s, opacity 0.15s; overflow: hidden; }
         .project-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-color: var(--primary); }
         .project-card.dragging { opacity: 0.4; }
@@ -143,6 +201,9 @@
         .board-compact .prestudy-panel { width: 120px; }
         /* STATUS STRIPE */
         .status-stripe { height: 5px; margin: 0 -11px 8px -11px; border-radius: 0; }
+        /* === Status-Farbstreifen oben auf Karte === */
+
+        /* ══ STATUS-FARB-STREIFEN (oben auf Karte) ══ */
         .status-idea    { background: #bfb1ac; }
         .status-planned { background: #18274a; }
         .status-active  { background: #f39200; }
@@ -175,10 +236,13 @@
         .delete-lane-btn:hover { color: #e81123; }
 
         /* MODAL */
+        /* === Modales Overlay === */
+
+        /* ══ PROJEKT-MODAL ══ */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
         .modal-window { background: var(--surface); width: 1060px; max-height: 95vh; border-radius: 4px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; }
         .modal-header { padding: 12px 20px; background: rgba(73,90,107,0.15); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 16px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .modal-body { padding: 16px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 1; min-height: 0; }
         .full-width { grid-column: span 2; }
         .form-section { border: 1px solid var(--border); border-radius: 4px; padding: 12px; background: #fafafa; }
         .form-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #a0aab4; margin-bottom: 8px; }
@@ -188,19 +252,23 @@
         .slider-label-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
         .slider-val-badge { background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 6px; min-width: 22px; text-align: center; }
         .roadmap-editor-box { border: 1px solid var(--border); border-radius: 4px; padding: 14px; background: #fff; }
-        .editor-timeline-axis { display: grid; border-bottom: 2px solid #10253f; padding-bottom: 5px; text-align: center; font-weight: 600; font-size: 12px; }
-        .editor-milestones-zone { position: relative; height: 120px; background: #fdfdfd; border-bottom: 1px solid var(--border); margin-bottom: 10px; overflow-y: auto; }
-        .milestone-pin-ui { position: absolute; transform: translateX(-50%); text-align: center; }
-        .pin-icon { font-size: 14px; color: var(--primary); line-height: 1; }
-        .pin-label { font-size: 9px; background: #fff; border: 1px solid #ccc; padding: 2px 4px; border-radius: 3px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        /* === Meilenstein-Liste im Modal === */
+
+        /* ══ MEILENSTEIN-LISTE (Konzept B: quartalsweise gruppiert) ══ */
+        .editor-milestones-zone { background: #fafaf9; border: 0.5px solid var(--border); border-radius: 4px; padding: 8px; margin-bottom: 10px; min-height: 40px; max-height: 200px; overflow-y: auto; }
 
         /* CONFIRM */
+        /* === Bestätigungs- & Eingabe-Popups === */
+
+        /* ══ BESTÄTIGUNGS- UND EINGABE-POPUPS ══ */
         .confirm-popup-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999; }
         .confirm-popup { background: #fff; border-radius: 6px; padding: 24px 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 380px; width: 90%; text-align: center; }
         .confirm-popup h3 { margin: 0 0 8px 0; font-size: 15px; color: #201f1e; }
         .confirm-popup p { margin: 0 0 18px 0; font-size: 13px; color: #495a6b; }
         .confirm-popup-btns { display: flex; gap: 10px; justify-content: center; }
 
+        /* === Neuronales Netzwerk Hintergrund-Canvas === */
         #neural-bg {
             position: fixed;
             top: 0; left: 0;
@@ -309,6 +377,11 @@
             <option value="y2034_35">2034–2035</option>
             <option value="vision">2036+</option>
         </select>
+        <label style="font-size:11px;font-weight:500;">Score:</label>
+        <button class="filter-chip chip-score-high active" onclick="toggleScoreFilter('high',this)">High</button>
+        <button class="filter-chip chip-score-medium active" onclick="toggleScoreFilter('medium',this)">Medium</button>
+        <button class="filter-chip chip-score-low active" onclick="toggleScoreFilter('low',this)">Low</button>
+        <span style="width:1px;height:18px;background:var(--border);margin:0 4px;display:inline-block;vertical-align:middle;"></span>
         <label style="margin-left:4px;">Status:</label>
         <span class="filter-chip chip-idea active"    data-status="idea"    onclick="toggleStatusFilter('idea',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#595857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="6.5" r="3.5"/><path d="M6 10h4M6.5 12h3M7 14h2"/></svg> Idea</span>
         <span class="filter-chip chip-planned active" data-status="planned" onclick="toggleStatusFilter('planned',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5 6h6M5 9h6M5 12h3"/></svg> Planned</span>
@@ -386,6 +459,1272 @@
     </div>
 </div>
 
+    <script>
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  GLOBALE VARIABLEN & KONSTANTEN                                 ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    var projectsData = {};
+        var productLines = [];
+        var activeProjectId = null;
+        var dependencyMode = false;
+        var dependencySourceId = null;
+        var connectionsList = [];
+        var deleteConnectionMode = false;
+        var activePsId = null;
+        var currentView = 'full';
+        var activeStatusFilters = new Set(['idea','planned','active','done','blocked']);
+    var activeScoreFilters = new Set(['low','medium','high']); // Score-Filter
+    
+        var STATUS_META = {
+            idea:    { label: 'Idea',    color: '#bfb1ac', stripe: 'status-idea' },
+            planned: { label: 'Planned', color: '#18274a', stripe: 'status-planned' },
+            active:  { label: 'Active',  color: '#f39200', stripe: 'status-active' },
+            done:    { label: 'Done',    color: '#94b654', stripe: 'status-done' },
+            blocked: { label: 'Blocked', color: '#e56b78', stripe: 'status-blocked' }
+        };
+        var EFFORT_W = { XS:1, S:2, M:3, L:4, XL:5 };
+    
+        // ── Strategischen Score berechnen (0–100) ──
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 1: SCORING & BEWERTUNG                               ║
+    // ║  Strategischen Score berechnen und anzeigen                     ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Strategischen Score aus Benefit- und Innovations-Werten berechnen
+        function calcScore(d) {
+            var bAvg = (d.benefitValues||[0,0,0,0]).reduce(function(a,b){return a+b;},0)/4;
+            var iAvg = (d.innovationValues||[]).reduce(function(a,b){return a+b;},0)/10;
+            var ef = EFFORT_W[d.effort||'M']||3;
+            var co = EFFORT_W[d.cost||'M']||3;
+            return Math.round(Math.min(((bAvg*0.5+iAvg*0.5)*10)/((ef+co)/2), 100));
+        }
+
+    // CSS-Klasse für Score-Farbe zurückgeben (high/medium/low)
+        function scoreClass(s){ return s>=60?'score-high':s>=30?'score-medium':'score-low'; }
+
+    // Score-Anzeige im Modal live aktualisieren
+        function updateScoreDisplay() {
+            var bv=[1,2,3,4].map(function(i){return parseInt(document.getElementById('b-val'+i).value)||0;});
+            var iv=[1,2,3,4,5,6,7,8,9,10].map(function(i){return parseInt(document.getElementById('i-val'+i).value)||0;});
+            var fake={benefitValues:bv,innovationValues:iv,effort:document.getElementById('modal-effort').value,cost:document.getElementById('modal-cost').value};
+            var s=calcScore(fake);
+            var el=document.getElementById('modal-score-display');
+            el.textContent=s;
+            el.style.color=s>=60?'#107c41':s>=30?'#f39200':'#a19f9d';
+            document.getElementById('modal-score-label').textContent=s>=60?'High strategic value':s>=30?'Medium — review effort':'Low value or high cost';
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 2: FILTER & ANSICHT                                  ║
+    // ║  Status-Filter, Suche, kompakte/normale Ansicht                 ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Score-Filter-Chip ein/ausschalten (low/medium/high)
+        function toggleScoreFilter(level, el) {
+            if(activeScoreFilters.has(level)) activeScoreFilters.delete(level);
+            else activeScoreFilters.add(level);
+            el.classList.toggle('active', activeScoreFilters.has(level));
+            applyFilters();
+        }
+
+    // Status-Filter-Chip ein/ausschalten
+        function toggleStatusFilter(status,el) {
+            if(activeStatusFilters.has(status)) activeStatusFilters.delete(status); else activeStatusFilters.add(status);
+            el.classList.toggle('active'); applyFilters();
+        }
+
+    // Alle Filter anwenden (Suche, Produktlinie, Horizont, Status)
+        function applyFilters() {
+            var search=document.getElementById('filter-search').value.toLowerCase();
+            var prod=document.getElementById('filter-product').value;
+            var horiz=document.getElementById('filter-horizon').value;
+            Object.keys(projectsData).forEach(function(id) {
+                var d=projectsData[id]; var card=document.getElementById(id); if(!card) return;
+                var score = calcScore(d);
+                var scoreLvl = score>=60?'high':score>=30?'medium':'low';
+                var ok=(!search||d.title.toLowerCase().indexOf(search)>=0) &&
+                       (!prod||d.prodLineId===prod) &&
+                       (!horiz||d.horizonId===horiz) &&
+                       activeStatusFilters.has(d.status||'idea') &&
+                       activeScoreFilters.has(scoreLvl);
+                card.style.display=ok?'':'none';
+                // Wrapper (inkl. Pre-Study-Tab) ebenfalls verstecken
+                var wrap=document.getElementById('wrap-'+id);
+                if(wrap) wrap.style.display=ok?'':'none';
+            });
+            updateKpiStrip(); updateEffortSummaries(); redrawAllConnections();
+        }
+
+    // Ansicht wechseln: "full" (normal) oder "compact" (schmale Karten)
+        function setView(mode) {
+            currentView=mode;
+            document.getElementById('view-full-btn').classList.toggle('active',mode==='full');
+            document.getElementById('view-compact-btn').classList.toggle('active',mode==='compact');
+            document.getElementById('strategy-board').classList.toggle('board-compact',mode==='compact');
+            document.querySelectorAll('.project-card').forEach(function(c){c.style.width=mode==='compact'?'155px':'230px';});
+            if(mode==='compact') document.querySelectorAll('.prestudy-panel.ps-open').forEach(function(p){p.classList.remove('ps-open');});
+            setTimeout(function(){redrawAllConnections();},50);
+        }
+
+    // KPI-Leiste im Header mit Projekt-Zählern aktualisieren
+        function updateKpiStrip() {
+            var all=Object.values(projectsData);
+            var vis=all.filter(function(d){var card=document.getElementById(Object.keys(projectsData).find(function(k){return projectsData[k]===d;}));return card&&card.style.display!=='none';});
+            var counts={idea:0,planned:0,active:0,done:0,blocked:0};
+            vis.forEach(function(d){counts[d.status||'idea']++;});
+            document.getElementById('board-kpi-strip').innerHTML=
+                '<span style="font-weight:700;">Visible: '+vis.length+' / '+all.length+'</span>'+
+                ' <span>Idea: '+counts.idea+'</span>'+
+                ' <span>Planned: '+counts.planned+'</span>'+
+                ' <span>Active: '+counts.active+'</span>'+
+                ' <span>Done: '+counts.done+'</span>'+
+                ' <span>Blocked: '+counts.blocked+'</span>';
+        }
+
+    // Aufwands-Summaries in Zeilen- und Spaltenköpfen neu berechnen
+        function updateEffortSummaries() {
+            productLines.forEach(function(line) {
+                var el=document.getElementById('effort-summary-'+line.id); if(!el) return;
+                var parts=[];
+                ['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'].forEach(function(h) {
+                    var cell=document.getElementById(line.id+'-'+h); if(!cell) return;
+                    var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){return c.style.display!=='none';});
+                    if(!cards.length) return;
+                    var ec={};
+                    cards.forEach(function(c){var e=(projectsData[c.id]||{}).effort||'M';ec[e]=(ec[e]||0)+1;});
+                    parts.push('<span style="color:#bbb;font-size:9px;">'+h.toUpperCase()+':</span> '+Object.entries(ec).map(function(x){return x[1]+'x'+x[0];}).join(' '));
+                });
+                el.innerHTML=parts.join('<br>');
+            });
+            document.querySelectorAll('.lane-col-summary').forEach(function(el) {
+                var cell=document.getElementById(el.dataset.cell); if(!cell) return;
+                var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){return c.style.display!=='none';});
+                if(!cards.length){el.innerHTML='<span style="color:#bbb;">&#x2013;</span>';return;}
+                var ec={};
+                cards.forEach(function(c){var e=(projectsData[c.id]||{}).effort||'M';ec[e]=(ec[e]||0)+1;});
+                el.innerHTML=Object.entries(ec).map(function(x){return '<span class="effort-pill">'+x[1]+'x'+x[0]+'</span>';}).join('')+
+                    '<span style="margin-left:auto;color:#a0aab4;font-size:10px;">'+cards.length+' project'+(cards.length!==1?'s':'')+'</span>';
+            });
+        }
+
+    // Produktlinien-Dropdown im Control Bar synchronisieren
+        function syncProductDropdown() {
+            ['select-product','filter-product'].forEach(function(sid) {
+                var s=document.getElementById(sid); var cur=s.value;
+                s.innerHTML=sid==='filter-product'?'<option value="">All product lines</option>':'';
+                productLines.forEach(function(line){var o=document.createElement('option');o.value=line.id;o.text=line.title||'Unnamed';s.appendChild(o);});
+                if(cur) s.value=cur;
+            });
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 3: PRODUKTLINIEN                                     ║
+    // ║  Zeilen im Board anlegen, benennen, löschen, sortieren          ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Eingabe-Popup öffnen und neue Produktlinie anlegen
+        function promptAddNewProductLine() {
+            showPrompt('Add product line', 'Product line name...', function(name) {
+                try {
+                    addNewProductLineVisual("prod-"+Date.now(), name);
+                } catch(err) {
+                    showAlert('Error adding product line: ' + err.message);
+                }
+            });
+        }
+
+    // Neue Produktlinie als Grid-Zeile mit 8 Jahres-Zellen einfügen
+        function addNewProductLineVisual(id, titleText) {
+            if(!productLines.find(function(l){return l.id===id;})) productLines.push({id:id,title:titleText});
+            var board=document.getElementById('strategy-board');
+            var titleCell=document.createElement('div');
+            titleCell.className='swimlane-title'; titleCell.id='title-box-'+id;
+            titleCell.innerHTML = '';
+            var handle = document.createElement('span');
+            handle.className = 'swimlane-drag-handle';
+            handle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#bfb1ac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="5" cy="5" r="1" fill="#bfb1ac" stroke="none"/><circle cx="5" cy="8" r="1" fill="#bfb1ac" stroke="none"/><circle cx="5" cy="11" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="5" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="8" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="11" r="1" fill="#bfb1ac" stroke="none"/></svg>'; // hamburger/grip icon
+            handle.title = 'Drag to reorder';
+            titleCell.appendChild(handle);
+    
+            var inner = document.createElement('div');
+            inner.className = 'swimlane-title-inner';
+            var span = document.createElement('input');
+            span.type = 'text';
+            span.id = 'text-title-' + id;
+            span.dataset.lineid = id;
+            span.value = titleText;
+            span.style.cssText = 'background:transparent;border:none;outline:none;font-weight:700;font-size:20px;color:#495a6b;width:100%;font-family:inherit;cursor:text;padding:0;';
+            span.addEventListener('input', function(){ updateProductLineTitle(this.dataset.lineid); });
+            var effortDiv = document.createElement('div');
+            effortDiv.className = 'lane-effort-summary';
+            effortDiv.id = 'effort-summary-' + id;
+            inner.appendChild(span);
+            inner.appendChild(effortDiv);
+            var delBtn = document.createElement('span');
+            delBtn.className = 'delete-lane-btn';
+            delBtn.dataset.delid = id;
+            delBtn.title = 'Delete product line';
+            delBtn.innerHTML = '&times;';
+            // Click-Handler direkt auf Button — löscht diese Produktlinie
+            delBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                deleteProductLine(id);
+            });
+            titleCell.appendChild(inner);
+            titleCell.appendChild(delBtn);
+    
+            // Swimlane row drag-to-reorder
+            titleCell.draggable = true;
+            titleCell.dataset.laneid = id;
+            titleCell.addEventListener('dragstart', function(e) {
+                if (!e.target.classList.contains('swimlane-drag-handle') && e.target !== titleCell) return;
+                titleCell.classList.add('lane-dragging');
+                e.dataTransfer.setData('lane-drag', id);
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            titleCell.addEventListener('dragend', function() {
+                titleCell.classList.remove('lane-dragging');
+                document.querySelectorAll('.lane-drag-over').forEach(function(el){ el.classList.remove('lane-drag-over'); });
+            });
+            titleCell.addEventListener('dragover', function(e) {
+                if (!e.dataTransfer.types.includes('lane-drag')) return;
+                e.preventDefault();
+                document.querySelectorAll('.lane-drag-over').forEach(function(el){ el.classList.remove('lane-drag-over'); });
+                titleCell.classList.add('lane-drag-over');
+            });
+            titleCell.addEventListener('dragleave', function() {
+                titleCell.classList.remove('lane-drag-over');
+            });
+            titleCell.addEventListener('drop', function(e) {
+                if (!e.dataTransfer.types.includes('lane-drag')) return;
+                e.preventDefault();
+                titleCell.classList.remove('lane-drag-over');
+                var fromId = e.dataTransfer.getData('lane-drag');
+                if (fromId && fromId !== id) reorderProductLine(fromId, id);
+            });
+    
+            var horizons=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+            var cellClasses={'y2026':'cell-short','y2027':'cell-short','y2028':'cell-mid','y2029':'cell-mid','y2030':'cell-mid','y2031_33':'cell-long','y2034_35':'cell-long','vision':'cell-vision'};
+            var cells=horizons.map(function(h) {
+                var cell=document.createElement('div');
+                cell.className='lane-cell '+(cellClasses[h]||'cell-vision'); cell.id=id+'-'+h;
+                var summary=document.createElement('div');
+                summary.className='lane-col-summary'; summary.dataset.cell=id+'-'+h;
+                summary.innerHTML='<span style="color:#bbb;">&#x2013;</span>';
+                cell.addEventListener('dragover',function(e){e.preventDefault();cell.classList.add('drag-over');});
+                cell.addEventListener('dragleave',function(){cell.classList.remove('drag-over');});
+                cell.addEventListener('drop',function(e) {
+                    e.preventDefault(); cell.classList.remove('drag-over');
+                    var cardId=e.dataTransfer.getData('text/plain');
+                    var card=document.getElementById(cardId);
+                    if(card){
+                        var w=document.getElementById('wrap-'+cardId)||card;
+                        cell.insertBefore(w,summary);
+                        // horizonId nach Drag aktualisieren
+                        var horizIds=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+                        var cid=cell.id; var horiz='',prod=cid;
+                        for(var hi=0;hi<horizIds.length;hi++){if(cid.endsWith('-'+horizIds[hi])){horiz=horizIds[hi];prod=cid.slice(0,-(horizIds[hi].length+1));break;}}
+                        if(projectsData[cardId]){projectsData[cardId].horizonId=horiz;projectsData[cardId].prodLineId=prod;}
+                        setTimeout(function(){redrawAllConnections();updateEffortSummaries();},50);
+                    }
+                });
+                cell.appendChild(summary); return cell;
+            });
+            board.appendChild(titleCell);
+            cells.forEach(function(c){board.appendChild(c);});
+            syncProductDropdown();
+            updateEffortSummaries();
+        }
+
+    // Produktlinien-Titel nach Texteingabe speichern
+        function updateProductLineTitle(id) {
+            var el=document.getElementById('text-title-'+id); var txt=(el.value!==undefined?el.value:el.innerText||'').trim();
+            var line=productLines.find(function(l){return l.id===id;}); if(line) line.title=txt; syncProductDropdown();
+        }
+
+    // Produktlinie mit allen Karten löschen (nach Bestätigung)
+        function deleteProductLine(id) {
+            showConfirm('Delete product line?','This will delete the product line and all its cards. Cannot be undone.',function() {
+                ['title-box-'+id,id+'-y2026',id+'-y2027',id+'-y2028',id+'-y2029',id+'-y2030',id+'-y2031_33',id+'-y2034_35',id+'-vision'].forEach(function(sel){var el=document.getElementById(sel);if(el)el.remove();});
+                // Remove card wrappers belonging to this lane
+    
+                productLines=productLines.filter(function(l){return l.id!==id;}); syncProductDropdown();
+                setTimeout(function(){redrawAllConnections();},50);
+            });
+        }
+
+    // Produktlinien per Drag & Drop umsortieren (DocumentFragment für atomares Verschieben)
+        function reorderProductLine(fromId, toId) {
+            var board = document.getElementById('strategy-board');
+            var horizons = ['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+    
+            // Collect the 5 DOM nodes of the FROM row
+            var fromNodes = [document.getElementById('title-box-' + fromId)]
+                .concat(horizons.map(function(h){ return document.getElementById(fromId+'-'+h); }));
+    
+            // Reference node: the title cell of the TO row (insert our row before this)
+            var toTitle = document.getElementById('title-box-' + toId);
+    
+            // Insert all 5 from-nodes consecutively before toTitle
+            // Use a DocumentFragment so they land in one operation, preserving order
+            var frag = document.createDocumentFragment();
+            fromNodes.forEach(function(node){ frag.appendChild(node); });
+            board.insertBefore(frag, toTitle);
+    
+            // Update productLines array order
+            var fromIdx = productLines.findIndex(function(l){ return l.id === fromId; });
+            var toIdx   = productLines.findIndex(function(l){ return l.id === toId; });
+            var item = productLines.splice(fromIdx, 1)[0];
+            productLines.splice(toIdx, 0, item);
+    
+            setTimeout(function(){ redrawAllConnections(); updateEffortSummaries(); }, 50);
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 4: PROJEKTKARTEN                                     ║
+    // ║  Karten erstellen, rendern, verschieben, löschen                ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Neue Karte aus Control Bar anlegen
+        function addNewProjectCard() {
+            var ti=document.getElementById('new-title');
+            var prod=document.getElementById('select-product').value;
+            var horiz=document.getElementById('select-horizon').value;
+            if(!prod){ showAlert('Please create a product line first!'); return; }
+            if(!ti.value.trim()){ showAlert('Please enter a project name!'); return; }
+            createProjectCard(prod,horiz,ti.value.trim()); ti.value='';
+        }
+
+    // Projektkarte im DOM erzeugen (Wrapper + Pre-Study-Tab + Karte)
+        function createProjectCard(prod,horizon,title,initialData,forcedId) {
+            var id=forcedId||('proj-'+Date.now()+Math.floor(Math.random()*1000));
+            var container=document.getElementById(prod+'-'+horizon); if(!container) return;
+            projectsData[id]=initialData||{title:title,prodLineId:prod,horizonId:horizon,persona:'',effort:'M',cost:'M',status:'idea',depType:'blocking',benefitValues:[0,0,0,0],innovationValues:[0,0,0,0,0,0,0,0,0,0],milestones:[],preStudy:null};
+            var d=projectsData[id];
+            if(!d.prodLineId) d.prodLineId=prod; if(!d.horizonId) d.horizonId=horizon;
+            if(!d.status) d.status='idea'; if(!d.depType) d.depType='blocking';
+            if(d.preStudy===undefined) d.preStudy=null;
+            if(!d.benefitValues) d.benefitValues=[0,0,0,0];
+            if(!d.innovationValues) d.innovationValues=[0,0,0,0,0,0,0,0,0,0];
+    
+            var wrapper=document.createElement('div');
+            wrapper.className='card-with-prestudy'; wrapper.id='wrap-'+id;
+    
+            var psTab=document.createElement('div');
+            psTab.className='prestudy-tab ps-empty'; psTab.id='pstab-'+id;
+            psTab.title='Pre-study';
+            psTab.innerHTML='<svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg><span class="ps-tab-label">Pre-study</span>';
+            psTab.addEventListener('click', function(e){ e.stopPropagation(); togglePreStudy(id); });
+    
+            var psPanel=document.createElement('div');
+            psPanel.className='prestudy-panel'; psPanel.id='pspanel-'+id;
+    
+            var card=document.createElement('div');
+            card.className='project-card'; card.id=id; card.draggable=true;
+            card.style.width=currentView==='compact'?'155px':'230px';
+            
+            wrapper.appendChild(psPanel);
+            wrapper.appendChild(psTab);
+            wrapper.appendChild(card);
+    
+            card.addEventListener('dragstart',function(e){card.classList.add('dragging');e.dataTransfer.setData('text/plain',id);});
+            card.addEventListener('dragend',function(){card.classList.remove('dragging');document.querySelectorAll('.drag-insert-before').forEach(function(c){c.classList.remove('drag-insert-before');});});
+            card.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();document.querySelectorAll('.drag-insert-before').forEach(function(c){c.classList.remove('drag-insert-before');});card.classList.add('drag-insert-before');});
+            card.addEventListener('dragleave',function(){card.classList.remove('drag-insert-before');});
+            card.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();card.classList.remove('drag-insert-before');var did=e.dataTransfer.getData('text/plain');var dc=document.getElementById(did);if(dc&&dc!==card){var dw=document.getElementById('wrap-'+did)||dc;var tw=card.closest('.card-with-prestudy')||card;card.parentElement.insertBefore(dw,tw);setTimeout(function(){redrawAllConnections();},50);}});
+            card.addEventListener('click',function(e){if(e.target.classList.contains('dependency-dot'))return;openProjectModal(id);});
+    
+            var summary=container.querySelector('.lane-col-summary');
+            if(summary) container.insertBefore(wrapper,summary); else container.appendChild(wrapper);
+            
+            renderCardContent(card,id);
+            
+            updateEffortSummaries(); setTimeout(function(){redrawAllConnections();},50);
+        }
+
+    // Karteninhalt rendern: Score, Status-Streifen, Radar-Vorschau
+        function renderCardContent(card,id) {
+            var d=projectsData[id]; if(!d) return;
+            var score=calcScore(d); var sc=scoreClass(score);
+            var sm=STATUS_META[d.status||'idea'];
+            var dot = document.createElement('div');
+            dot.className = 'dependency-dot';
+            dot.dataset.depid = id;
+            dot.title = 'Link dependency';
+            dot.addEventListener('click', function(e){ handleDepClick(e, id); });
+    
+            var stripe = document.createElement('div');
+            stripe.className = 'status-stripe ' + sm.stripe;
+    
+            var titleRow = document.createElement('div');
+            titleRow.className = 'card-header-row';
+            titleRow.innerHTML = '<div class="card-title-text">' + d.title + '</div>';
+            titleRow.appendChild(dot);
+    
+            var personaEl = document.createElement('div');
+            personaEl.className = 'card-body-details';
+            personaEl.id = id + '-persona';
+            personaEl.textContent = d.persona || 'No persona defined.';
+    
+            var badges = document.createElement('div');
+            badges.className = 'card-badges';
+            badges.innerHTML =
+                '<span class="card-badge badge-eff">Effort: ' + d.effort + '</span>' +
+                '<span class="card-badge badge-cos">Cost: ' + d.cost + '</span>' +
+                '<span class="card-badge badge-score ' + sc + '">Score ' + score + '</span>' +
+                '<span class="card-badge badge-status" style="background:' + sm.color + ';">' + sm.label + '</span>';
+    
+            var radarRow = document.createElement('div');
+            radarRow.className = 'card-radar-row';
+            if (currentView === 'compact') radarRow.style.display = 'none';
+            radarRow.innerHTML =
+                '<div class="card-radar-wrap"><div class="card-radar-label">Benefit</div><svg id="' + id + '-mini-benefit" class="card-mini-radar" width="62" height="62"></svg></div>' +
+                '<div class="card-radar-wrap"><div class="card-radar-label">Innovation</div><svg id="' + id + '-mini-innovation" class="card-mini-radar" width="62" height="62"></svg></div>';
+    
+            card.innerHTML = '';
+            card.appendChild(stripe);
+            card.appendChild(titleRow);
+            card.appendChild(personaEl);
+            card.appendChild(badges);
+            card.appendChild(radarRow);
+    
+            var bs = card.querySelector('#' + id + '-mini-benefit');
+            var is = card.querySelector('#' + id + '-mini-innovation');
+            if(bs) drawMiniRadar(bs, d.benefitValues||[0,0,0,0], 10);
+            if(is) drawMiniRadar(is, d.innovationValues||new Array(10).fill(0), 10);
+        }
+
+    // Kartenvorschau nach Modal-Speicherung aktualisieren
+        function updateCardUIPreview(id) {
+            var card=document.getElementById(id); if(!card) return;
+            renderCardContent(card,id);
+            card.style.width=currentView==='compact'?'155px':'230px';
+            // Refresh prestudy panel if open
+            var panel = document.getElementById('pspanel-'+id);
+            if (panel && panel.classList.contains('ps-open')) renderPreStudyPanel(id);
+            // Refresh tab state
+            var d = projectsData[id];
+            var tab = document.getElementById('pstab-'+id);
+            if (tab && d) {
+                if (d.preStudy) {
+                    tab.classList.remove('ps-empty');
+                } else {
+                    tab.classList.add('ps-empty');
+                }
+            }
+        }
+
+    // Mini-Radar (Spider-Chart) auf Karte zeichnen
+        function drawMiniRadar(svg,values,maxVal) {
+            svg.innerHTML='';
+            var n=values.length,cx=31,cy=31,r=24;
+            for(var i=2;i<=maxVal;i+=2){
+                var lr=(r/maxVal)*i; var pts=[];
+                for(var a=0;a<n;a++){var ang=(Math.PI*2/n)*a-Math.PI/2;pts.push((cx+Math.cos(ang)*lr)+','+(cy+Math.sin(ang)*lr));}
+                var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+                poly.setAttribute("points",pts.join(" "));poly.setAttribute("stroke","#e1dfdd");poly.setAttribute("fill","none");svg.appendChild(poly);
+            }
+            var dp=[];
+            for(var a=0;a<n;a++){
+                var ang=(Math.PI*2/n)*a-Math.PI/2;
+                var ln=document.createElementNS("http://www.w3.org/2000/svg","line");
+                ln.setAttribute("x1",cx);ln.setAttribute("y1",cy);ln.setAttribute("x2",cx+Math.cos(ang)*r);ln.setAttribute("y2",cy+Math.sin(ang)*r);
+                ln.setAttribute("stroke","#edebe9");svg.appendChild(ln);
+                var v=Math.max(0,values[a]);
+                dp.push((cx+Math.cos(ang)*((r/maxVal)*v))+','+(cy+Math.sin(ang)*((r/maxVal)*v)));
+            }
+            var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+            poly.setAttribute("points",dp.join(" "));poly.setAttribute("stroke","var(--primary)");
+            poly.setAttribute("stroke-width","1.5");poly.setAttribute("fill","rgba(49,183,188,0.25)");svg.appendChild(poly);
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 5: PROJEKT-MODAL                                     ║
+    // ║  Detailansicht öffnen, bearbeiten, speichern, schließen         ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Projekt-Modal öffnen und alle Felder befüllen
+        function openProjectModal(id) {
+            activeProjectId=id; var d=projectsData[id];
+            document.getElementById('modal-project-title').value=d.title;
+            document.getElementById('modal-description').value=d.description||'';
+            document.getElementById('modal-user-persona').value=d.persona||'';
+            document.getElementById('modal-effort').value=d.effort||'M';
+            document.getElementById('modal-cost').value=d.cost||'M';
+            document.getElementById('modal-status').value=d.status||'idea';
+            document.getElementById('modal-dep-type').value=d.depType||'blocking';
+            for(var i=1;i<=4;i++){document.getElementById('b-val'+i).value=d.benefitValues[i-1];document.getElementById('b-lbl'+i).textContent=d.benefitValues[i-1];}
+            for(var i=1;i<=10;i++){document.getElementById('i-val'+i).value=d.innovationValues[i-1];document.getElementById('i-lbl'+i).textContent=d.innovationValues[i-1];}
+            renderBenefitRadar();renderInnovationRadar();renderRoadmapEditorList();updateScoreDisplay();
+            document.getElementById('modal-overlay').style.display='flex';
+        }
+
+    // Alle Modal-Eingaben in projectsData speichern und Karte aktualisieren
+        function saveActiveProjectDetails() {
+            var d=projectsData[activeProjectId];
+            var nt=document.getElementById('modal-project-title').value.trim(); if(nt) d.title=nt;
+            d.description=document.getElementById('modal-description').value;
+            d.persona=document.getElementById('modal-user-persona').value;
+            d.effort=document.getElementById('modal-effort').value;
+            d.cost=document.getElementById('modal-cost').value;
+            d.status=document.getElementById('modal-status').value;
+            d.depType=document.getElementById('modal-dep-type').value;
+            // Update all existing connections from this card to reflect new depType
+            connectionsList.forEach(function(conn) {
+                if (conn.from === activeProjectId) conn.type = d.depType;
+            });
+            for(var i=1;i<=4;i++) d.benefitValues[i-1]=parseInt(document.getElementById('b-val'+i).value);
+            for(var i=1;i<=10;i++) d.innovationValues[i-1]=parseInt(document.getElementById('i-val'+i).value);
+            updateCardUIPreview(activeProjectId);updateEffortSummaries();updateKpiStrip();closeProjectModal();
+            setTimeout(function(){redrawAllConnections();},50);
+        }
+
+    // Modal schließen
+        function closeProjectModal(){document.getElementById('modal-overlay').style.display='none';activeProjectId=null;}
+
+    // Aktive Projektkarte löschen (inkl. Wrapper, Pre-Study und Verbindungen)
+        function deleteActiveProjectCard() {
+            if(!activeProjectId) return;
+            var title=(projectsData[activeProjectId]||{}).title||'this card';
+            showConfirm('Delete card?','Delete "'+title+'"? This cannot be undone.',function(){
+                var wrap=document.getElementById('wrap-'+activeProjectId);
+                var card=document.getElementById(activeProjectId);
+                if(wrap) wrap.remove(); else if(card) card.remove();
+                connectionsList=connectionsList.filter(function(c){return c.from!==activeProjectId&&c.to!==activeProjectId;});
+                delete projectsData[activeProjectId];
+                closeProjectModal();updateEffortSummaries();updateKpiStrip();
+                setTimeout(function(){redrawAllConnections();},50);
+            });
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 6: RADAR-CHARTS                                      ║
+    // ║  Benefit- und Innovations-Radars im Modal zeichnen              ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Kunden-Nutzen-Radar im Modal rendern
+        function renderBenefitRadar(){
+            var svg=document.getElementById('svg-radar-benefit');svg.innerHTML='';
+            var vals=[1,2,3,4].map(function(i){return parseInt(document.getElementById('b-val'+i).value);});
+            generateRadarPath(svg,160,135,78,vals,10,["Revenue (+)","Cost savings","Convenience","Clinical benefit"]);
+        }
+
+    // Innovations-Typen-Radar im Modal rendern
+        function renderInnovationRadar(){
+            var svg=document.getElementById('svg-radar-innovation');svg.innerHTML='';
+            var vals=[1,2,3,4,5,6,7,8,9,10].map(function(i){return parseInt(document.getElementById('i-val'+i).value);});
+            generateRadarPath(svg,230,155,90,vals,10,["Profit Model","Network","Structure","Process","Product Perf.","Product System","Service","Channel","Brand","Cust. Engagement"]);
+        }
+
+    // SVG-Pfad für Radar-Polygon berechnen
+        function generateRadarPath(svg,cx,cy,r,values,maxVal,labels){
+            var n=values.length;
+            for(var i=2;i<=maxVal;i+=2){
+                var lr=(r/maxVal)*i;var pts=[];
+                for(var a=0;a<n;a++){var ang=(Math.PI*2/n)*a-Math.PI/2;pts.push((cx+Math.cos(ang)*lr)+','+(cy+Math.sin(ang)*lr));}
+                var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+                poly.setAttribute("points",pts.join(" "));poly.setAttribute("stroke","#e1dfdd");poly.setAttribute("fill","none");svg.appendChild(poly);
+            }
+            var dp=[];
+            for(var a=0;a<n;a++){
+                var ang=(Math.PI*2/n)*a-Math.PI/2;
+                var ln=document.createElementNS("http://www.w3.org/2000/svg","line");
+                ln.setAttribute("x1",cx);ln.setAttribute("y1",cy);ln.setAttribute("x2",cx+Math.cos(ang)*r);ln.setAttribute("y2",cy+Math.sin(ang)*r);
+                ln.setAttribute("stroke","#f3f2f1");svg.appendChild(ln);
+                dp.push((cx+Math.cos(ang)*((r/maxVal)*values[a]))+','+(cy+Math.sin(ang)*((r/maxVal)*values[a])));
+                var txt=document.createElementNS("http://www.w3.org/2000/svg","text");
+                var td=r+18,tx=cx+Math.cos(ang)*td,ty=cy+Math.sin(ang)*td;
+                txt.setAttribute("x",tx);txt.setAttribute("y",ty+3);txt.setAttribute("font-size","10px");txt.setAttribute("font-weight","600");
+                if(Math.abs(Math.cos(ang))<0.1) txt.setAttribute("text-anchor","middle");
+                else if(Math.cos(ang)>0) txt.setAttribute("text-anchor","start");
+                else txt.setAttribute("text-anchor","end");
+                txt.setAttribute("fill","#323130");txt.textContent=labels[a];svg.appendChild(txt);
+            }
+            var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
+            poly.setAttribute("points",dp.join(" "));poly.setAttribute("stroke","var(--primary)");
+            poly.setAttribute("stroke-width","2.5");poly.setAttribute("fill","rgba(49,183,188,0.2)");svg.appendChild(poly);
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 7: PROJEKT-ROADMAP (MEILENSTEINE)                   ║
+    // ║  Meilensteine hinzufügen, löschen, quartalsweise anzeigen       ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Meilenstein-Liste im Modal rendern (nach Quartal gruppiert)
+        function renderRoadmapEditorList() {
+            // Meilensteine nach Jahr+Quartal sortieren und gruppiert darstellen
+            var zone = document.getElementById('editor-milestones-zone');
+            zone.innerHTML = '';
+            var milestones = (projectsData[activeProjectId] || {}).milestones || [];
+            if (milestones.length === 0) {
+                zone.innerHTML = '<div style="font-size:11px;color:#bfb1ac;padding:8px;">Noch keine Meilensteine.</div>';
+                return;
+            }
+            // Sortieren nach Jahr, dann Quartal
+            var sorted = milestones.map(function(ms, i){ return {ms:ms, i:i}; }).sort(function(a, b){
+                var ya = parseInt(a.ms.year), yb = parseInt(b.ms.year);
+                if (ya !== yb) return ya - yb;
+                return parseInt(a.ms.quarter.replace('Q','')) - parseInt(b.ms.quarter.replace('Q',''));
+            });
+            // Nach Gruppe (Jahr + Quartal) zusammenfassen
+            var groups = {}, groupOrder = [];
+            sorted.forEach(function(item){
+                var key = item.ms.quarter + ' ' + item.ms.year;
+                if (!groups[key]) { groups[key] = []; groupOrder.push(key); }
+                groups[key].push(item);
+            });
+            // Farbe je nach Zeitraum
+            var colors = {2026:'#c85060',2027:'#c85060',2028:'#c07000',2029:'#c07000',2030:'#c07000',2031:'#6a8040',2032:'#6a8040',2033:'#6a8040',2034:'#6a8040',2035:'#6a8040',2036:'#2090a0'};
+            groupOrder.forEach(function(key){
+                var groupDiv = document.createElement('div');
+                groupDiv.style.cssText = 'margin-bottom:10px;';
+                // Gruppen-Header
+                var yr = parseInt(key.split(' ')[1]);
+                var col = colors[yr] || '#495a6b';
+                var gh = document.createElement('div');
+                gh.style.cssText = 'font-size:9px;font-weight:500;color:'+col+';text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;padding-left:8px;';
+                gh.textContent = key;
+                groupDiv.appendChild(gh);
+                // Meilensteine in dieser Gruppe
+                groups[key].forEach(function(item, gi){
+                    var ms = item.ms, origIdx = item.i;
+                    var row = document.createElement('div');
+                    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 8px;background:#fafaf9;border:0.5px solid #e9e4e3;border-radius:4px;margin-bottom:2px;';
+                    // Farbpunkt
+                    var dot = document.createElement('div');
+                    dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:'+col+';flex-shrink:0;';
+                    // Text
+                    var lbl = document.createElement('span');
+                    lbl.style.cssText = 'font-size:11px;color:#18274a;flex:1;';
+                    lbl.textContent = ms.label;
+                    // Datum
+                    var dt = document.createElement('span');
+                    dt.style.cssText = 'font-size:10px;color:#8b7e79;';
+                    dt.textContent = ms.quarter + ' ' + ms.year;
+                    // Löschen-Button
+                    var del = document.createElement('span');
+                    del.style.cssText = 'font-size:12px;color:#bfb1ac;cursor:pointer;padding:0 2px;';
+                    del.innerHTML = '&times;';
+                    del.title = 'Meilenstein löschen';
+                    del.addEventListener('click', (function(idx){ return function(){ deleteMilestone(idx); }; })(origIdx));
+                    row.appendChild(dot); row.appendChild(lbl); row.appendChild(dt); row.appendChild(del);
+                    groupDiv.appendChild(row);
+                });
+                zone.appendChild(groupDiv);
+            });
+        }
+
+    // Neuen Meilenstein zum aktiven Projekt hinzufügen
+        function addMilestoneToActiveProject(){
+            var label=document.getElementById('ms-label').value.trim();
+            if(!label){ showAlert("Please enter a milestone title!"); return; }
+            projectsData[activeProjectId].milestones.push({
+                label: label,
+                quarter: document.getElementById('ms-quarter').value,
+                year: document.getElementById('ms-year').value
+            });
+            document.getElementById('ms-label').value='';
+            renderRoadmapEditorList();
+        }
+
+    // Meilenstein aus Liste löschen
+        function deleteMilestone(idx){projectsData[activeProjectId].milestones.splice(idx,1);renderRoadmapEditorList();}
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 8: PRE-STUDY                                         ║
+    // ║  Vorprojekt-Anhängsel: Status, Aufwand, Kosten, Notiz           ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Pre-Study-Tab ein/ausklappen — bei erstem Klick neue Pre-Study anlegen
+        function togglePreStudy(id) {
+            var d = projectsData[id];
+            var panel = document.getElementById('pspanel-'+id);
+            var tab = document.getElementById('pstab-'+id);
+            if (!panel || !tab) return;
+    
+            if (!d.preStudy) {
+                // Create pre-study with defaults
+                d.preStudy = { status: 'idea', effort: 'S', cost: 'S', note: '' };
+                tab.classList.remove('ps-empty');
+                tab.innerHTML = '<svg viewBox="0 0 12 12" style="width:12px;height:12px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 1h6M2 3h8l-1 7H3L2 3z"/><path d="M5 6h2"/></svg><span class="ps-tab-label">Pre-study</span>';
+            }
+    
+            var isOpen = panel.classList.contains('ps-open');
+            if (isOpen) {
+                panel.classList.remove('ps-open');
+            } else {
+                renderPreStudyPanel(id);
+                panel.classList.add('ps-open');
+            }
+            setTimeout(function(){ redrawAllConnections(); }, 50);
+        }
+
+    // Pre-Study-Panel-Inhalt (Status, Effort, Cost, Notiz) neu rendern
+        function renderPreStudyPanel(id) {
+            var d = projectsData[id];
+            var ps = d.preStudy;
+            var panel = document.getElementById('pspanel-'+id);
+            if (!panel || !ps) return;
+    
+            var statusColors = { idea:'#bfb1ac', planned:'#18274a', active:'#f39200', done:'#94b654', blocked:'#e56b78' };
+            var sc = statusColors[ps.status] || '#bfb1ac';
+    
+            panel.innerHTML =
+                '<div class="ps-panel-title">' +
+                    '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#835600" stroke-width="2" stroke-linecap="round"><path d="M3 1h6M2 3h8l-1 7H3L2 3z"/><path d="M5 6h2"/></svg>' +
+                    ' Pre-study' +
+                '</div>' +
+                '<div class="ps-panel-row"><span class="ps-panel-lbl">Status</span>' +
+                    '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:'+sc+';color:white;font-weight:400;">'+ps.status+'</span></div>' +
+                '<div class="ps-panel-row"><span class="ps-panel-lbl">Effort</span><span class="ps-panel-val">'+ps.effort+'</span></div>' +
+                '<div class="ps-panel-row"><span class="ps-panel-lbl">Cost</span><span class="ps-panel-val">'+ps.cost+'</span></div>' +
+                (ps.note ? '<div style="font-size:10px;color:#8b7e79;margin-top:6px;line-height:1.4;">'+ps.note+'</div>' : '') +
+                '<button onclick="openPreStudyEditor(\''+id+'\')" style="margin-top:8px;width:100%;padding:4px;font-size:10px;background:#f39200;color:white;border:none;border-radius:3px;cursor:pointer;font-weight:400;">Edit</button>' +
+                '<button onclick="removePreStudy(\''+id+'\')" style="margin-top:4px;width:100%;padding:4px;font-size:10px;background:transparent;color:#8b7e79;border:1px solid #d4cac8;border-radius:3px;cursor:pointer;font-weight:400;">Remove</button>';
+        }
+
+    // Pre-Study von Karte entfernen und Tab zurücksetzen
+        function removePreStudy(id) {
+            projectsData[id].preStudy = null;
+            var panel = document.getElementById('pspanel-'+id);
+            var tab = document.getElementById('pstab-'+id);
+            if (panel) { panel.classList.remove('ps-open'); panel.innerHTML = ''; }
+            if (tab) {
+                tab.classList.add('ps-empty');
+                tab.innerHTML = '<svg viewBox="0 0 12 12" style="width:12px;height:12px;stroke:#8b7e79;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M6 1v10M1 6h10"/></svg><span class="ps-tab-label">Pre-study</span>';
+            }
+            setTimeout(function(){ redrawAllConnections(); }, 50);
+        }
+
+    // Pre-Study-Bearbeitungs-Modal öffnen
+        function openPreStudyEditor(id) {
+            var d = projectsData[id];
+            if (!d.preStudy) return;
+            activePsId = id;
+            var ps = d.preStudy;
+            document.getElementById('ps-modal-title').textContent = 'Pre-study: ' + d.title;
+            document.getElementById('ps-status').value = ps.status;
+            document.getElementById('ps-effort').value = ps.effort;
+            document.getElementById('ps-cost').value = ps.cost;
+            document.getElementById('ps-note').value = ps.note || '';
+            document.getElementById('ps-modal-overlay').style.display = 'flex';
+        }
+
+    // Pre-Study-Daten aus Modal speichern
+        function savePreStudy() {
+            if (!activePsId) return;
+            var ps = projectsData[activePsId].preStudy;
+            ps.status = document.getElementById('ps-status').value;
+            ps.effort = document.getElementById('ps-effort').value;
+            ps.cost   = document.getElementById('ps-cost').value;
+            ps.note   = document.getElementById('ps-note').value.trim();
+            renderPreStudyPanel(activePsId);
+            document.getElementById('ps-modal-overlay').style.display = 'none';
+            activePsId = null;
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 9: VERBINDUNGEN (CONNECTIONS)                        ║
+    // ║  Blocking- und informelle Verbindungen zwischen Karten          ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Verbindungs-Modus ein/ausschalten (Klick auf Abhängigkeits-Punkt)
+        function toggleDependencyMode(){
+            dependencyMode=!dependencyMode;var btn=document.getElementById('dep-btn');
+            if(dependencyMode){btn.style.background='#e81123';btn.style.color='#fff';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Click source…';}
+            else{btn.style.background='';btn.style.color='';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add connection';dependencySourceId=null;}
+        }
+
+    // Klick auf Abhängigkeits-Punkt verarbeiten (Quelle oder Ziel setzen)
+        function handleDepClick(e,id){
+            e.stopPropagation();
+            // Auto-activate dependency mode when clicking a dot
+            if(!dependencyMode) toggleDependencyMode();
+            if(!dependencySourceId){
+                dependencySourceId=id;
+                document.getElementById('dep-btn').innerText='Click target node...';
+            } else {
+                if(dependencySourceId!==id){
+                    var depType=(projectsData[dependencySourceId]||{}).depType||'blocking';
+                    connectionsList.push({from:dependencySourceId,to:id,type:depType});
+                }
+                dependencySourceId=null;
+                toggleDependencyMode();
+                redrawAllConnections();
+            }
+        }
+
+    // Lösch-Modus für einzelne Verbindung aktivieren
+        function deleteSingleConnectionMode(){
+            deleteConnectionMode=!deleteConnectionMode;var btn=document.getElementById('dep-del-btn');
+            if(deleteConnectionMode){btn.style.background='#e81123';btn.style.color='#fff';btn.innerText='Click connection to delete...';document.getElementById('strategy-board').parentElement.classList.add('dep-delete-mode');}
+            else{btn.style.background='';btn.style.color='#8a4500';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><path d="M5.5 4.5l7-1.5M5.5 11.5l7 1.5M12 8h2"/></svg> Delete connection';document.getElementById('strategy-board').parentElement.classList.remove('dep-delete-mode');}
+            redrawAllConnections();
+        }
+
+    // Einzelne Verbindung aus Liste entfernen und Board aktualisieren
+        function deleteConnection(index){connectionsList.splice(index,1);redrawAllConnections();if(deleteConnectionMode)deleteSingleConnectionMode();}
+
+    // Alle Verbindungen nach Bestätigung löschen
+        function clearConnections(){showConfirm('Delete all connections?','Remove all dependency connections? Cannot be undone.',function(){connectionsList=[];redrawAllConnections();});}
+
+    // Alle Verbindungslinien im SVG neu zeichnen (mit Pill-Labels)
+        function redrawAllConnections(){
+            var svg=document.getElementById('connections-svg');svg.innerHTML='';
+            connectionsList.forEach(function(conn,index){
+                var eF=document.getElementById(conn.from),eT=document.getElementById(conn.to);
+                if(!eF||!eT||eF.style.display==='none'||eT.style.display==='none') return;
+                var rF=eF.getBoundingClientRect(),rT=eT.getBoundingClientRect(),rB=svg.getBoundingClientRect();
+                var x1=rF.left+rF.width-rB.left,y1=rF.top+rF.height/2-rB.top,x2=rT.left-rB.left,y2=rT.top+rT.height/2-rB.top;
+                var mx=(x1+x2)/2, my=(y1+y2)/2;
+                var isBlocking=(conn.type||'blocking')==='blocking';
+                var lineColor = isBlocking ? '#e56b78' : '#bfb1ac';
+                var d = "M "+x1+" "+y1+" C "+(x1+60)+" "+y1+", "+(x2-60)+" "+y2+", "+x2+" "+y2;
+    
+                var g=document.createElementNS("http://www.w3.org/2000/svg","g");
+                g.setAttribute("class","connection-line-group");
+    
+                // Main visible path
+                var path=document.createElementNS("http://www.w3.org/2000/svg","path");
+                path.setAttribute("d",d);
+                path.setAttribute("stroke",lineColor);
+                path.setAttribute("stroke-width",isBlocking?'3':'2');
+                path.setAttribute("fill","none");
+                path.setAttribute("stroke-dasharray",isBlocking?'5 3':'2 5');
+                g.appendChild(path);
+    
+                // Wide invisible hit area for clicking
+                var hit=document.createElementNS("http://www.w3.org/2000/svg","path");
+                hit.setAttribute("d",d);
+                hit.setAttribute("stroke","transparent");
+                hit.setAttribute("stroke-width","18");
+                hit.setAttribute("fill","none");
+                hit.setAttribute("cursor","pointer");
+                hit.setAttribute("pointer-events","stroke");
+    
+                if(deleteConnectionMode){
+                    hit.addEventListener('click',function(ev){ev.stopPropagation();deleteConnection(index);});
+                    // Delete label
+                    var dtxt=document.createElementNS("http://www.w3.org/2000/svg","text");
+                    dtxt.setAttribute("x",mx);dtxt.setAttribute("y",my-10);
+                    dtxt.setAttribute("text-anchor","middle");dtxt.setAttribute("font-size","11px");
+                    dtxt.setAttribute("fill","#e81123");dtxt.setAttribute("pointer-events","none");
+                    dtxt.textContent="\u2715 delete";g.appendChild(dtxt);
+                } else {
+                    // Click to edit label
+                    hit.addEventListener('click',(function(i){ return function(ev){ev.stopPropagation();openConnLabelEditor(i);}; })(index));
+                }
+                g.appendChild(hit);
+    
+                // Label pill on the line midpoint
+                var icon = isBlocking ? '●' : '○'; // 🔴 or ⚪
+                var labelText = (conn.label && conn.label.trim()) ? (icon+' '+conn.label) : (isBlocking ? icon+' Blocking' : icon+' Related');
+                var labelLen = labelText.length * 6.5 + 14;
+    
+                // Pill background
+                var rect=document.createElementNS("http://www.w3.org/2000/svg","rect");
+                rect.setAttribute("x",mx-labelLen/2);rect.setAttribute("y",my-10);
+                rect.setAttribute("width",labelLen);rect.setAttribute("height",18);
+                rect.setAttribute("rx","9");
+                rect.setAttribute("fill", isBlocking?'#fae0e3':'#ede9e8');
+                rect.setAttribute("stroke",lineColor);rect.setAttribute("stroke-width","1");
+                rect.setAttribute("pointer-events","none");
+                g.appendChild(rect);
+    
+                // Pill text
+                var ltxt=document.createElementNS("http://www.w3.org/2000/svg","text");
+                ltxt.setAttribute("x",mx);ltxt.setAttribute("y",my+4);
+                ltxt.setAttribute("text-anchor","middle");ltxt.setAttribute("font-size","10px");
+                ltxt.setAttribute("font-weight","600");ltxt.setAttribute("font-family","Segoe UI,Arial,sans-serif");
+                ltxt.setAttribute("fill",isBlocking?'#8a2030':'#595857');
+                ltxt.setAttribute("pointer-events","none");
+                ltxt.textContent=labelText;
+                g.appendChild(ltxt);
+    
+                svg.appendChild(g);
+            });
+        }
+
+    // Verbindungs-Label-Editor öffnen (Klick auf Linie)
+        function openConnLabelEditor(index) {
+            var conn = connectionsList[index];
+            if (!conn) return;
+            var isBlocking = (conn.type||'blocking') === 'blocking';
+            var overlay = document.getElementById('conn-label-overlay');
+            var fromTitle = (projectsData[conn.from]||{}).title || conn.from;
+            var toTitle   = (projectsData[conn.to]||{}).title   || conn.to;
+            document.getElementById('conn-label-title').textContent = fromTitle + ' \u2192 ' + toTitle;
+            document.getElementById('conn-label-type').textContent = isBlocking ? '● Blocking connection' : '○ Informational / Related';
+            var field = document.getElementById('conn-label-field');
+            field.value = conn.label || '';
+            overlay.style.display = 'flex';
+            setTimeout(function(){ field.focus(); }, 50);
+            var ok = document.getElementById('conn-label-ok').cloneNode(true);
+            var cancel = document.getElementById('conn-label-cancel').cloneNode(true);
+            document.getElementById('conn-label-ok').replaceWith(ok);
+            document.getElementById('conn-label-cancel').replaceWith(cancel);
+            ok.addEventListener('click', function() {
+                conn.label = field.value.trim();
+                overlay.style.display = 'none';
+                redrawAllConnections();
+            });
+            field.addEventListener('keydown', function(e){
+                if(e.key==='Enter'){ conn.label=field.value.trim(); overlay.style.display='none'; redrawAllConnections(); }
+                if(e.key==='Escape'){ overlay.style.display='none'; }
+            });
+            cancel.addEventListener('click', function(){ overlay.style.display='none'; });
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 10: EXPORT / IMPORT                                  ║
+    // ║  Board-Zustand als JSON speichern und laden                     ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Kompletten Board-Zustand als JSON-Datei herunterladen
+        function exportStrategyBoard(){
+            var cp={};
+            document.querySelectorAll('.lane-cell').forEach(function(cell){
+                Array.from(cell.querySelectorAll('.card-with-prestudy,.project-card')).forEach(function(wrapper,order){
+                    var card = wrapper.classList.contains('project-card') ? wrapper : wrapper.querySelector('.project-card');
+                    if (!card) return;
+                    cp[card.id]={cellId:cell.id,order:order};
+                    var horizIds=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+                    var cid=cell.id; var horizId='',prodId=cid;
+                    for(var hi=0;hi<horizIds.length;hi++){if(cid.endsWith('-'+horizIds[hi])){horizId=horizIds[hi];prodId=cid.slice(0,-(horizIds[hi].length+1));break;}}
+                    if(projectsData[card.id]){projectsData[card.id].horizonId=horizId||cid;projectsData[card.id].prodLineId=prodId;}
+                });
+            });
+            var data={version:3,projectsData:projectsData,productLines:productLines,connectionsList:connectionsList,cardPositions:cp};
+            var a=document.createElement('a');
+            a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
+            a.download="accelerate_strategy_export.json";a.click();
+        }
+
+    // JSON-Datei importieren und Board vollständig neu aufbauen
+        function importStrategyBoard(file){
+            var reader=new FileReader();
+            reader.onload=function(e){
+                try{
+                    var data=JSON.parse(e.target.result);
+                    var board=document.getElementById('strategy-board');
+                    board.innerHTML='<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+                    productLines=[];projectsData={};connectionsList=data.connectionsList||[];
+                    data.productLines.forEach(function(l){addNewProductLineVisual(l.id,l.title);});
+                    var cp=data.cardPositions||{};
+                    var sorted=Object.keys(data.projectsData).sort(function(a,b){return (cp[a]?cp[a].order:0)-(cp[b]?cp[b].order:0);});
+                    var horizonMap={'short':'y2026','mid':'y2028','long':'y2031_33'};
+                    sorted.forEach(function(id){
+                        var p=data.projectsData[id];
+                        var cellId=cp[id]?cp[id].cellId:(p.prodLineId+'-'+p.horizonId);
+                        var horizIds2=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+                        var prod=cellId,horiz='';
+                        for(var hj=0;hj<horizIds2.length;hj++){if(cellId.endsWith('-'+horizIds2[hj])){horiz=horizIds2[hj];prod=cellId.slice(0,-(horizIds2[hj].length+1));break;}}
+                        if(!horiz){var ld=cellId.lastIndexOf('-');prod=cellId.substring(0,ld);horiz=cellId.substring(ld+1);}
+                        // Migrate old horizon IDs to new year-based IDs
+                        if(horizonMap[horiz]) horiz=horizonMap[horiz];
+                        createProjectCard(prod,horiz,p.title,p,id);
+                        // Prestudy-Tab nach Import wiederherstellen
+                        if(p.preStudy) {
+                            var tab=document.getElementById('pstab-'+id);
+                            if(tab){ tab.classList.remove('ps-empty'); }
+                        }
+                    });
+                    redrawAllConnections();updateKpiStrip();updateEffortSummaries();
+                    showAlert("Import successful!");
+                }catch(err){showAlert("Import failed: "+err.message);}
+            };
+            reader.readAsText(file);
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 11: POPUPS & DIALOGE                                 ║
+    // ║  Ersatz für native browser prompt(), alert(), confirm()         ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Eingabe-Popup anzeigen (ersetzt nativen prompt())
+        function showPrompt(title, placeholder, onConfirm) {
+            _promptCallback = onConfirm;
+            var overlay = document.getElementById('input-popup-overlay');
+            document.getElementById('input-popup-title').textContent = title;
+            var field = document.getElementById('input-popup-field');
+            field.value = '';
+            field.placeholder = placeholder || '';
+            overlay.style.display = 'flex';
+            setTimeout(function(){ field.focus(); }, 60);
+        }
+
+    // OK-Klick im Eingabe-Popup verarbeiten
+        function _promptOk() {
+            var field = document.getElementById('input-popup-field');
+            var val = field ? field.value.trim() : '';
+            if (!val) return;
+            document.getElementById('input-popup-overlay').style.display = 'none';
+            if (_promptCallback) { var cb = _promptCallback; _promptCallback = null; cb(val); }
+        }
+
+    // Abbrechen im Eingabe-Popup
+        function _promptCancel() {
+            document.getElementById('input-popup-overlay').style.display = 'none';
+            _promptCallback = null;
+        }
+
+    // Info-Popup anzeigen (ersetzt nativen alert())
+        function showAlert(message, onClose) {
+            _confirmCallback = onClose || null;
+            document.getElementById('confirm-popup-title').textContent = '';
+            document.getElementById('confirm-popup-msg').textContent = message;
+            document.getElementById('confirm-popup-cancel').style.display = 'none';
+            document.getElementById('confirm-popup-ok').textContent = 'OK';
+            document.getElementById('confirm-popup-overlay').style.display = 'flex';
+        }
+
+    // Bestätigungs-Popup anzeigen (ersetzt nativen confirm())
+    var _confirmCallback = null;
+        function showConfirm(title, message, onConfirm) {
+            _confirmCallback = onConfirm;
+            document.getElementById('confirm-popup-title').textContent = title;
+            document.getElementById('confirm-popup-msg').textContent = message;
+            document.getElementById('confirm-popup-cancel').style.display = '';
+            document.getElementById('confirm-popup-ok').textContent = 'OK';
+            document.getElementById('confirm-popup-overlay').style.display = 'flex';
+        }
+        function _confirmOk() {
+            document.getElementById('confirm-popup-overlay').style.display = 'none';
+            if (_confirmCallback) { var cb = _confirmCallback; _confirmCallback = null; cb(); }
+        }
+        function _confirmCancel() {
+            document.getElementById('confirm-popup-overlay').style.display = 'none';
+            _confirmCallback = null;
+        }
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  ABSCHNITT 12: INITIALISIERUNG                                  ║
+    // ║  Beispieldaten beim Laden setzen                                ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    window.onload=function(){
+        // ── Beispiel-Produktlinie: Closed Loop Patient Monitoring ──
+        addNewProductLineVisual("clpm","Closed Loop Monitoring");
+
+        // Karte 1: Sensor Fusion Baseline (2026) – mit Pre-Study, hoch bewertet
+        createProjectCard("clpm","y2026","Sensor Fusion Baseline",{
+            title:"Sensor Fusion Baseline",
+            prodLineId:"clpm", horizonId:"y2026",
+            persona:"ICU Nurse – benötigt zuverlässige Echtzeit-Vitaldaten ohne Alarm-Overload",
+            effort:"XS", cost:"XS", status:"active", depType:"blocking",
+            benefitValues:[9,9,10,9],
+            innovationValues:[8,8,9,8,8,9,9,8,9,8],
+            milestones:[
+                {label:"Kick-off & Datenerhebung",quarter:"Q1",year:"2026"},
+                {label:"Sensor-Validierung abgeschlossen",quarter:"Q3",year:"2026"},
+                {label:"Klinische Pilotstudie Start",quarter:"Q4",year:"2026"}
+            ],
+            preStudy:{status:"done", effort:"S", cost:"XS",
+                note:"Klinische Datenbasis & Sensor-Validierung – MDR-konforme Anforderungsanalyse abgeschlossen."}
+        },"card-clpm-2026");
+
+        // Karte 2: Alarm Intelligence Engine (2027) – blockiert durch Sensor Fusion
+        createProjectCard("clpm","y2027","Alarm Intelligence Engine",{
+            title:"Alarm Intelligence Engine",
+            prodLineId:"clpm", horizonId:"y2027",
+            persona:"Intensivpfleger – leidet unter Alarm-Fatigue bei >200 Alarmen/Schicht",
+            effort:"S", cost:"S", status:"planned", depType:"blocking",
+            benefitValues:[8,9,8,8],
+            innovationValues:[8,8,8,7,7,8,8,7,8,8],
+            milestones:[
+                {label:"Algorithm Freeze",quarter:"Q2",year:"2027"},
+                {label:"FDA/MDR Submission",quarter:"Q4",year:"2027"}
+            ],
+            preStudy:null
+        },"card-clpm-2027a");
+
+        // Karte 3: Regulatory Dossier EU MDR (2027) – informational zu Alarm Engine
+        createProjectCard("clpm","y2027","Regulatory Dossier EU MDR",{
+            title:"Regulatory Dossier EU MDR",
+            prodLineId:"clpm", horizonId:"y2027",
+            persona:"Regulatory Affairs Manager – braucht lückenlose MDR-Dokumentation",
+            effort:"M", cost:"S", status:"planned", depType:"informal",
+            benefitValues:[4,5,3,6],
+            innovationValues:[2,3,2,4,6,3,2,4,3,2],
+            milestones:[
+                {label:"Gap-Analyse fertig",quarter:"Q1",year:"2027"},
+                {label:"Dossier eingereicht",quarter:"Q3",year:"2027"}
+            ],
+            preStudy:{status:"active", effort:"S", cost:"XS",
+                note:"MDR-Lückenanalyse: Welche klinischen Nachweise fehlen noch für Class IIb?"}
+        },"card-clpm-2027b");
+
+        // Karte 4: Predictive Deterioration AI (2029) – strategisches Kernprojekt
+        createProjectCard("clpm","y2029","Predictive Deterioration AI",{
+            title:"Predictive Deterioration AI",
+            prodLineId:"clpm", horizonId:"y2029",
+            persona:"Intensivmediziner – will 6h vor kritischem Ereignis gewarnt werden",
+            effort:"M", cost:"S", status:"idea", depType:"blocking",
+            benefitValues:[9,9,9,9],
+            innovationValues:[8,8,9,8,8,9,9,8,9,8],
+            milestones:[
+                {label:"AI-Modell Training abgeschlossen",quarter:"Q2",year:"2029"},
+                {label:"Prospektive Validierungsstudie",quarter:"Q4",year:"2029"}
+            ],
+            preStudy:null
+        },"card-clpm-2029");
+
+        // Karte 5: Autonomous Closed Loop ICU Platform (Vision 2036+)
+        createProjectCard("clpm","vision","Autonomous Closed Loop ICU Platform",{
+            title:"Autonomous Closed Loop ICU Platform",
+            prodLineId:"clpm", horizonId:"vision",
+            persona:"ICU Medical Director – will vollautonomes, lernfähiges Monitoring-System",
+            effort:"M", cost:"S", status:"idea", depType:"blocking",
+            benefitValues:[10,10,9,10],
+            innovationValues:[9,9,10,9,9,10,9,9,10,9],
+            milestones:[
+                {label:"Vision Paper veröffentlicht",quarter:"Q2",year:"2027"},
+                {label:"Technologie-Roadmap fixiert",quarter:"Q1",year:"2030"}
+            ],
+            preStudy:null
+        },"card-clpm-vision");
+
+        // Pre-Study Tabs für Karten mit Pre-Study aktivieren
+        ["card-clpm-2026","card-clpm-2027b"].forEach(function(id){
+            var tab = document.getElementById("pstab-"+id);
+            if(tab) tab.classList.remove("ps-empty");
+        });
+
+        // Beispiel-Verbindungen einfügen
+        connectionsList.push({from:"card-clpm-2026",  to:"card-clpm-2027a", type:"blocking"});
+        connectionsList.push({from:"card-clpm-2027a", to:"card-clpm-2029",  type:"blocking"});
+        connectionsList.push({from:"card-clpm-2029",  to:"card-clpm-vision",type:"blocking"});
+        connectionsList.push({from:"card-clpm-2027a", to:"card-clpm-2027b", type:"informal"});
+
+        // ── 3 leere Platzhalter-Produktlinien ──
+        addNewProductLineVisual("prod-b","Product line 2");
+        addNewProductLineVisual("prod-c","Product line 3");
+        addNewProductLineVisual("prod-d","Product line 4");
+
+        setTimeout(function(){ redrawAllConnections(); updateEffortSummaries(); }, 100);
+    }
+
+    </script>
+
+    <div id="getinge-brand" style="
+        position: fixed;
+        bottom: 22px;
+        right: 26px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        z-index: 9000;
+        pointer-events: none;
+    ">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 945 140" width="300" height="45" style="display:block;"><g transform="scale(1,-1) translate(0,-140)">
+  <path d="M 885.049 2.100 C 885.049 0.950 884.110 0.010 882.950 0.010 L 859.939 0.000 C 858.799 0.000 857.870 0.920 857.870 2.060 L 857.870 38.520 L 826.380 20.340 C 825.390 19.770 824.130 20.110 823.560 21.100 L 812.040 41.060 C 811.470 42.050 811.799 43.310 812.790 43.880 L 844.140 61.920 C 857.179 69.450 873.860 64.991 881.380 51.950 C 883.780 47.800 884.950 43.280 885.040 38.810 L 885.049 2.100 Z" fill="white"/>
+  <path d="M 882.980 139.750 L 859.929 139.750 C 858.790 139.750 857.870 138.831 857.870 137.690 L 857.870 101.331 L 826.280 119.560 C 825.299 120.130 824.040 119.790 823.470 118.800 L 811.970 98.870 C 811.390 97.860 811.730 96.581 812.740 96.001 L 844.530 77.661 C 848.439 75.491 852.939 74.251 857.740 74.251 C 872.790 74.251 884.990 86.459 884.990 101.520 L 885.019 105.280 L 885.040 112.959 L 885.040 137.690 C 885.040 138.831 884.120 139.750 882.980 139.750 Z" fill="white"/>
+  <path d="M 929.939 28.200 C 930.929 27.630 932.189 27.959 932.759 28.950 L 944.290 48.920 C 944.849 49.900 944.519 51.161 943.530 51.730 L 912.040 69.911 L 943.620 88.150 C 944.599 88.709 944.939 89.980 944.370 90.970 L 932.839 110.920 C 932.269 111.911 931.000 112.251 930.009 111.670 L 898.210 93.300 C 894.380 90.991 891.049 87.720 888.660 83.560 C 881.130 70.530 885.599 53.850 898.640 46.331 L 929.939 28.200 Z" fill="white"/>
+  <path d="M 129.054 29.381 L 129.054 110.114 L 210.479 110.114 L 203.006 97.100 L 146.403 97.100 L 146.403 77.704 L 200.127 77.725 L 200.127 65.444 L 146.403 65.452 L 146.403 42.881 L 210.328 42.879 L 210.328 29.381 L 129.054 29.381 Z" fill="white"/>
+  <path d="M 656.008 29.381 L 656.008 110.114 L 737.177 110.114 L 729.725 97.100 L 673.357 97.100 L 673.357 77.704 L 727.081 77.725 L 727.081 65.444 L 673.357 65.452 L 673.357 42.881 L 737.282 42.879 L 737.282 29.381 L 656.008 29.381 Z" fill="white"/>
+  <path d="M 272.089 29.381 L 272.089 97.053 L 234.213 97.046 L 234.213 110.114 L 327.613 110.114 L 320.138 97.039 L 289.448 97.056 L 289.448 29.381 L 272.089 29.381 Z" fill="white"/>
+  <path d="M 353.137 29.381 L 353.137 110.124 L 370.489 110.124 L 370.489 29.410 C 370.489 29.394 370.476 29.381 370.461 29.381 L 353.137 29.381 Z" fill="white"/>
+  <path d="M 23.528 29.381 C 10.534 29.381 -0.000 39.915 -0.000 52.909 L -0.000 86.585 C -0.000 99.580 10.534 110.114 23.528 110.114 L 91.618 110.114 L 84.604 97.050 L 28.117 97.050 C 22.041 97.050 17.116 92.124 17.116 86.049 L 17.116 54.093 C 17.116 47.884 22.149 42.851 28.358 42.851 L 72.076 42.851 C 78.204 42.851 83.172 47.819 83.172 53.948 L 83.172 62.751 L 51.768 62.744 L 51.768 75.807 L 99.904 75.807 L 99.904 52.909 C 99.904 39.915 89.370 29.381 76.376 29.381 L 23.528 29.381 Z" fill="white"/>
+  <path d="M 550.473 29.381 C 537.479 29.381 526.946 39.915 526.946 52.909 L 526.946 86.585 C 526.946 99.580 537.479 110.114 550.473 110.114 L 618.563 110.114 L 611.550 97.050 L 555.117 97.050 C 549.011 97.050 544.061 92.101 544.061 85.995 L 544.061 53.906 C 544.061 47.800 549.011 42.851 555.117 42.851 L 599.063 42.851 C 605.169 42.851 610.118 47.800 610.118 53.906 L 610.118 62.751 L 578.714 62.744 L 578.714 75.807 L 626.849 75.807 L 626.849 52.909 C 626.849 39.915 616.316 29.381 603.322 29.381 L 550.473 29.381 Z" fill="white"/>
+  <path d="M 481.212 29.381 L 481.212 86.279 C 481.212 92.228 476.388 97.050 470.439 97.050 L 420.319 97.047 L 420.319 29.381 L 402.970 29.381 L 402.970 110.124 L 474.862 110.124 C 487.856 110.124 498.390 99.591 498.390 86.597 L 498.390 29.381 L 481.212 29.381 Z" fill="white"/>
+</g></svg>
+        <div style="
+            color: rgba(255,255,255,0.65);
+            font-size: 10px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        ">&#169; Daniel R&#246;ckl</div>
+    </div>
+
+
+<div id="conn-label-overlay" class="confirm-popup-overlay" style="display:none;">
+        <div class="confirm-popup" style="max-width:340px;">
+            <h3 id="conn-label-title" style="margin-bottom:6px;">Edit connection</h3>
+            <p id="conn-label-type" style="margin:0 0 12px 0;font-size:12px;"></p>
+            <input type="text" id="conn-label-field" maxlength="40"
+                style="width:100%;padding:8px 10px;border:1px solid #edebe9;border-radius:2px;font-size:13px;margin-bottom:16px;box-sizing:border-box;"
+                placeholder="e.g. needs API first, regulatory approval...">
+            <div class="confirm-popup-btns">
+                <button id="conn-label-ok">Save</button>
+                <button class="secondary" id="conn-label-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
+    
+
+<div id="ps-modal-overlay" class="confirm-popup-overlay" style="display:none;">
+        <div class="confirm-popup" style="max-width:340px;text-align:left;">
+            <h3 id="ps-modal-title" style="margin-bottom:16px;font-size:15px;color:#18274a;font-weight:400;"></h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                <div>
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Status</label>
+                    <select id="ps-status" style="width:100%;font-size:13px;padding:6px 8px;">
+                        <option value="idea">Idea</option>
+                        <option value="planned">Planned</option>
+                        <option value="active">Active</option>
+                        <option value="done">Done</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Effort</label>
+                    <select id="ps-effort" style="width:100%;font-size:13px;padding:6px 8px;">
+                        <option value="XS">XS</option><option value="S">S</option>
+                        <option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Cost</label>
+                    <select id="ps-cost" style="width:100%;font-size:13px;padding:6px 8px;">
+                        <option value="XS">XS</option><option value="S">S</option>
+                        <option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Note</label>
+                <textarea id="ps-note" style="width:100%;height:60px;font-size:12px;padding:6px 8px;border:1px solid #d4cac8;border-radius:3px;resize:vertical;font-weight:400;" placeholder="Brief description of scope or goal..."></textarea>
+            </div>
+            <div class="confirm-popup-btns">
+                <button onclick="savePreStudy()" style="background:#f39200;">Save</button>
+                <button class="secondary" onclick="document.getElementById('ps-modal-overlay').style.display='none';">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    
+
+<div id="input-popup-overlay" class="confirm-popup-overlay" style="display:none;">
+        <div class="confirm-popup">
+            <h3 id="input-popup-title">Enter value</h3>
+            <input type="text" id="input-popup-field" onkeydown="if(event.key==='Enter')_promptOk();if(event.key==='Escape')_promptCancel();" style="width:100%;padding:8px 10px;border:1px solid #edebe9;border-radius:2px;font-size:14px;margin-bottom:16px;box-sizing:border-box;" placeholder="">
+            <div class="confirm-popup-btns">
+                <button id="input-popup-ok" onclick="_promptOk()">OK</button>
+                <button class="secondary" id="input-popup-cancel" onclick="_promptCancel()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    
+
+<div id="confirm-popup-overlay" class="confirm-popup-overlay" style="display:none;">
+    <div class="confirm-popup">
+        <h3 id="confirm-popup-title">Are you sure?</h3>
+        <p id="confirm-popup-msg"></p>
+        <div class="confirm-popup-btns">
+            <button id="confirm-popup-ok" onclick="_confirmOk()" style="background:#a80000;">Confirm</button>
+            <button class="secondary" id="confirm-popup-cancel" onclick="_confirmCancel()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal-window">
         <div class="modal-header">
@@ -406,6 +1745,10 @@
         </div>
         <div class="modal-body">
             <div>
+                <div class="form-section" style="margin-bottom:12px;">
+                    <div class="form-section-title">Project Description</div>
+                    <textarea id="modal-description" style="width:100%;height:52px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;" placeholder="Kurze Beschreibung des Projekts..."></textarea>
+                </div>
                 <div class="form-section" style="margin-bottom:12px;">
                     <div class="form-section-title">User Persona</div>
                     <textarea id="modal-user-persona" style="width:100%;height:65px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;" placeholder="Describe the primary user..."></textarea>
@@ -477,1007 +1820,21 @@
             </div>
 
             <div class="roadmap-editor-box full-width">
-                <label style="font-size:13px;color:#10253f;display:block;margin-bottom:7px;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M1 3l5 2 4-2 5 2v10l-5-2-4 2-5-2V3z"/><path d="M6 5v10M10 3v10"/></svg> Project Roadmap (Quarter + Year)</label>
-                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                    <span style="font-size:11px;font-weight:600;color:#495a6b;">Scroll:</span>
-                    <input type="range" id="timeline-scroll" min="0" max="6" step="0.25" value="0" style="flex:1;" oninput="scrollTimeline(this.value)">
-                </div>
-                <div style="overflow:hidden;border-radius:2px;border:1px solid var(--border);">
-                    <div id="timeline-inner" style="width:1000px;position:relative;transform:translateX(0);transition:transform 0.15s ease;">
-                        <div class="editor-timeline-axis" style="grid-template-columns:repeat(10,100px);">
-                            <div>2026</div><div>2027</div><div>2028</div><div>2029</div><div>2030</div>
-                            <div>2031</div><div>2032</div><div>2033</div><div>2034</div><div>2035</div>
-                        </div>
-                        <div class="editor-milestones-zone" id="editor-milestones-zone" style="width:1000px;"></div>
-                    </div>
-                </div>
-                <div style="display:flex;gap:8px;align-items:center;background:#f3f2f1;padding:8px;border-radius:2px;margin-top:9px;flex-wrap:wrap;">
-                    <span style="font-size:12px;font-weight:600;">Milestone:</span>
-                    <input type="text" id="ms-label" placeholder="Title..." style="width:130px;">
-                    <input type="text" id="ms-desc" placeholder="Description (optional)..." style="width:170px;">
+                <label style="font-size:13px;color:#10253f;display:block;margin-bottom:7px;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M1 3l5 2 4-2 5 2v10l-5-2-4 2-5-2V3z"/><path d="M6 5v10M10 3v10"/></svg> Project Roadmap</label>
+                <!-- Meilenstein-Liste nach Quartal gruppiert -->
+                <div id="editor-milestones-zone" style="max-height:200px;overflow-y:auto;margin-bottom:10px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                    <input type="text" id="ms-label" placeholder="Meilenstein-Titel..." style="flex:1;min-width:120px;">
                     <select id="ms-quarter"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select>
-                    <select id="ms-year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option><option>2032</option><option>2033</option><option>2034</option><option>2035</option></select>
+                    <select id="ms-year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option><option>2032</option><option>2033</option><option>2034</option><option>2035</option><option>2036</option></select>
                     <button type="button" onclick="addMilestoneToActiveProject()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M8 2v12M2 8h12"/></svg> Add</button>
-                </div>
-            </div>
-        </div>
-        <div class="modal-header" style="justify-content:flex-end;gap:10px;">
+                </div></div>
+        <div style="border-top:2px solid var(--border);padding:14px 24px;display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-shrink:0;background:rgba(73,90,107,0.08);width:100%;box-sizing:border-box;">
             <button onclick="saveActiveProjectDetails()">Save &amp; Close</button>
             <button class="secondary" onclick="closeProjectModal()">Cancel</button>
         </div>
     </div>
 </div>
 
-
-
-    <div id="conn-label-overlay" class="confirm-popup-overlay" style="display:none;">
-        <div class="confirm-popup" style="max-width:340px;">
-            <h3 id="conn-label-title" style="margin-bottom:6px;">Edit connection</h3>
-            <p id="conn-label-type" style="margin:0 0 12px 0;font-size:12px;"></p>
-            <input type="text" id="conn-label-field" maxlength="40"
-                style="width:100%;padding:8px 10px;border:1px solid #edebe9;border-radius:2px;font-size:13px;margin-bottom:16px;box-sizing:border-box;"
-                placeholder="e.g. needs API first, regulatory approval...">
-            <div class="confirm-popup-btns">
-                <button id="conn-label-ok">Save</button>
-                <button class="secondary" id="conn-label-cancel">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="ps-modal-overlay" class="confirm-popup-overlay" style="display:none;">
-        <div class="confirm-popup" style="max-width:340px;text-align:left;">
-            <h3 id="ps-modal-title" style="margin-bottom:16px;font-size:15px;color:#18274a;font-weight:400;"></h3>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                <div>
-                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Status</label>
-                    <select id="ps-status" style="width:100%;font-size:13px;padding:6px 8px;">
-                        <option value="idea">Idea</option>
-                        <option value="planned">Planned</option>
-                        <option value="active">Active</option>
-                        <option value="done">Done</option>
-                        <option value="blocked">Blocked</option>
-                    </select>
-                </div>
-                <div>
-                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Effort</label>
-                    <select id="ps-effort" style="width:100%;font-size:13px;padding:6px 8px;">
-                        <option value="XS">XS</option><option value="S">S</option>
-                        <option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
-                    </select>
-                </div>
-                <div>
-                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Cost</label>
-                    <select id="ps-cost" style="width:100%;font-size:13px;padding:6px 8px;">
-                        <option value="XS">XS</option><option value="S">S</option>
-                        <option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
-                    </select>
-                </div>
-            </div>
-            <div style="margin-bottom:16px;">
-                <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Note</label>
-                <textarea id="ps-note" style="width:100%;height:60px;font-size:12px;padding:6px 8px;border:1px solid #d4cac8;border-radius:3px;resize:vertical;font-weight:400;" placeholder="Brief description of scope or goal..."></textarea>
-            </div>
-            <div class="confirm-popup-btns">
-                <button onclick="savePreStudy()" style="background:#f39200;">Save</button>
-                <button class="secondary" onclick="document.getElementById('ps-modal-overlay').style.display='none';">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="input-popup-overlay" class="confirm-popup-overlay" style="display:none;">
-        <div class="confirm-popup">
-            <h3 id="input-popup-title">Enter value</h3>
-            <input type="text" id="input-popup-field" style="width:100%;padding:8px 10px;border:1px solid #edebe9;border-radius:2px;font-size:14px;margin-bottom:16px;box-sizing:border-box;" placeholder="">
-            <div class="confirm-popup-btns">
-                <button id="input-popup-ok">OK</button>
-                <button class="secondary" id="input-popup-cancel">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="confirm-popup-overlay" class="confirm-popup-overlay" style="display:none;">
-    <div class="confirm-popup">
-        <h3 id="confirm-popup-title">Are you sure?</h3>
-        <p id="confirm-popup-msg"></p>
-        <div class="confirm-popup-btns">
-            <button id="confirm-popup-ok" style="background:#a80000;">Confirm</button>
-            <button class="secondary" id="confirm-popup-cancel">Cancel</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    var projectsData = {};
-    var productLines = [];
-    var activeProjectId = null;
-    var dependencyMode = false;
-    var dependencySourceId = null;
-    var connectionsList = [];
-    var deleteConnectionMode = false;
-    var activePsId = null;
-    var currentView = 'full';
-    var activeStatusFilters = new Set(['idea','planned','active','done','blocked']);
-
-    var STATUS_META = {
-        idea:    { label: 'Idea',    color: '#bfb1ac', stripe: 'status-idea' },
-        planned: { label: 'Planned', color: '#18274a', stripe: 'status-planned' },
-        active:  { label: 'Active',  color: '#f39200', stripe: 'status-active' },
-        done:    { label: 'Done',    color: '#94b654', stripe: 'status-done' },
-        blocked: { label: 'Blocked', color: '#e56b78', stripe: 'status-blocked' }
-    };
-    var EFFORT_W = { XS:1, S:2, M:3, L:4, XL:5 };
-
-    function calcScore(d) {
-        var bAvg = (d.benefitValues||[0,0,0,0]).reduce(function(a,b){return a+b;},0)/4;
-        var iAvg = (d.innovationValues||[]).reduce(function(a,b){return a+b;},0)/10;
-        var ef = EFFORT_W[d.effort||'M']||3;
-        var co = EFFORT_W[d.cost||'M']||3;
-        return Math.round(Math.min(((bAvg*0.5+iAvg*0.5)*10)/((ef+co)/2), 100));
-    }
-    function scoreClass(s){ return s>=60?'score-high':s>=30?'score-medium':'score-low'; }
-
-    function updateScoreDisplay() {
-        var bv=[1,2,3,4].map(function(i){return parseInt(document.getElementById('b-val'+i).value)||0;});
-        var iv=[1,2,3,4,5,6,7,8,9,10].map(function(i){return parseInt(document.getElementById('i-val'+i).value)||0;});
-        var fake={benefitValues:bv,innovationValues:iv,effort:document.getElementById('modal-effort').value,cost:document.getElementById('modal-cost').value};
-        var s=calcScore(fake);
-        var el=document.getElementById('modal-score-display');
-        el.textContent=s;
-        el.style.color=s>=60?'#107c41':s>=30?'#f39200':'#a19f9d';
-        document.getElementById('modal-score-label').textContent=s>=60?'High strategic value':s>=30?'Medium — review effort':'Low value or high cost';
-    }
-
-    function toggleStatusFilter(status,el) {
-        if(activeStatusFilters.has(status)) activeStatusFilters.delete(status); else activeStatusFilters.add(status);
-        el.classList.toggle('active'); applyFilters();
-    }
-
-    function applyFilters() {
-        var search=document.getElementById('filter-search').value.toLowerCase();
-        var prod=document.getElementById('filter-product').value;
-        var horiz=document.getElementById('filter-horizon').value;
-        Object.keys(projectsData).forEach(function(id) {
-            var d=projectsData[id]; var card=document.getElementById(id); if(!card) return;
-            var ok=(!search||d.title.toLowerCase().indexOf(search)>=0) &&
-                   (!prod||d.prodLineId===prod) &&
-                   (!horiz||d.horizonId===horiz) &&
-                   activeStatusFilters.has(d.status||'idea');
-            card.style.display=ok?'':'none';
-        });
-        updateKpiStrip(); updateEffortSummaries(); redrawAllConnections();
-    }
-
-    function setView(mode) {
-        currentView=mode;
-        document.getElementById('view-full-btn').classList.toggle('active',mode==='full');
-        document.getElementById('view-compact-btn').classList.toggle('active',mode==='compact');
-        document.getElementById('strategy-board').classList.toggle('board-compact',mode==='compact');
-        document.querySelectorAll('.project-card').forEach(function(c){c.style.width=mode==='compact'?'155px':'230px';});
-        if(mode==='compact') document.querySelectorAll('.prestudy-panel.ps-open').forEach(function(p){p.classList.remove('ps-open');});
-        setTimeout(function(){redrawAllConnections();},50);
-    }
-
-    function updateKpiStrip() {
-        var all=Object.values(projectsData);
-        var vis=all.filter(function(d){var card=document.getElementById(Object.keys(projectsData).find(function(k){return projectsData[k]===d;}));return card&&card.style.display!=='none';});
-        var counts={idea:0,planned:0,active:0,done:0,blocked:0};
-        vis.forEach(function(d){counts[d.status||'idea']++;});
-        document.getElementById('board-kpi-strip').innerHTML=
-            '<span style="font-weight:700;">Visible: '+vis.length+' / '+all.length+'</span>'+
-            ' <span>Idea: '+counts.idea+'</span>'+
-            ' <span>Planned: '+counts.planned+'</span>'+
-            ' <span>Active: '+counts.active+'</span>'+
-            ' <span>Done: '+counts.done+'</span>'+
-            ' <span>Blocked: '+counts.blocked+'</span>';
-    }
-
-    function updateEffortSummaries() {
-        productLines.forEach(function(line) {
-            var el=document.getElementById('effort-summary-'+line.id); if(!el) return;
-            var parts=[];
-            ['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'].forEach(function(h) {
-                var cell=document.getElementById(line.id+'-'+h); if(!cell) return;
-                var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){return c.style.display!=='none';});
-                if(!cards.length) return;
-                var ec={};
-                cards.forEach(function(c){var e=(projectsData[c.id]||{}).effort||'M';ec[e]=(ec[e]||0)+1;});
-                parts.push('<span style="color:#bbb;font-size:9px;">'+h.toUpperCase()+':</span> '+Object.entries(ec).map(function(x){return x[1]+'x'+x[0];}).join(' '));
-            });
-            el.innerHTML=parts.join('<br>');
-        });
-        document.querySelectorAll('.lane-col-summary').forEach(function(el) {
-            var cell=document.getElementById(el.dataset.cell); if(!cell) return;
-            var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){return c.style.display!=='none';});
-            if(!cards.length){el.innerHTML='<span style="color:#bbb;">&#x2013;</span>';return;}
-            var ec={};
-            cards.forEach(function(c){var e=(projectsData[c.id]||{}).effort||'M';ec[e]=(ec[e]||0)+1;});
-            el.innerHTML=Object.entries(ec).map(function(x){return '<span class="effort-pill">'+x[1]+'x'+x[0]+'</span>';}).join('')+
-                '<span style="margin-left:auto;color:#a0aab4;font-size:10px;">'+cards.length+' project'+(cards.length!==1?'s':'')+'</span>';
-        });
-    }
-
-    function syncProductDropdown() {
-        ['select-product','filter-product'].forEach(function(sid) {
-            var s=document.getElementById(sid); var cur=s.value;
-            s.innerHTML=sid==='filter-product'?'<option value="">All product lines</option>':'';
-            productLines.forEach(function(line){var o=document.createElement('option');o.value=line.id;o.text=line.title||'Unnamed';s.appendChild(o);});
-            if(cur) s.value=cur;
-        });
-    }
-
-    function promptAddNewProductLine() {
-        showPrompt('Add product line', 'Product line name...', function(name) {
-            try {
-                addNewProductLineVisual("prod-"+Date.now(), name);
-            } catch(err) {
-                showAlert('Error adding product line: ' + err.message);
-            }
-        });
-    }
-
-    function addNewProductLineVisual(id, titleText) {
-        if(!productLines.find(function(l){return l.id===id;})) productLines.push({id:id,title:titleText});
-        var board=document.getElementById('strategy-board');
-        var titleCell=document.createElement('div');
-        titleCell.className='swimlane-title'; titleCell.id='title-box-'+id;
-        titleCell.innerHTML = '';
-        var handle = document.createElement('span');
-        handle.className = 'swimlane-drag-handle';
-        handle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#bfb1ac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="5" cy="5" r="1" fill="#bfb1ac" stroke="none"/><circle cx="5" cy="8" r="1" fill="#bfb1ac" stroke="none"/><circle cx="5" cy="11" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="5" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="8" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="11" r="1" fill="#bfb1ac" stroke="none"/></svg>'; // hamburger/grip icon
-        handle.title = 'Drag to reorder';
-        titleCell.appendChild(handle);
-
-        var inner = document.createElement('div');
-        inner.className = 'swimlane-title-inner';
-        var span = document.createElement('input');
-        span.type = 'text';
-        span.id = 'text-title-' + id;
-        span.dataset.lineid = id;
-        span.value = titleText;
-        span.style.cssText = 'background:transparent;border:none;outline:none;font-weight:700;font-size:20px;color:#495a6b;width:100%;font-family:inherit;cursor:text;padding:0;';
-        span.addEventListener('input', function(){ updateProductLineTitle(this.dataset.lineid); });
-        var effortDiv = document.createElement('div');
-        effortDiv.className = 'lane-effort-summary';
-        effortDiv.id = 'effort-summary-' + id;
-        inner.appendChild(span);
-        inner.appendChild(effortDiv);
-        var delBtn = document.createElement('span');
-        delBtn.className = 'delete-lane-btn';
-        delBtn.dataset.delid = id;
-        delBtn.title = 'Delete product line';
-        delBtn.innerHTML = '&times;';
-        titleCell.appendChild(inner);
-        titleCell.appendChild(delBtn);
-
-        // Swimlane row drag-to-reorder
-        titleCell.draggable = true;
-        titleCell.dataset.laneid = id;
-        titleCell.addEventListener('dragstart', function(e) {
-            if (!e.target.classList.contains('swimlane-drag-handle') && e.target !== titleCell) return;
-            titleCell.classList.add('lane-dragging');
-            e.dataTransfer.setData('lane-drag', id);
-            e.dataTransfer.effectAllowed = 'move';
-        });
-        titleCell.addEventListener('dragend', function() {
-            titleCell.classList.remove('lane-dragging');
-            document.querySelectorAll('.lane-drag-over').forEach(function(el){ el.classList.remove('lane-drag-over'); });
-        });
-        titleCell.addEventListener('dragover', function(e) {
-            if (!e.dataTransfer.types.includes('lane-drag')) return;
-            e.preventDefault();
-            document.querySelectorAll('.lane-drag-over').forEach(function(el){ el.classList.remove('lane-drag-over'); });
-            titleCell.classList.add('lane-drag-over');
-        });
-        titleCell.addEventListener('dragleave', function() {
-            titleCell.classList.remove('lane-drag-over');
-        });
-        titleCell.addEventListener('drop', function(e) {
-            if (!e.dataTransfer.types.includes('lane-drag')) return;
-            e.preventDefault();
-            titleCell.classList.remove('lane-drag-over');
-            var fromId = e.dataTransfer.getData('lane-drag');
-            if (fromId && fromId !== id) reorderProductLine(fromId, id);
-        });
-
-        var horizons=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
-        var cellClasses={'y2026':'cell-short','y2027':'cell-short','y2028':'cell-mid','y2029':'cell-mid','y2030':'cell-mid','y2031_33':'cell-long','y2034_35':'cell-long','vision':'cell-vision'};
-        var cells=horizons.map(function(h) {
-            var cell=document.createElement('div');
-            cell.className='lane-cell '+(cellClasses[h]||'cell-vision'); cell.id=id+'-'+h;
-            var summary=document.createElement('div');
-            summary.className='lane-col-summary'; summary.dataset.cell=id+'-'+h;
-            summary.innerHTML='<span style="color:#bbb;">&#x2013;</span>';
-            cell.addEventListener('dragover',function(e){e.preventDefault();cell.classList.add('drag-over');});
-            cell.addEventListener('dragleave',function(){cell.classList.remove('drag-over');});
-            cell.addEventListener('drop',function(e) {
-                e.preventDefault(); cell.classList.remove('drag-over');
-                var cardId=e.dataTransfer.getData('text/plain');
-                var card=document.getElementById(cardId);
-                if(card){var w=document.getElementById('wrap-'+cardId)||card; cell.insertBefore(w,summary);setTimeout(function(){redrawAllConnections();},50);}
-            });
-            cell.appendChild(summary); return cell;
-        });
-        board.appendChild(titleCell);
-        cells.forEach(function(c){board.appendChild(c);});
-        syncProductDropdown();
-        updateEffortSummaries();
-    }
-
-    function updateProductLineTitle(id) {
-        var el=document.getElementById('text-title-'+id); var txt=(el.value!==undefined?el.value:el.innerText||'').trim();
-        var line=productLines.find(function(l){return l.id===id;}); if(line) line.title=txt; syncProductDropdown();
-    }
-
-    function deleteProductLine(id) {
-        showConfirm('Delete product line?','This will delete the product line and all its cards. Cannot be undone.',function() {
-            ['title-box-'+id,id+'-y2026',id+'-y2027',id+'-y2028',id+'-y2029',id+'-y2030',id+'-y2031_33',id+'-y2034_35',id+'-vision'].forEach(function(sel){var el=document.getElementById(sel);if(el)el.remove();});
-            // Remove card wrappers belonging to this lane
-
-            productLines=productLines.filter(function(l){return l.id!==id;}); syncProductDropdown();
-            setTimeout(function(){redrawAllConnections();},50);
-        });
-    }
-
-    function addNewProjectCard() {
-        var ti=document.getElementById('new-title');
-        var prod=document.getElementById('select-product').value;
-        var horiz=document.getElementById('select-horizon').value;
-        if(!prod){ showAlert('Please create a product line first!'); return; }
-        if(!ti.value.trim()){ showAlert('Please enter a project name!'); return; }
-        createProjectCard(prod,horiz,ti.value.trim()); ti.value='';
-    }
-
-    function createProjectCard(prod,horizon,title,initialData,forcedId) {
-        var id=forcedId||('proj-'+Date.now()+Math.floor(Math.random()*1000));
-        var container=document.getElementById(prod+'-'+horizon); if(!container) return;
-        projectsData[id]=initialData||{title:title,prodLineId:prod,horizonId:horizon,persona:'',effort:'M',cost:'M',status:'idea',depType:'blocking',benefitValues:[0,0,0,0],innovationValues:[0,0,0,0,0,0,0,0,0,0],milestones:[],preStudy:null};
-        var d=projectsData[id];
-        if(!d.prodLineId) d.prodLineId=prod; if(!d.horizonId) d.horizonId=horizon;
-        if(!d.status) d.status='idea'; if(!d.depType) d.depType='blocking';
-        if(d.preStudy===undefined) d.preStudy=null;
-        if(!d.benefitValues) d.benefitValues=[0,0,0,0];
-        if(!d.innovationValues) d.innovationValues=[0,0,0,0,0,0,0,0,0,0];
-
-        var wrapper=document.createElement('div');
-        wrapper.className='card-with-prestudy'; wrapper.id='wrap-'+id;
-
-        var psTab=document.createElement('div');
-        psTab.className='prestudy-tab ps-empty'; psTab.id='pstab-'+id;
-        psTab.title='Pre-study';
-        psTab.innerHTML='<svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg><span class="ps-tab-label">Pre-study</span>';
-        psTab.addEventListener('click', function(e){ e.stopPropagation(); togglePreStudy(id); });
-
-        var psPanel=document.createElement('div');
-        psPanel.className='prestudy-panel'; psPanel.id='pspanel-'+id;
-
-        var card=document.createElement('div');
-        card.className='project-card'; card.id=id; card.draggable=true;
-        card.style.width=currentView==='compact'?'155px':'230px';
-        
-        wrapper.appendChild(psPanel);
-        wrapper.appendChild(psTab);
-        wrapper.appendChild(card);
-
-        card.addEventListener('dragstart',function(e){card.classList.add('dragging');e.dataTransfer.setData('text/plain',id);});
-        card.addEventListener('dragend',function(){card.classList.remove('dragging');document.querySelectorAll('.drag-insert-before').forEach(function(c){c.classList.remove('drag-insert-before');});});
-        card.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();document.querySelectorAll('.drag-insert-before').forEach(function(c){c.classList.remove('drag-insert-before');});card.classList.add('drag-insert-before');});
-        card.addEventListener('dragleave',function(){card.classList.remove('drag-insert-before');});
-        card.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();card.classList.remove('drag-insert-before');var did=e.dataTransfer.getData('text/plain');var dc=document.getElementById(did);if(dc&&dc!==card){var dw=document.getElementById('wrap-'+did)||dc;var tw=card.closest('.card-with-prestudy')||card;card.parentElement.insertBefore(dw,tw);setTimeout(function(){redrawAllConnections();},50);}});
-        card.addEventListener('click',function(e){if(e.target.classList.contains('dependency-dot'))return;openProjectModal(id);});
-
-        var summary=container.querySelector('.lane-col-summary');
-        if(summary) container.insertBefore(wrapper,summary); else container.appendChild(wrapper);
-        
-        renderCardContent(card,id);
-        
-        updateEffortSummaries(); setTimeout(function(){redrawAllConnections();},50);
-    }
-
-    function renderCardContent(card,id) {
-        var d=projectsData[id]; if(!d) return;
-        var score=calcScore(d); var sc=scoreClass(score);
-        var sm=STATUS_META[d.status||'idea'];
-        var dot = document.createElement('div');
-        dot.className = 'dependency-dot';
-        dot.dataset.depid = id;
-        dot.title = 'Link dependency';
-
-        var stripe = document.createElement('div');
-        stripe.className = 'status-stripe ' + sm.stripe;
-
-        var titleRow = document.createElement('div');
-        titleRow.className = 'card-header-row';
-        titleRow.innerHTML = '<div class="card-title-text">' + d.title + '</div>';
-        titleRow.appendChild(dot);
-
-        var personaEl = document.createElement('div');
-        personaEl.className = 'card-body-details';
-        personaEl.id = id + '-persona';
-        personaEl.textContent = d.persona || 'No persona defined.';
-
-        var badges = document.createElement('div');
-        badges.className = 'card-badges';
-        badges.innerHTML =
-            '<span class="card-badge badge-eff">Effort: ' + d.effort + '</span>' +
-            '<span class="card-badge badge-cos">Cost: ' + d.cost + '</span>' +
-            '<span class="card-badge badge-score ' + sc + '">Score ' + score + '</span>' +
-            '<span class="card-badge badge-status" style="background:' + sm.color + ';">' + sm.label + '</span>';
-
-        var radarRow = document.createElement('div');
-        radarRow.className = 'card-radar-row';
-        if (currentView === 'compact') radarRow.style.display = 'none';
-        radarRow.innerHTML =
-            '<div class="card-radar-wrap"><div class="card-radar-label">Benefit</div><svg id="' + id + '-mini-benefit" class="card-mini-radar" width="62" height="62"></svg></div>' +
-            '<div class="card-radar-wrap"><div class="card-radar-label">Innovation</div><svg id="' + id + '-mini-innovation" class="card-mini-radar" width="62" height="62"></svg></div>';
-
-        card.innerHTML = '';
-        card.appendChild(stripe);
-        card.appendChild(titleRow);
-        card.appendChild(personaEl);
-        card.appendChild(badges);
-        card.appendChild(radarRow);
-
-        var bs = card.querySelector('#' + id + '-mini-benefit');
-        var is = card.querySelector('#' + id + '-mini-innovation');
-        if(bs) drawMiniRadar(bs, d.benefitValues||[0,0,0,0], 10);
-        if(is) drawMiniRadar(is, d.innovationValues||new Array(10).fill(0), 10);
-    }
-    function updateCardUIPreview(id) {
-        var card=document.getElementById(id); if(!card) return;
-        renderCardContent(card,id);
-        card.style.width=currentView==='compact'?'155px':'230px';
-        // Refresh prestudy panel if open
-        var panel = document.getElementById('pspanel-'+id);
-        if (panel && panel.classList.contains('ps-open')) renderPreStudyPanel(id);
-        // Refresh tab state
-        var d = projectsData[id];
-        var tab = document.getElementById('pstab-'+id);
-        if (tab && d) {
-            if (d.preStudy) {
-                tab.classList.remove('ps-empty');
-            } else {
-                tab.classList.add('ps-empty');
-            }
-        }
-    }
-
-    function drawMiniRadar(svg,values,maxVal) {
-        svg.innerHTML='';
-        var n=values.length,cx=31,cy=31,r=24;
-        for(var i=2;i<=maxVal;i+=2){
-            var lr=(r/maxVal)*i; var pts=[];
-            for(var a=0;a<n;a++){var ang=(Math.PI*2/n)*a-Math.PI/2;pts.push((cx+Math.cos(ang)*lr)+','+(cy+Math.sin(ang)*lr));}
-            var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
-            poly.setAttribute("points",pts.join(" "));poly.setAttribute("stroke","#e1dfdd");poly.setAttribute("fill","none");svg.appendChild(poly);
-        }
-        var dp=[];
-        for(var a=0;a<n;a++){
-            var ang=(Math.PI*2/n)*a-Math.PI/2;
-            var ln=document.createElementNS("http://www.w3.org/2000/svg","line");
-            ln.setAttribute("x1",cx);ln.setAttribute("y1",cy);ln.setAttribute("x2",cx+Math.cos(ang)*r);ln.setAttribute("y2",cy+Math.sin(ang)*r);
-            ln.setAttribute("stroke","#edebe9");svg.appendChild(ln);
-            var v=Math.max(0,values[a]);
-            dp.push((cx+Math.cos(ang)*((r/maxVal)*v))+','+(cy+Math.sin(ang)*((r/maxVal)*v)));
-        }
-        var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
-        poly.setAttribute("points",dp.join(" "));poly.setAttribute("stroke","var(--primary)");
-        poly.setAttribute("stroke-width","1.5");poly.setAttribute("fill","rgba(49,183,188,0.25)");svg.appendChild(poly);
-    }
-
-    function openProjectModal(id) {
-        activeProjectId=id; var d=projectsData[id];
-        document.getElementById('modal-project-title').value=d.title;
-        document.getElementById('modal-user-persona').value=d.persona||'';
-        document.getElementById('modal-effort').value=d.effort||'M';
-        document.getElementById('modal-cost').value=d.cost||'M';
-        document.getElementById('modal-status').value=d.status||'idea';
-        document.getElementById('modal-dep-type').value=d.depType||'blocking';
-        for(var i=1;i<=4;i++){document.getElementById('b-val'+i).value=d.benefitValues[i-1];document.getElementById('b-lbl'+i).textContent=d.benefitValues[i-1];}
-        for(var i=1;i<=10;i++){document.getElementById('i-val'+i).value=d.innovationValues[i-1];document.getElementById('i-lbl'+i).textContent=d.innovationValues[i-1];}
-        renderBenefitRadar();renderInnovationRadar();renderRoadmapEditorList();updateScoreDisplay();
-        document.getElementById('modal-overlay').style.display='flex';
-    }
-
-    function saveActiveProjectDetails() {
-        var d=projectsData[activeProjectId];
-        var nt=document.getElementById('modal-project-title').value.trim(); if(nt) d.title=nt;
-        d.persona=document.getElementById('modal-user-persona').value;
-        d.effort=document.getElementById('modal-effort').value;
-        d.cost=document.getElementById('modal-cost').value;
-        d.status=document.getElementById('modal-status').value;
-        d.depType=document.getElementById('modal-dep-type').value;
-        // Update all existing connections from this card to reflect new depType
-        connectionsList.forEach(function(conn) {
-            if (conn.from === activeProjectId) conn.type = d.depType;
-        });
-        for(var i=1;i<=4;i++) d.benefitValues[i-1]=parseInt(document.getElementById('b-val'+i).value);
-        for(var i=1;i<=10;i++) d.innovationValues[i-1]=parseInt(document.getElementById('i-val'+i).value);
-        updateCardUIPreview(activeProjectId);updateEffortSummaries();updateKpiStrip();closeProjectModal();
-        setTimeout(function(){redrawAllConnections();},50);
-    }
-
-    function closeProjectModal(){document.getElementById('modal-overlay').style.display='none';activeProjectId=null;}
-
-    function deleteActiveProjectCard() {
-        if(!activeProjectId) return;
-        var title=(projectsData[activeProjectId]||{}).title||'this card';
-        showConfirm('Delete card?','Delete "'+title+'"? This cannot be undone.',function(){
-            var card=document.getElementById(activeProjectId); if(card) card.remove();
-            connectionsList=connectionsList.filter(function(c){return c.from!==activeProjectId&&c.to!==activeProjectId;});
-            delete projectsData[activeProjectId];
-            closeProjectModal();updateEffortSummaries();updateKpiStrip();
-            setTimeout(function(){redrawAllConnections();},50);
-        });
-    }
-
-    function renderBenefitRadar(){
-        var svg=document.getElementById('svg-radar-benefit');svg.innerHTML='';
-        var vals=[1,2,3,4].map(function(i){return parseInt(document.getElementById('b-val'+i).value);});
-        generateRadarPath(svg,160,135,78,vals,10,["Revenue (+)","Cost savings","Convenience","Clinical benefit"]);
-    }
-    function renderInnovationRadar(){
-        var svg=document.getElementById('svg-radar-innovation');svg.innerHTML='';
-        var vals=[1,2,3,4,5,6,7,8,9,10].map(function(i){return parseInt(document.getElementById('i-val'+i).value);});
-        generateRadarPath(svg,230,155,90,vals,10,["Profit Model","Network","Structure","Process","Product Perf.","Product System","Service","Channel","Brand","Cust. Engagement"]);
-    }
-    function generateRadarPath(svg,cx,cy,r,values,maxVal,labels){
-        var n=values.length;
-        for(var i=2;i<=maxVal;i+=2){
-            var lr=(r/maxVal)*i;var pts=[];
-            for(var a=0;a<n;a++){var ang=(Math.PI*2/n)*a-Math.PI/2;pts.push((cx+Math.cos(ang)*lr)+','+(cy+Math.sin(ang)*lr));}
-            var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
-            poly.setAttribute("points",pts.join(" "));poly.setAttribute("stroke","#e1dfdd");poly.setAttribute("fill","none");svg.appendChild(poly);
-        }
-        var dp=[];
-        for(var a=0;a<n;a++){
-            var ang=(Math.PI*2/n)*a-Math.PI/2;
-            var ln=document.createElementNS("http://www.w3.org/2000/svg","line");
-            ln.setAttribute("x1",cx);ln.setAttribute("y1",cy);ln.setAttribute("x2",cx+Math.cos(ang)*r);ln.setAttribute("y2",cy+Math.sin(ang)*r);
-            ln.setAttribute("stroke","#f3f2f1");svg.appendChild(ln);
-            dp.push((cx+Math.cos(ang)*((r/maxVal)*values[a]))+','+(cy+Math.sin(ang)*((r/maxVal)*values[a])));
-            var txt=document.createElementNS("http://www.w3.org/2000/svg","text");
-            var td=r+18,tx=cx+Math.cos(ang)*td,ty=cy+Math.sin(ang)*td;
-            txt.setAttribute("x",tx);txt.setAttribute("y",ty+3);txt.setAttribute("font-size","10px");txt.setAttribute("font-weight","600");
-            if(Math.abs(Math.cos(ang))<0.1) txt.setAttribute("text-anchor","middle");
-            else if(Math.cos(ang)>0) txt.setAttribute("text-anchor","start");
-            else txt.setAttribute("text-anchor","end");
-            txt.setAttribute("fill","#323130");txt.textContent=labels[a];svg.appendChild(txt);
-        }
-        var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
-        poly.setAttribute("points",dp.join(" "));poly.setAttribute("stroke","var(--primary)");
-        poly.setAttribute("stroke-width","2.5");poly.setAttribute("fill","rgba(49,183,188,0.2)");svg.appendChild(poly);
-    }
-
-    function scrollTimeline(val){document.getElementById('timeline-inner').style.transform='translateX(-'+parseFloat(val)*100+'px)';}
-    function renderRoadmapEditorList(){
-        var zone=document.getElementById('editor-milestones-zone');zone.innerHTML='';
-        ((projectsData[activeProjectId]||{}).milestones||[]).forEach(function(ms,idx){
-            var yr=parseInt(ms.year)-2026,qv=(parseInt(ms.quarter.replace('Q',''))-1)*0.25;
-            var pin=document.createElement('div');pin.className='milestone-pin-ui';
-            pin.style.left=((yr+qv)*100+10)+'px';pin.style.top=(20+(idx*30)%80)+'px';
-            pin.innerHTML='<div class="pin-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M8 1a4 4 0 0 1 4 4c0 3-4 9-4 9S4 8 4 5a4 4 0 0 1 4-4z"/><circle cx="8" cy="5" r="1.5" fill="#18274a" stroke="none"/></svg></div><div class="pin-label">'+ms.quarter+'/'+ms.year+' &#x2013; <strong>'+ms.label+'</strong> <span onclick="deleteMilestone('+idx+')" style="color:red;font-weight:bold;cursor:pointer;margin-left:4px;">&times;</span></div>';
-            zone.appendChild(pin);
-        });
-    }
-    function addMilestoneToActiveProject(){
-        var label=document.getElementById('ms-label').value.trim();
-        if(!label){ showAlert("Please enter a milestone title!"); return; }
-        projectsData[activeProjectId].milestones.push({label:label,desc:document.getElementById('ms-desc').value.trim(),quarter:document.getElementById('ms-quarter').value,year:document.getElementById('ms-year').value});
-        document.getElementById('ms-label').value='';document.getElementById('ms-desc').value='';renderRoadmapEditorList();
-    }
-    function deleteMilestone(idx){projectsData[activeProjectId].milestones.splice(idx,1);renderRoadmapEditorList();}
-
-    function toggleDependencyMode(){
-        dependencyMode=!dependencyMode;var btn=document.getElementById('dep-btn');
-        if(dependencyMode){btn.style.background='#e81123';btn.style.color='#fff';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Click source…';}
-        else{btn.style.background='';btn.style.color='';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add connection';dependencySourceId=null;}
-    }
-    function handleDepClick(e,id){
-        e.stopPropagation();
-        // Auto-activate dependency mode when clicking a dot
-        if(!dependencyMode) toggleDependencyMode();
-        if(!dependencySourceId){
-            dependencySourceId=id;
-            document.getElementById('dep-btn').innerText='Click target node...';
-        } else {
-            if(dependencySourceId!==id){
-                var depType=(projectsData[dependencySourceId]||{}).depType||'blocking';
-                connectionsList.push({from:dependencySourceId,to:id,type:depType});
-            }
-            dependencySourceId=null;
-            toggleDependencyMode();
-            redrawAllConnections();
-        }
-    }
-    function deleteSingleConnectionMode(){
-        deleteConnectionMode=!deleteConnectionMode;var btn=document.getElementById('dep-del-btn');
-        if(deleteConnectionMode){btn.style.background='#e81123';btn.style.color='#fff';btn.innerText='Click connection to delete...';document.getElementById('strategy-board').parentElement.classList.add('dep-delete-mode');}
-        else{btn.style.background='';btn.style.color='#8a4500';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><path d="M5.5 4.5l7-1.5M5.5 11.5l7 1.5M12 8h2"/></svg> Delete connection';document.getElementById('strategy-board').parentElement.classList.remove('dep-delete-mode');}
-        redrawAllConnections();
-    }
-    function deleteConnection(index){connectionsList.splice(index,1);redrawAllConnections();if(deleteConnectionMode)deleteSingleConnectionMode();}
-    function clearConnections(){showConfirm('Delete all connections?','Remove all dependency connections? Cannot be undone.',function(){connectionsList=[];redrawAllConnections();});}
-
-    function redrawAllConnections(){
-        var svg=document.getElementById('connections-svg');svg.innerHTML='';
-        connectionsList.forEach(function(conn,index){
-            var eF=document.getElementById(conn.from),eT=document.getElementById(conn.to);
-            if(!eF||!eT||eF.style.display==='none'||eT.style.display==='none') return;
-            var rF=eF.getBoundingClientRect(),rT=eT.getBoundingClientRect(),rB=svg.getBoundingClientRect();
-            var x1=rF.left+rF.width-rB.left,y1=rF.top+rF.height/2-rB.top,x2=rT.left-rB.left,y2=rT.top+rT.height/2-rB.top;
-            var mx=(x1+x2)/2, my=(y1+y2)/2;
-            var isBlocking=(conn.type||'blocking')==='blocking';
-            var lineColor = isBlocking ? '#e56b78' : '#bfb1ac';
-            var d = "M "+x1+" "+y1+" C "+(x1+60)+" "+y1+", "+(x2-60)+" "+y2+", "+x2+" "+y2;
-
-            var g=document.createElementNS("http://www.w3.org/2000/svg","g");
-            g.setAttribute("class","connection-line-group");
-
-            // Main visible path
-            var path=document.createElementNS("http://www.w3.org/2000/svg","path");
-            path.setAttribute("d",d);
-            path.setAttribute("stroke",lineColor);
-            path.setAttribute("stroke-width",isBlocking?'3':'2');
-            path.setAttribute("fill","none");
-            path.setAttribute("stroke-dasharray",isBlocking?'5 3':'2 5');
-            g.appendChild(path);
-
-            // Wide invisible hit area for clicking
-            var hit=document.createElementNS("http://www.w3.org/2000/svg","path");
-            hit.setAttribute("d",d);
-            hit.setAttribute("stroke","transparent");
-            hit.setAttribute("stroke-width","18");
-            hit.setAttribute("fill","none");
-            hit.setAttribute("cursor","pointer");
-            hit.setAttribute("pointer-events","stroke");
-
-            if(deleteConnectionMode){
-                hit.addEventListener('click',function(ev){ev.stopPropagation();deleteConnection(index);});
-                // Delete label
-                var dtxt=document.createElementNS("http://www.w3.org/2000/svg","text");
-                dtxt.setAttribute("x",mx);dtxt.setAttribute("y",my-10);
-                dtxt.setAttribute("text-anchor","middle");dtxt.setAttribute("font-size","11px");
-                dtxt.setAttribute("fill","#e81123");dtxt.setAttribute("pointer-events","none");
-                dtxt.textContent="\u2715 delete";g.appendChild(dtxt);
-            } else {
-                // Click to edit label
-                hit.addEventListener('click',(function(i){ return function(ev){ev.stopPropagation();openConnLabelEditor(i);}; })(index));
-            }
-            g.appendChild(hit);
-
-            // Label pill on the line midpoint
-            var icon = isBlocking ? '●' : '○'; // 🔴 or ⚪
-            var labelText = (conn.label && conn.label.trim()) ? (icon+' '+conn.label) : (isBlocking ? icon+' Blocking' : icon+' Related');
-            var labelLen = labelText.length * 6.5 + 14;
-
-            // Pill background
-            var rect=document.createElementNS("http://www.w3.org/2000/svg","rect");
-            rect.setAttribute("x",mx-labelLen/2);rect.setAttribute("y",my-10);
-            rect.setAttribute("width",labelLen);rect.setAttribute("height",18);
-            rect.setAttribute("rx","9");
-            rect.setAttribute("fill", isBlocking?'#fae0e3':'#ede9e8');
-            rect.setAttribute("stroke",lineColor);rect.setAttribute("stroke-width","1");
-            rect.setAttribute("pointer-events","none");
-            g.appendChild(rect);
-
-            // Pill text
-            var ltxt=document.createElementNS("http://www.w3.org/2000/svg","text");
-            ltxt.setAttribute("x",mx);ltxt.setAttribute("y",my+4);
-            ltxt.setAttribute("text-anchor","middle");ltxt.setAttribute("font-size","10px");
-            ltxt.setAttribute("font-weight","600");ltxt.setAttribute("font-family","Segoe UI,Arial,sans-serif");
-            ltxt.setAttribute("fill",isBlocking?'#8a2030':'#595857');
-            ltxt.setAttribute("pointer-events","none");
-            ltxt.textContent=labelText;
-            g.appendChild(ltxt);
-
-            svg.appendChild(g);
-        });
-    }
-
-    function openConnLabelEditor(index) {
-        var conn = connectionsList[index];
-        if (!conn) return;
-        var isBlocking = (conn.type||'blocking') === 'blocking';
-        var overlay = document.getElementById('conn-label-overlay');
-        var fromTitle = (projectsData[conn.from]||{}).title || conn.from;
-        var toTitle   = (projectsData[conn.to]||{}).title   || conn.to;
-        document.getElementById('conn-label-title').textContent = fromTitle + ' \u2192 ' + toTitle;
-        document.getElementById('conn-label-type').textContent = isBlocking ? '● Blocking connection' : '○ Informational / Related';
-        var field = document.getElementById('conn-label-field');
-        field.value = conn.label || '';
-        overlay.style.display = 'flex';
-        setTimeout(function(){ field.focus(); }, 50);
-        var ok = document.getElementById('conn-label-ok').cloneNode(true);
-        var cancel = document.getElementById('conn-label-cancel').cloneNode(true);
-        document.getElementById('conn-label-ok').replaceWith(ok);
-        document.getElementById('conn-label-cancel').replaceWith(cancel);
-        ok.addEventListener('click', function() {
-            conn.label = field.value.trim();
-            overlay.style.display = 'none';
-            redrawAllConnections();
-        });
-        field.addEventListener('keydown', function(e){
-            if(e.key==='Enter'){ conn.label=field.value.trim(); overlay.style.display='none'; redrawAllConnections(); }
-            if(e.key==='Escape'){ overlay.style.display='none'; }
-        });
-        cancel.addEventListener('click', function(){ overlay.style.display='none'; });
-    }
-    window.addEventListener('resize',function(){redrawAllConnections();});
-
-
-    function showPrompt(title, placeholder, onConfirm) {
-        var overlay = document.getElementById('input-popup-overlay');
-        document.getElementById('input-popup-title').textContent = title;
-        var field = document.getElementById('input-popup-field');
-        field.value = '';
-        field.placeholder = placeholder || '';
-        overlay.style.display = 'flex';
-        setTimeout(function(){ field.focus(); }, 50);
-        var ok = document.getElementById('input-popup-ok').cloneNode(true);
-        var cancel = document.getElementById('input-popup-cancel').cloneNode(true);
-        document.getElementById('input-popup-ok').replaceWith(ok);
-        document.getElementById('input-popup-cancel').replaceWith(cancel);
-        function doConfirm() {
-            var val = document.getElementById('input-popup-field').value.trim();
-            if (!val) return;
-            overlay.style.display = 'none';
-            onConfirm(val);
-        }
-        ok.addEventListener('click', doConfirm);
-        field.addEventListener('keydown', function(e){ if(e.key==='Enter') doConfirm(); if(e.key==='Escape') cancel.click(); });
-        cancel.addEventListener('click', function(){ overlay.style.display = 'none'; });
-    }
-
-    function showAlert(message, onClose) {
-        var overlay = document.getElementById('confirm-popup-overlay');
-        document.getElementById('confirm-popup-title').textContent = '';
-        document.getElementById('confirm-popup-msg').textContent = message;
-        var cancelBtn = document.getElementById('confirm-popup-cancel');
-        cancelBtn.style.display = 'none';
-        overlay.style.display = 'flex';
-        var ok = document.getElementById('confirm-popup-ok').cloneNode(true);
-        document.getElementById('confirm-popup-ok').replaceWith(ok);
-        ok.textContent = 'OK';
-        ok.addEventListener('click', function() {
-            overlay.style.display = 'none';
-            document.getElementById('confirm-popup-cancel').style.display = '';
-            if (onClose) onClose();
-        });
-    }
-
-    function showConfirm(title,message,onConfirm){
-        var overlay=document.getElementById('confirm-popup-overlay');
-        document.getElementById('confirm-popup-title').textContent=title;
-        document.getElementById('confirm-popup-msg').textContent=message;
-        overlay.style.display='flex';
-        var ok=document.getElementById('confirm-popup-ok').cloneNode(true);
-        var cancel=document.getElementById('confirm-popup-cancel').cloneNode(true);
-        document.getElementById('confirm-popup-ok').replaceWith(ok);
-        document.getElementById('confirm-popup-cancel').replaceWith(cancel);
-        ok.addEventListener('click',function(){overlay.style.display='none';onConfirm();});
-        cancel.addEventListener('click',function(){overlay.style.display='none';});
-    }
-
-    function exportStrategyBoard(){
-        var cp={};
-        document.querySelectorAll('.lane-cell').forEach(function(cell){
-            Array.from(cell.querySelectorAll('.card-with-prestudy,.project-card')).forEach(function(wrapper,order){
-                var card = wrapper.classList.contains('project-card') ? wrapper : wrapper.querySelector('.project-card');
-                if (!card) return;
-                cp[card.id]={cellId:cell.id,order:order};
-                var horizIds=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
-                var cid=cell.id; var horizId='',prodId=cid;
-                for(var hi=0;hi<horizIds.length;hi++){if(cid.endsWith('-'+horizIds[hi])){horizId=horizIds[hi];prodId=cid.slice(0,-(horizIds[hi].length+1));break;}}
-                if(projectsData[card.id]){projectsData[card.id].horizonId=horizId||cid;projectsData[card.id].prodLineId=prodId;}
-            });
-        });
-        var data={version:3,projectsData:projectsData,productLines:productLines,connectionsList:connectionsList,cardPositions:cp};
-        var a=document.createElement('a');
-        a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
-        a.download="accelerate_strategy_export.json";a.click();
-    }
-
-    function importStrategyBoard(file){
-        var reader=new FileReader();
-        reader.onload=function(e){
-            try{
-                var data=JSON.parse(e.target.result);
-                var board=document.getElementById('strategy-board');
-                board.innerHTML='<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
-                productLines=[];projectsData={};connectionsList=data.connectionsList||[];
-                data.productLines.forEach(function(l){addNewProductLineVisual(l.id,l.title);});
-                var cp=data.cardPositions||{};
-                var sorted=Object.keys(data.projectsData).sort(function(a,b){return (cp[a]?cp[a].order:0)-(cp[b]?cp[b].order:0);});
-                var horizonMap={'short':'y2026','mid':'y2028','long':'y2031_33'};
-                sorted.forEach(function(id){
-                    var p=data.projectsData[id];
-                    var cellId=cp[id]?cp[id].cellId:(p.prodLineId+'-'+p.horizonId);
-                    var horizIds2=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
-                    var prod=cellId,horiz='';
-                    for(var hj=0;hj<horizIds2.length;hj++){if(cellId.endsWith('-'+horizIds2[hj])){horiz=horizIds2[hj];prod=cellId.slice(0,-(horizIds2[hj].length+1));break;}}
-                    if(!horiz){var ld=cellId.lastIndexOf('-');prod=cellId.substring(0,ld);horiz=cellId.substring(ld+1);}
-                    // Migrate old horizon IDs to new year-based IDs
-                    if(horizonMap[horiz]) horiz=horizonMap[horiz];
-                    createProjectCard(prod,horiz,p.title,p,id);
-                });
-                redrawAllConnections();updateKpiStrip();updateEffortSummaries();
-                showAlert("Import successful!");
-            }catch(err){showAlert("Import failed: "+err.message);}
-        };
-        reader.readAsText(file);
-    }
-
-
-    // Event delegation for dynamically created elements
-    document.addEventListener('click', function(e) {
-        // dependency dot
-        if (e.target.classList.contains('dependency-dot')) {
-            var id = e.target.dataset.depid;
-            if (id) handleDepClick(e, id);
-        }
-        // delete lane button
-        if (e.target.classList.contains('delete-lane-btn')) {
-            var delId = e.target.dataset.delid;
-            if (delId) deleteProductLine(delId);
-        }
-    });
-
-
-
-    function togglePreStudy(id) {
-        var d = projectsData[id];
-        var panel = document.getElementById('pspanel-'+id);
-        var tab = document.getElementById('pstab-'+id);
-        if (!panel || !tab) return;
-
-        if (!d.preStudy) {
-            // Create pre-study with defaults
-            d.preStudy = { status: 'idea', effort: 'S', cost: 'S', note: '' };
-            tab.classList.remove('ps-empty');
-            tab.innerHTML = '<svg viewBox="0 0 12 12" style="width:12px;height:12px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 1h6M2 3h8l-1 7H3L2 3z"/><path d="M5 6h2"/></svg><span class="ps-tab-label">Pre-study</span>';
-        }
-
-        var isOpen = panel.classList.contains('ps-open');
-        if (isOpen) {
-            panel.classList.remove('ps-open');
-        } else {
-            renderPreStudyPanel(id);
-            panel.classList.add('ps-open');
-        }
-        setTimeout(function(){ redrawAllConnections(); }, 50);
-    }
-
-    function renderPreStudyPanel(id) {
-        var d = projectsData[id];
-        var ps = d.preStudy;
-        var panel = document.getElementById('pspanel-'+id);
-        if (!panel || !ps) return;
-
-        var statusColors = { idea:'#bfb1ac', planned:'#18274a', active:'#f39200', done:'#94b654', blocked:'#e56b78' };
-        var sc = statusColors[ps.status] || '#bfb1ac';
-
-        panel.innerHTML =
-            '<div class="ps-panel-title">' +
-                '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#835600" stroke-width="2" stroke-linecap="round"><path d="M3 1h6M2 3h8l-1 7H3L2 3z"/><path d="M5 6h2"/></svg>' +
-                ' Pre-study' +
-            '</div>' +
-            '<div class="ps-panel-row"><span class="ps-panel-lbl">Status</span>' +
-                '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:'+sc+';color:white;font-weight:400;">'+ps.status+'</span></div>' +
-            '<div class="ps-panel-row"><span class="ps-panel-lbl">Effort</span><span class="ps-panel-val">'+ps.effort+'</span></div>' +
-            '<div class="ps-panel-row"><span class="ps-panel-lbl">Cost</span><span class="ps-panel-val">'+ps.cost+'</span></div>' +
-            (ps.note ? '<div style="font-size:10px;color:#8b7e79;margin-top:6px;line-height:1.4;">'+ps.note+'</div>' : '') +
-            '<button onclick="openPreStudyEditor(\''+id+'\')" style="margin-top:8px;width:100%;padding:4px;font-size:10px;background:#f39200;color:white;border:none;border-radius:3px;cursor:pointer;font-weight:400;">Edit</button>' +
-            '<button onclick="removePreStudy(\''+id+'\')" style="margin-top:4px;width:100%;padding:4px;font-size:10px;background:transparent;color:#8b7e79;border:1px solid #d4cac8;border-radius:3px;cursor:pointer;font-weight:400;">Remove</button>';
-    }
-
-    function removePreStudy(id) {
-        projectsData[id].preStudy = null;
-        var panel = document.getElementById('pspanel-'+id);
-        var tab = document.getElementById('pstab-'+id);
-        if (panel) { panel.classList.remove('ps-open'); panel.innerHTML = ''; }
-        if (tab) {
-            tab.classList.add('ps-empty');
-            tab.innerHTML = '<svg viewBox="0 0 12 12" style="width:12px;height:12px;stroke:#8b7e79;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M6 1v10M1 6h10"/></svg><span class="ps-tab-label">Pre-study</span>';
-        }
-        setTimeout(function(){ redrawAllConnections(); }, 50);
-    }
-
-    function openPreStudyEditor(id) {
-        var d = projectsData[id];
-        if (!d.preStudy) return;
-        activePsId = id;
-        var ps = d.preStudy;
-        document.getElementById('ps-modal-title').textContent = 'Pre-study: ' + d.title;
-        document.getElementById('ps-status').value = ps.status;
-        document.getElementById('ps-effort').value = ps.effort;
-        document.getElementById('ps-cost').value = ps.cost;
-        document.getElementById('ps-note').value = ps.note || '';
-        document.getElementById('ps-modal-overlay').style.display = 'flex';
-    }
-
-    function savePreStudy() {
-        if (!activePsId) return;
-        var ps = projectsData[activePsId].preStudy;
-        ps.status = document.getElementById('ps-status').value;
-        ps.effort = document.getElementById('ps-effort').value;
-        ps.cost   = document.getElementById('ps-cost').value;
-        ps.note   = document.getElementById('ps-note').value.trim();
-        renderPreStudyPanel(activePsId);
-        document.getElementById('ps-modal-overlay').style.display = 'none';
-        activePsId = null;
-    }
-
-    function reorderProductLine(fromId, toId) {
-        var board = document.getElementById('strategy-board');
-        var horizons = ['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
-
-        // Collect the 5 DOM nodes of the FROM row
-        var fromNodes = [document.getElementById('title-box-' + fromId)]
-            .concat(horizons.map(function(h){ return document.getElementById(fromId+'-'+h); }));
-
-        // Reference node: the title cell of the TO row (insert our row before this)
-        var toTitle = document.getElementById('title-box-' + toId);
-
-        // Insert all 5 from-nodes consecutively before toTitle
-        // Use a DocumentFragment so they land in one operation, preserving order
-        var frag = document.createDocumentFragment();
-        fromNodes.forEach(function(node){ frag.appendChild(node); });
-        board.insertBefore(frag, toTitle);
-
-        // Update productLines array order
-        var fromIdx = productLines.findIndex(function(l){ return l.id === fromId; });
-        var toIdx   = productLines.findIndex(function(l){ return l.id === toId; });
-        var item = productLines.splice(fromIdx, 1)[0];
-        productLines.splice(toIdx, 0, item);
-
-        setTimeout(function(){ redrawAllConnections(); updateEffortSummaries(); }, 50);
-    }
-
-    window.onload=function(){
-        addNewProductLineVisual("prod-a","Product line 1");
-        addNewProductLineVisual("prod-b","Product line 2");
-        addNewProductLineVisual("prod-c","Product line 3");
-        createProjectCard("prod-a","y2026","Example project",{
-            title:"Example project",prodLineId:"prod-a",horizonId:"y2026",
-            persona:"ICU nurse \u2013 needs fast access in high-stress situations",
-            effort:"M",cost:"S",status:"active",depType:"blocking",
-            benefitValues:[7,4,6,8],innovationValues:[3,5,0,4,7,5,6,8,3,4],milestones:[]
-        });
-        updateKpiStrip();updateEffortSummaries();redrawAllConnections();
-    };
-</script>
-
-    <div id="getinge-brand" style="
-        position: fixed;
-        bottom: 22px;
-        right: 26px;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 4px;
-        z-index: 9000;
-        pointer-events: none;
-    ">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 945 140" width="300" height="45" style="display:block;"><g transform="scale(1,-1) translate(0,-140)">
-  <path d="M 885.049 2.100 C 885.049 0.950 884.110 0.010 882.950 0.010 L 859.939 0.000 C 858.799 0.000 857.870 0.920 857.870 2.060 L 857.870 38.520 L 826.380 20.340 C 825.390 19.770 824.130 20.110 823.560 21.100 L 812.040 41.060 C 811.470 42.050 811.799 43.310 812.790 43.880 L 844.140 61.920 C 857.179 69.450 873.860 64.991 881.380 51.950 C 883.780 47.800 884.950 43.280 885.040 38.810 L 885.049 2.100 Z" fill="white"/>
-  <path d="M 882.980 139.750 L 859.929 139.750 C 858.790 139.750 857.870 138.831 857.870 137.690 L 857.870 101.331 L 826.280 119.560 C 825.299 120.130 824.040 119.790 823.470 118.800 L 811.970 98.870 C 811.390 97.860 811.730 96.581 812.740 96.001 L 844.530 77.661 C 848.439 75.491 852.939 74.251 857.740 74.251 C 872.790 74.251 884.990 86.459 884.990 101.520 L 885.019 105.280 L 885.040 112.959 L 885.040 137.690 C 885.040 138.831 884.120 139.750 882.980 139.750 Z" fill="white"/>
-  <path d="M 929.939 28.200 C 930.929 27.630 932.189 27.959 932.759 28.950 L 944.290 48.920 C 944.849 49.900 944.519 51.161 943.530 51.730 L 912.040 69.911 L 943.620 88.150 C 944.599 88.709 944.939 89.980 944.370 90.970 L 932.839 110.920 C 932.269 111.911 931.000 112.251 930.009 111.670 L 898.210 93.300 C 894.380 90.991 891.049 87.720 888.660 83.560 C 881.130 70.530 885.599 53.850 898.640 46.331 L 929.939 28.200 Z" fill="white"/>
-  <path d="M 129.054 29.381 L 129.054 110.114 L 210.479 110.114 L 203.006 97.100 L 146.403 97.100 L 146.403 77.704 L 200.127 77.725 L 200.127 65.444 L 146.403 65.452 L 146.403 42.881 L 210.328 42.879 L 210.328 29.381 L 129.054 29.381 Z" fill="white"/>
-  <path d="M 656.008 29.381 L 656.008 110.114 L 737.177 110.114 L 729.725 97.100 L 673.357 97.100 L 673.357 77.704 L 727.081 77.725 L 727.081 65.444 L 673.357 65.452 L 673.357 42.881 L 737.282 42.879 L 737.282 29.381 L 656.008 29.381 Z" fill="white"/>
-  <path d="M 272.089 29.381 L 272.089 97.053 L 234.213 97.046 L 234.213 110.114 L 327.613 110.114 L 320.138 97.039 L 289.448 97.056 L 289.448 29.381 L 272.089 29.381 Z" fill="white"/>
-  <path d="M 353.137 29.381 L 353.137 110.124 L 370.489 110.124 L 370.489 29.410 C 370.489 29.394 370.476 29.381 370.461 29.381 L 353.137 29.381 Z" fill="white"/>
-  <path d="M 23.528 29.381 C 10.534 29.381 -0.000 39.915 -0.000 52.909 L -0.000 86.585 C -0.000 99.580 10.534 110.114 23.528 110.114 L 91.618 110.114 L 84.604 97.050 L 28.117 97.050 C 22.041 97.050 17.116 92.124 17.116 86.049 L 17.116 54.093 C 17.116 47.884 22.149 42.851 28.358 42.851 L 72.076 42.851 C 78.204 42.851 83.172 47.819 83.172 53.948 L 83.172 62.751 L 51.768 62.744 L 51.768 75.807 L 99.904 75.807 L 99.904 52.909 C 99.904 39.915 89.370 29.381 76.376 29.381 L 23.528 29.381 Z" fill="white"/>
-  <path d="M 550.473 29.381 C 537.479 29.381 526.946 39.915 526.946 52.909 L 526.946 86.585 C 526.946 99.580 537.479 110.114 550.473 110.114 L 618.563 110.114 L 611.550 97.050 L 555.117 97.050 C 549.011 97.050 544.061 92.101 544.061 85.995 L 544.061 53.906 C 544.061 47.800 549.011 42.851 555.117 42.851 L 599.063 42.851 C 605.169 42.851 610.118 47.800 610.118 53.906 L 610.118 62.751 L 578.714 62.744 L 578.714 75.807 L 626.849 75.807 L 626.849 52.909 C 626.849 39.915 616.316 29.381 603.322 29.381 L 550.473 29.381 Z" fill="white"/>
-  <path d="M 481.212 29.381 L 481.212 86.279 C 481.212 92.228 476.388 97.050 470.439 97.050 L 420.319 97.047 L 420.319 29.381 L 402.970 29.381 L 402.970 110.124 L 474.862 110.124 C 487.856 110.124 498.390 99.591 498.390 86.597 L 498.390 29.381 L 481.212 29.381 Z" fill="white"/>
-</g></svg>
-        <div style="
-            color: rgba(255,255,255,0.65);
-            font-size: 10px;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-        ">&#169; Daniel R&#246;ckl</div>
-    </div>
 </body>
 </html>
