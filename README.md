@@ -2,9 +2,9 @@
 
 A single-file, browser-based strategy dashboard for long-term product portfolio planning across multiple product lines and time horizons. Built for product managers who need to map, prioritize, and communicate a multi-year roadmap — without installing anything.
 
-What it does
+### What it does
 
-Board structure
+### Board structure
 Swimlane board: product lines (rows) × time columns
 8 year-based columns with decreasing granularity: 2026 · 2027 · 2028 · 2029 · 2030 · 2031–33 · 2034–35 · 2036+
 Grouped under four horizons: Short Term / Mid Term / Long Term / BU Vision
@@ -12,47 +12,47 @@ Product lines can be reordered by drag & drop
 Effort summaries per column and product line, updated live
 
 
-Project cards
+### Project cards
 Title, status (Idea / Planned / Active / Done / Blocked), effort and cost sizing (XS–XL)
 Strategic Score (0–100): calculated from benefit and innovation ratings vs. effort and cost
 Two mini spider-radars per card: Customer Benefit (4 dimensions) + 10 Types of Innovation
 Full detail view in modal: project description, user persona, sizing, radars, roadmap, connections
 
 
-Pre-Study add-on
+### Pre-Study add-on
 Each card can have an optional Pre-Study attached (orange left tab)
 Pre-Study has its own status, effort, cost, and a short note
 Visible at a glance on the board without opening the card
 
 
-Project Roadmap
+### Project Roadmap
 Milestones per project with quarter + year
 Grouped by quarter in the modal, sorted chronologically
 
 
-Connections
+### Connections
 Blocking connections (Berry red, dashed) and informational/related connections (Clay gray)
 Draw connections by clicking the dot on any card
 Labels on connection lines, editable by clicking the line
 Delete individual connections or all at once
 
 
-Filters
+### Filters
 Search by name, status, and strategic score level (High / Medium / Low)
 All filters combinable; filtered cards including Pre-Study tabs disappear cleanly
 
 
-Views
+### Views
 Full view (with radars) and compact view (smaller cards, no radars)
 
 
-Save & share
+### Save & share
 Export full board state as JSON (cards, positions, connections, product lines)
 Import JSON to restore any saved state
 No server needed — share the JSON file alongside the HTML
 
 
-Strategic Score
+### Strategic Score
 The strategic score (0–100) evaluates how much value a project delivers relative to the effort and cost required. It is designed to reward focused innovation and clear customer benefit, while accounting for realistic project sizing.
 
 ### How it is calculated
@@ -99,18 +99,18 @@ The exponent 0.72 compresses the upper range and stretches the middle — giving
 | L/L, all dimensions maxed | 58 |
 | XL/XL, all dimensions maxed | 53 |
 
-How to use Dashboard
+### How to use Dashboard
 Open index.html in any modern browser — no server, no install, no dependencies.
 To share a saved state, export as JSON and send it alongside the HTML file. Recipients import it with one click.
 
-Example data
+### Example data
 The board loads with a Closed Loop Patient Monitoring example showing:
 Clear the example by deleting the product line and starting fresh.
 
-Tech
+### Tech
 Pure HTML, CSS, and vanilla JavaScript. No frameworks, no build step, no external dependencies (except Google Fonts for Source Sans 3 as fallback for Adelle Sans). Everything runs client-side. One file, ~130 KB.
 
-Branding
+### Branding
 Built with official Getinge brand colors 
 
 Built by Daniel Röckl 
