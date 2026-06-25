@@ -8,16 +8,16 @@
     <title>Accelerate Strategy – 10-Year Product Board</title>
     <!--
     ╔══════════════════════════════════════════════════════════════╗
-    ║  ACCELERATE STRATEGY – 10-Year Product Board                ║
-    ║  Version: v16  |  Erstellt: 2025  |  Autor: Daniel Röckl   ║
-    ║  Getinge AB – Internal Strategy Tool                        ║
+    ║  ACCELERATE STRATEGY – 10-Year Product Board                 ║
+    ║  Version: v16  |  Erstellt: 2026  |  Autor: Daniel Röckl     ║
+    ║  Getinge AB – Internal Strategy Tool                         ║
     ╠══════════════════════════════════════════════════════════════╣
-    ║  AUFBAU DER DATEI:                                          ║
-    ║  1. CSS-Variablen (Getinge Brandfarben)                     ║
-    ║  2. Layout & Komponenten CSS                                ║
-    ║  3. HTML-Struktur (Header, Board, Modals, Popups)           ║
-    ║  4. JavaScript (Daten, Funktionen, Event-Handler)           ║
-    ║  5. window.onload (Beispieldaten CLPM)                      ║
+    ║  AUFBAU DER DATEI:                                           ║
+    ║  1. CSS-Variablen (Getinge Brandfarben)                      ║
+    ║  2. Layout & Komponenten CSS                                 ║
+    ║  3. HTML-Struktur (Header, Board, Modals, Popups)            ║
+    ║  4. JavaScript (Daten, Funktionen, Event-Handler)            ║
+    ║  5. window.onload (Beispieldaten CLPM)                       ║
     ╚══════════════════════════════════════════════════════════════╝
     -->
     <style>
@@ -27,11 +27,9 @@
            Alle Farben zentral definiert
            ══════════════════════════════════════════════ */
         :root {
-            /* Getinge Primary */
             /* === Getinge Primärfarben === */
             --getinge-blue: #18274a;
             --white: #ffffff;
-            /* Getinge Secondary */
             /* === Getinge Sekundärfarben (Grautöne) === */
             --snow: #e9e4e3;
             --oat: #d4cac8;
@@ -39,14 +37,12 @@
             --cliff: #8b7e79;
             --granite: #595857;
             --midnight: #495a6b;
-            /* Getinge Accent */
             /* === Getinge Akzentfarben === */
             --berry: #e56b78;
             --sun: #f39200;
             --grass: #94b654;
             --ocean: #31b7bc;
-            /* UI mappings */
-            /* === UI-Zuordnungen === */
+            /* UI mappings === UI-Zuordnungen === */
             --primary: #18274a;
             --primary-hover: #0d1a32;
             --bg-color: #e9e4e3;
@@ -59,7 +55,6 @@
         /* === Basis-Reset & Schriftart === */
         * { box-sizing: border-box; font-family: 'Adelle Sans', 'Source Sans 3', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
         /* === Grundlayout: Flex-Spalte für sticky Header === */
-
         /* ══ GRUNDLAYOUT ══ */
         html, body { margin: 0; padding: 0; height: 100%; }
         body { background-color: #18274a;  color: var(--text-main); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
@@ -70,7 +65,7 @@
 
         /* HEADER */
         /* === Header-Panel (Titel + KPI-Leiste) === */
-
+ 
         /* ══ HEADER-PANEL ══ */
         .header-panel { background: #ffffff; padding: 12px 28px; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .header-title h1 { margin: 0; font-size: 21px; color: #201f1e; font-weight: 700; }
@@ -472,7 +467,7 @@
 
     <script>
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  GLOBALE VARIABLEN & KONSTANTEN                                 ║
+    // ║  GLOBALE VARIABLEN & KONSTANTEN                                  ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     var projectsData = {};
@@ -499,8 +494,8 @@
         // ── Strategischen Score berechnen (0–100) ──
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 1: SCORING & BEWERTUNG                               ║
-    // ║  Strategischen Score berechnen und anzeigen                     ║
+    // ║  ABSCHNITT 1: SCORING & BEWERTUNG                                ║
+    // ║  Strategischen Score berechnen und anzeigen                      ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Strategischen Score aus Benefit- und Innovations-Werten berechnen
@@ -528,8 +523,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 2: FILTER & ANSICHT                                  ║
-    // ║  Status-Filter, Suche, kompakte/normale Ansicht                 ║
+    // ║  ABSCHNITT 2: FILTER & ANSICHT                                   ║
+    // ║  Status-Filter, Suche, kompakte/normale Ansicht                  ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Score-Filter-Chip ein/ausschalten (low/medium/high)
@@ -629,8 +624,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 3: PRODUKTLINIEN                                     ║
-    // ║  Zeilen im Board anlegen, benennen, löschen, sortieren          ║
+    // ║  ABSCHNITT 3: PRODUKTLINIEN                                      ║
+    // ║  Zeilen im Board anlegen, benennen, löschen, sortieren           ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Eingabe-Popup öffnen und neue Produktlinie anlegen
@@ -792,8 +787,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 4: PROJEKTKARTEN                                     ║
-    // ║  Karten erstellen, rendern, verschieben, löschen                ║
+    // ║  ABSCHNITT 4: PROJEKTKARTEN                                      ║
+    // ║  Karten erstellen, rendern, verschieben, löschen                 ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Neue Karte aus Control Bar anlegen
@@ -944,8 +939,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 5: PROJEKT-MODAL                                     ║
-    // ║  Detailansicht öffnen, bearbeiten, speichern, schließen         ║
+    // ║  ABSCHNITT 5: PROJEKT-MODAL                                      ║
+    // ║  Detailansicht öffnen, bearbeiten, speichern, schließen          ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Projekt-Modal öffnen und alle Felder befüllen
@@ -1003,8 +998,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 6: RADAR-CHARTS                                      ║
-    // ║  Benefit- und Innovations-Radars im Modal zeichnen              ║
+    // ║  ABSCHNITT 6: RADAR-CHARTS                                       ║
+    // ║  Benefit- und Innovations-Radars im Modal zeichnen               ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Kunden-Nutzen-Radar im Modal rendern
@@ -1051,8 +1046,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 7: PROJEKT-ROADMAP (MEILENSTEINE)                   ║
-    // ║  Meilensteine hinzufügen, löschen, quartalsweise anzeigen       ║
+    // ║  ABSCHNITT 7: PROJEKT-ROADMAP (MEILENSTEINE)                     ║
+    // ║  Meilensteine hinzufügen, löschen, quartalsweise anzeigen        ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Meilenstein-Liste im Modal rendern (nach Quartal gruppiert)
@@ -1136,8 +1131,8 @@
         function deleteMilestone(idx){projectsData[activeProjectId].milestones.splice(idx,1);renderRoadmapEditorList();}
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 8: PRE-STUDY                                         ║
-    // ║  Vorprojekt-Anhängsel: Status, Aufwand, Kosten, Notiz           ║
+    // ║  ABSCHNITT 8: PRE-STUDY                                          ║
+    // ║  Vorprojekt-Anhängsel: Status, Aufwand, Kosten, Notiz            ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Pre-Study-Tab ein/ausklappen — bei erstem Klick neue Pre-Study anlegen
@@ -1229,8 +1224,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 9: VERBINDUNGEN (CONNECTIONS)                        ║
-    // ║  Blocking- und informelle Verbindungen zwischen Karten          ║
+    // ║  ABSCHNITT 9: VERBINDUNGEN (CONNECTIONS)                         ║
+    // ║  Blocking- und informelle Verbindungen zwischen Karten           ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Verbindungs-Modus ein/ausschalten (Klick auf Abhängigkeits-Punkt)
@@ -1381,8 +1376,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 10: EXPORT / IMPORT                                  ║
-    // ║  Board-Zustand als JSON speichern und laden                     ║
+    // ║  ABSCHNITT 10: EXPORT / IMPORT                                   ║
+    // ║  Board-Zustand als JSON speichern und laden                      ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Kompletten Board-Zustand als JSON-Datei herunterladen
@@ -1442,8 +1437,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 11: POPUPS & DIALOGE                                 ║
-    // ║  Ersatz für native browser prompt(), alert(), confirm()         ║
+    // ║  ABSCHNITT 11: POPUPS & DIALOGE                                  ║
+    // ║  Ersatz für native browser prompt(), alert(), confirm()          ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Eingabe-Popup anzeigen (ersetzt nativen prompt())
@@ -1503,8 +1498,8 @@
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
-    // ║  ABSCHNITT 12: INITIALISIERUNG                                  ║
-    // ║  Beispieldaten beim Laden setzen                                ║
+    // ║  ABSCHNITT 12: INITIALISIERUNG                                   ║
+    // ║  Beispieldaten beim Laden setzen                                 ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
     window.onload=function(){
