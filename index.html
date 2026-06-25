@@ -81,7 +81,7 @@
         /* === Filter-Leiste === */
 
         /* ══ FILTER-LEISTE ══ */
-        .filter-bar { background: #f0eeed; border: 1px solid var(--oat,#d4cac8); padding: 9px 18px; border-radius: 4px; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .filter-bar { background: #edf2f0; padding: 0; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 10px; display: flex; align-items: stretch; flex-wrap: wrap; overflow: hidden; }
         .filter-bar label { font-size: 12px; font-weight: 600; color: var(--text-main); }
         .filter-bar select, .filter-bar input[type="text"] { padding: 5px 9px; border: 1px solid var(--border); border-radius: 2px; background: #fff; color: var(--text-main); font-size: 12px; }
         .filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; opacity: 0.45; }
@@ -363,35 +363,46 @@
     </div>
 
     <div class="filter-bar">
-        <label>Filter:</label>
-        <input type="text" id="filter-search" placeholder="Search by name..." style="width:150px;" oninput="applyFilters()">
-        <select id="filter-product" onchange="applyFilters()"><option value="">All product lines</option></select>
-        <select id="filter-horizon" onchange="applyFilters()">
-            <option value="">All horizons</option>
-            <option value="y2026">2026</option>
-            <option value="y2027">2027</option>
-            <option value="y2028">2028</option>
-            <option value="y2029">2029</option>
-            <option value="y2030">2030</option>
-            <option value="y2031_33">2031–2033</option>
-            <option value="y2034_35">2034–2035</option>
-            <option value="vision">2036+</option>
-        </select>
-        <label style="font-size:11px;font-weight:500;">Score:</label>
-        <button class="filter-chip chip-score-high active" onclick="toggleScoreFilter('high',this)">High</button>
-        <button class="filter-chip chip-score-medium active" onclick="toggleScoreFilter('medium',this)">Medium</button>
-        <button class="filter-chip chip-score-low active" onclick="toggleScoreFilter('low',this)">Low</button>
-        <span style="width:1px;height:18px;background:var(--border);margin:0 4px;display:inline-block;vertical-align:middle;"></span>
-        <label style="margin-left:4px;">Status:</label>
-        <span class="filter-chip chip-idea active"    data-status="idea"    onclick="toggleStatusFilter('idea',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#595857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="6.5" r="3.5"/><path d="M6 10h4M6.5 12h3M7 14h2"/></svg> Idea</span>
-        <span class="filter-chip chip-planned active" data-status="planned" onclick="toggleStatusFilter('planned',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5 6h6M5 9h6M5 12h3"/></svg> Planned</span>
-        <span class="filter-chip chip-active active"  data-status="active"  onclick="toggleStatusFilter('active',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#835600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M13 2v4h-4"/><path d="M3 14v-4h4"/><path d="M13 6A6 6 0 0 0 3 10"/><path d="M3 10a6 6 0 0 0 10-4"/></svg> Active</span>
-        <span class="filter-chip chip-done active"    data-status="done"    onclick="toggleStatusFilter('done',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#4a6020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 8l4 4 8-8"/></svg> Done</span>
-        <span class="filter-chip chip-blocked active" data-status="blocked" onclick="toggleStatusFilter('blocked',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a2030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="8" r="6"/><path d="M4 4l8 8"/></svg> Blocked</span>
-        <div class="view-toggle">
-            <button class="view-btn active" id="view-full-btn"    onclick="setView('full')">Full</button>
-            <button class="view-btn"        id="view-compact-btn" onclick="setView('compact')">Compact</button>
+
+        <!-- Gruppe: Suche -->
+        <div class="cb-group">
+            <div class="cb-group-label">Search</div>
+            <div class="cb-group-content">
+                <input type="text" id="filter-search" placeholder="Project name..." style="width:160px;" oninput="applyFilters()">
+            </div>
         </div>
+
+        <!-- Gruppe: Score -->
+        <div class="cb-group">
+            <div class="cb-group-label">Score</div>
+            <div class="cb-group-content">
+                <button class="filter-chip chip-score-high active" onclick="toggleScoreFilter('high',this)">High</button>
+                <button class="filter-chip chip-score-medium active" onclick="toggleScoreFilter('medium',this)">Medium</button>
+                <button class="filter-chip chip-score-low active" onclick="toggleScoreFilter('low',this)">Low</button>
+            </div>
+        </div>
+
+        <!-- Gruppe: Status -->
+        <div class="cb-group">
+            <div class="cb-group-label">Status</div>
+            <div class="cb-group-content">
+                <span class="filter-chip chip-idea active"    data-status="idea"    onclick="toggleStatusFilter('idea',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="8" cy="6.5" r="3.5"/><path d="M6 10h4M6.5 12h3M7 14h2"/></svg> Idea</span>
+                <span class="filter-chip chip-planned active" data-status="planned" onclick="toggleStatusFilter('planned',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5 6h6M5 9h6M5 12h3"/></svg> Planned</span>
+                <span class="filter-chip chip-active active"  data-status="active"  onclick="toggleStatusFilter('active',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M13 2v4h-4"/><path d="M3 14v-4h4"/><path d="M13 6A6 6 0 0 0 3 10"/><path d="M3 10a6 6 0 0 0 10-4"/></svg> Active</span>
+                <span class="filter-chip chip-done active"    data-status="done"    onclick="toggleStatusFilter('done',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M2 8l4 4 8-8"/></svg> Done</span>
+                <span class="filter-chip chip-blocked active" data-status="blocked" onclick="toggleStatusFilter('blocked',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="8" cy="8" r="6"/><path d="M4 4l8 8"/></svg> Blocked</span>
+            </div>
+        </div>
+
+        <!-- Gruppe: Ansicht -->
+        <div class="cb-group" style="border-right:none;">
+            <div class="cb-group-label">View</div>
+            <div class="cb-group-content">
+                <button class="view-btn active" id="view-full-btn"    onclick="setView('full')">Full</button>
+                <button class="view-btn"        id="view-compact-btn" onclick="setView('compact')">Compact</button>
+            </div>
+        </div>
+
     </div>
 
     <div class="control-bar">
@@ -535,25 +546,23 @@
             el.classList.toggle('active'); applyFilters();
         }
 
-    // Alle Filter anwenden (Suche, Produktlinie, Horizont, Status)
+    // Filter anwenden (Suche, Status, Score)
         function applyFilters() {
-            var search=document.getElementById('filter-search').value.toLowerCase();
-            var prod=document.getElementById('filter-product').value;
-            var horiz=document.getElementById('filter-horizon').value;
+            var search = document.getElementById('filter-search').value.toLowerCase();
+
             Object.keys(projectsData).forEach(function(id) {
-                var d=projectsData[id]; var card=document.getElementById(id); if(!card) return;
+                var d = projectsData[id];
+                var card = document.getElementById(id); if(!card) return;
                 var score = calcScore(d);
                 var scoreLvl = score>=60?'high':score>=30?'medium':'low';
-                var ok=(!search||d.title.toLowerCase().indexOf(search)>=0) &&
-                       (!prod||d.prodLineId===prod) &&
-                       (!horiz||d.horizonId===horiz) &&
-                       activeStatusFilters.has(d.status||'idea') &&
-                       activeScoreFilters.has(scoreLvl);
-                card.style.display=ok?'':'none';
-                // Wrapper (inkl. Pre-Study-Tab) ebenfalls verstecken
-                var wrap=document.getElementById('wrap-'+id);
-                if(wrap) wrap.style.display=ok?'':'none';
+                var ok = (!search || d.title.toLowerCase().indexOf(search)>=0) &&
+                         activeStatusFilters.has(d.status||'idea') &&
+                         activeScoreFilters.has(scoreLvl);
+                card.style.display = ok ? '' : 'none';
+                var wrap = document.getElementById('wrap-'+id);
+                if(wrap) wrap.style.display = ok ? '' : 'none';
             });
+
             updateKpiStrip(); updateEffortSummaries(); redrawAllConnections();
         }
 
@@ -611,9 +620,9 @@
 
     // Produktlinien-Dropdown im Control Bar synchronisieren
         function syncProductDropdown() {
-            ['select-product','filter-product'].forEach(function(sid) {
+            ['select-product'].forEach(function(sid) {
                 var s=document.getElementById(sid); var cur=s.value;
-                s.innerHTML=sid==='filter-product'?'<option value="">All product lines</option>':'';
+                s.innerHTML='';
                 productLines.forEach(function(line){var o=document.createElement('option');o.value=line.id;o.text=line.title||'Unnamed';s.appendChild(o);});
                 if(cur) s.value=cur;
             });
@@ -863,11 +872,6 @@
             titleRow.innerHTML = '<div class="card-title-text">' + d.title + '</div>';
             titleRow.appendChild(dot);
     
-            var personaEl = document.createElement('div');
-            personaEl.className = 'card-body-details';
-            personaEl.id = id + '-persona';
-            personaEl.textContent = d.persona || 'No persona defined.';
-    
             var badges = document.createElement('div');
             badges.className = 'card-badges';
             badges.innerHTML =
@@ -886,7 +890,6 @@
             card.innerHTML = '';
             card.appendChild(stripe);
             card.appendChild(titleRow);
-            card.appendChild(personaEl);
             card.appendChild(badges);
             card.appendChild(radarRow);
     
@@ -1747,7 +1750,7 @@
             <div>
                 <div class="form-section" style="margin-bottom:12px;">
                     <div class="form-section-title">Project Description</div>
-                    <textarea id="modal-description" style="width:100%;height:52px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;" placeholder="Kurze Beschreibung des Projekts..."></textarea>
+                    <textarea id="modal-description" style="width:100%;height:52px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;" placeholder="Brief project description..."></textarea>
                 </div>
                 <div class="form-section" style="margin-bottom:12px;">
                     <div class="form-section-title">User Persona</div>
