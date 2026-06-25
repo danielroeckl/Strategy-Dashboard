@@ -76,6 +76,7 @@ Effort (team capacity) is the primary constraint and is penalised more strongly 
 Divisor = √Effort weight × 0.5 + Cost weight × 0.03 + 0.3
 ```
 Effort and cost weights: XS = 1 · S = 2 · M = 3 · L = 4 · XL = 5
+
 **Step 5 — Final score**
 ```
 Score = Combined^0.72 × 15.81 / Divisor   (capped at 100)
