@@ -27,9 +27,11 @@
            Alle Farben zentral definiert
            ══════════════════════════════════════════════ */
         :root {
+            /* Getinge Primary */
             /* === Getinge Primärfarben === */
             --getinge-blue: #18274a;
             --white: #ffffff;
+            /* Getinge Secondary */
             /* === Getinge Sekundärfarben (Grautöne) === */
             --snow: #e9e4e3;
             --oat: #d4cac8;
@@ -37,12 +39,14 @@
             --cliff: #8b7e79;
             --granite: #595857;
             --midnight: #495a6b;
+            /* Getinge Accent */
             /* === Getinge Akzentfarben === */
             --berry: #e56b78;
             --sun: #f39200;
             --grass: #94b654;
             --ocean: #31b7bc;
-            /* UI mappings === UI-Zuordnungen === */
+            /* UI mappings */
+            /* === UI-Zuordnungen === */
             --primary: #18274a;
             --primary-hover: #0d1a32;
             --bg-color: #e9e4e3;
@@ -55,6 +59,7 @@
         /* === Basis-Reset & Schriftart === */
         * { box-sizing: border-box; font-family: 'Adelle Sans', 'Source Sans 3', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
         /* === Grundlayout: Flex-Spalte für sticky Header === */
+
         /* ══ GRUNDLAYOUT ══ */
         html, body { margin: 0; padding: 0; height: 100%; }
         body { background-color: #18274a;  color: var(--text-main); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
@@ -65,7 +70,7 @@
 
         /* HEADER */
         /* === Header-Panel (Titel + KPI-Leiste) === */
- 
+
         /* ══ HEADER-PANEL ══ */
         .header-panel { background: #ffffff; padding: 12px 28px; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .header-title h1 { margin: 0; font-size: 21px; color: #201f1e; font-weight: 700; }
@@ -369,7 +374,7 @@
 
         <!-- Gruppe: Score -->
         <div class="cb-group">
-            <div class="cb-group-label">Strategic Score</div>
+            <div class="cb-group-label">Score</div>
             <div class="cb-group-content">
                 <button class="filter-chip chip-score-high active" onclick="toggleScoreFilter('high',this)">High</button>
                 <button class="filter-chip chip-score-medium active" onclick="toggleScoreFilter('medium',this)">Medium</button>
@@ -379,7 +384,7 @@
 
         <!-- Gruppe: Status -->
         <div class="cb-group">
-            <div class="cb-group-label">Project Status</div>
+            <div class="cb-group-label">Status</div>
             <div class="cb-group-content">
                 <span class="filter-chip chip-idea active"    data-status="idea"    onclick="toggleStatusFilter('idea',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><circle cx="8" cy="6.5" r="3.5"/><path d="M6 10h4M6.5 12h3M7 14h2"/></svg> Idea</span>
                 <span class="filter-chip chip-planned active" data-status="planned" onclick="toggleStatusFilter('planned',this)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5 6h6M5 9h6M5 12h3"/></svg> Planned</span>
@@ -500,15 +505,26 @@
 
     // Strategischen Score aus Benefit- und Innovations-Werten berechnen
         function calcScore(d) {
-            var bAvg = (d.benefitValues||[0,0,0,0]).reduce(function(a,b){return a+b;},0)/4;
-            var iAvg = (d.innovationValues||[]).reduce(function(a,b){return a+b;},0)/10;
+            // Benefits: Top-2 zählen doppelt, alle 4 fließen ein
+            var bVals = (d.benefitValues||[0,0,0,0]).slice().sort(function(a,b){return b-a;});
+            var bAvg = (bVals[0]*2 + bVals[1]*2 + bVals[2] + bVals[3]) / 6.0;
+
+            // Innovation: Top-4 zählen doppelt, alle 10 fließen ein
+            // Jede weitere Innovation hebt den Score kontinuierlich an
+            var iVals = (d.innovationValues||[0,0,0,0,0,0,0,0,0,0]).slice().sort(function(a,b){return b-a;});
+            var iAvg = (iVals[0]*2+iVals[1]*2+iVals[2]*2+iVals[3]*2+iVals[4]+iVals[5]+iVals[6]+iVals[7]+iVals[8]+iVals[9]) / 14.0;
+
             var ef = EFFORT_W[d.effort||'M']||3;
             var co = EFFORT_W[d.cost||'M']||3;
-            return Math.round(Math.min(((bAvg*0.5+iAvg*0.5)*10)/((ef+co)/2), 100));
+            // Nichtlinearer Divisor: sqrt(Effort) bestraft große Projekte sanft
+            // Exponent 0.72 streckt den unteren Bereich (mehr Differenzierung bei mittleren Werten)
+            var combined = bAvg * 0.5 + iAvg * 0.5;
+            var divisor = Math.sqrt(ef) * 0.5 + co * 0.03 + 0.3;
+            return Math.round(Math.min(Math.pow(combined, 0.72) * 15.81 / divisor, 100));
         }
 
     // CSS-Klasse für Score-Farbe zurückgeben (high/medium/low)
-        function scoreClass(s){ return s>=60?'score-high':s>=30?'score-medium':'score-low'; }
+        function scoreClass(s){ return s>=45?'score-high':s>=25?'score-medium':'score-low'; }
 
     // Score-Anzeige im Modal live aktualisieren
         function updateScoreDisplay() {
@@ -518,8 +534,8 @@
             var s=calcScore(fake);
             var el=document.getElementById('modal-score-display');
             el.textContent=s;
-            el.style.color=s>=60?'#107c41':s>=30?'#f39200':'#a19f9d';
-            document.getElementById('modal-score-label').textContent=s>=60?'High strategic value':s>=30?'Medium — review effort':'Low value or high cost';
+            el.style.color=s>=45?'#94b654':s>=25?'#f39200':'#a19f9d';
+            document.getElementById('modal-score-label').textContent=s>=45?'High strategic value':s>=25?'Medium — review scope':'Low — consider reducing effort or increasing impact';
         }
 
     // ╔══════════════════════════════════════════════════════════════════╗
@@ -549,7 +565,7 @@
                 var d = projectsData[id];
                 var card = document.getElementById(id); if(!card) return;
                 var score = calcScore(d);
-                var scoreLvl = score>=60?'high':score>=30?'medium':'low';
+                var scoreLvl = score>=45?'high':score>=25?'medium':'low';
                 var ok = (!search || d.title.toLowerCase().indexOf(search)>=0) &&
                          activeStatusFilters.has(d.status||'idea') &&
                          activeScoreFilters.has(scoreLvl);
@@ -981,6 +997,34 @@
 
     // Modal schließen
         function closeProjectModal(){document.getElementById('modal-overlay').style.display='none';activeProjectId=null;}
+
+    // ── Aktive Projektkarte duplizieren (in gleicher Zelle) ──
+        function duplicateActiveProjectCard() {
+            if(!activeProjectId) return;
+            var orig = projectsData[activeProjectId];
+            if(!orig) return;
+
+            // Neue ID und geklonte Daten
+            var newId = 'card-' + Date.now();
+            var clone = JSON.parse(JSON.stringify(orig));
+            clone.title = orig.title + ' (Copy)';
+            projectsData[newId] = clone;
+
+            // In gleicher Zelle einfügen
+            var cell = document.getElementById(orig.prodLineId + '-' + orig.horizonId);
+            if(!cell) { showAlert('Could not find target cell.'); return; }
+
+            createProjectCard(orig.prodLineId, orig.horizonId, clone.title, clone, newId);
+
+            // Pre-Study Tab aktivieren falls vorhanden
+            if(clone.preStudy) {
+                var tab = document.getElementById('pstab-' + newId);
+                if(tab) tab.classList.remove('ps-empty');
+            }
+
+            closeProjectModal();
+            setTimeout(function(){ updateEffortSummaries(); redrawAllConnections(); }, 50);
+        }
 
     // Aktive Projektkarte löschen (inkl. Wrapper, Pre-Study und Verbindungen)
         function deleteActiveProjectCard() {
@@ -1512,8 +1556,8 @@
             prodLineId:"clpm", horizonId:"y2026",
             persona:"ICU Nurse – benötigt zuverlässige Echtzeit-Vitaldaten ohne Alarm-Overload",
             effort:"XS", cost:"XS", status:"active", depType:"blocking",
-            benefitValues:[9,9,10,9],
-            innovationValues:[8,8,9,8,8,9,9,8,9,8],
+            benefitValues:[9,7,3,2],
+            innovationValues:[0,0,8,9,8,7,0,0,0,0],
             milestones:[
                 {label:"Kick-off & Datenerhebung",quarter:"Q1",year:"2026"},
                 {label:"Sensor-Validierung abgeschlossen",quarter:"Q3",year:"2026"},
@@ -1529,8 +1573,8 @@
             prodLineId:"clpm", horizonId:"y2027",
             persona:"Intensivpfleger – leidet unter Alarm-Fatigue bei >200 Alarmen/Schicht",
             effort:"S", cost:"S", status:"planned", depType:"blocking",
-            benefitValues:[8,9,8,8],
-            innovationValues:[8,8,8,7,7,8,8,7,8,8],
+            benefitValues:[5,8,7,3],
+            innovationValues:[0,0,0,8,9,0,7,0,0,0],
             milestones:[
                 {label:"Algorithm Freeze",quarter:"Q2",year:"2027"},
                 {label:"FDA/MDR Submission",quarter:"Q4",year:"2027"}
@@ -1544,8 +1588,8 @@
             prodLineId:"clpm", horizonId:"y2027",
             persona:"Regulatory Affairs Manager – braucht lückenlose MDR-Dokumentation",
             effort:"M", cost:"S", status:"planned", depType:"informal",
-            benefitValues:[4,5,3,6],
-            innovationValues:[2,3,2,4,6,3,2,4,3,2],
+            benefitValues:[2,4,2,3],
+            innovationValues:[0,0,7,6,0,0,0,0,0,0],
             milestones:[
                 {label:"Gap-Analyse fertig",quarter:"Q1",year:"2027"},
                 {label:"Dossier eingereicht",quarter:"Q3",year:"2027"}
@@ -1560,8 +1604,8 @@
             prodLineId:"clpm", horizonId:"y2029",
             persona:"Intensivmediziner – will 6h vor kritischem Ereignis gewarnt werden",
             effort:"M", cost:"S", status:"idea", depType:"blocking",
-            benefitValues:[9,9,9,9],
-            innovationValues:[8,8,9,8,8,9,9,8,9,8],
+            benefitValues:[6,7,5,9],
+            innovationValues:[0,0,0,8,9,8,0,0,0,0],
             milestones:[
                 {label:"AI-Modell Training abgeschlossen",quarter:"Q2",year:"2029"},
                 {label:"Prospektive Validierungsstudie",quarter:"Q4",year:"2029"}
@@ -1575,8 +1619,8 @@
             prodLineId:"clpm", horizonId:"vision",
             persona:"ICU Medical Director – will vollautonomes, lernfähiges Monitoring-System",
             effort:"M", cost:"S", status:"idea", depType:"blocking",
-            benefitValues:[10,10,9,10],
-            innovationValues:[9,9,10,9,9,10,9,9,10,9],
+            benefitValues:[7,8,6,9],
+            innovationValues:[0,7,0,8,9,8,7,0,0,0],
             milestones:[
                 {label:"Vision Paper veröffentlicht",quarter:"Q2",year:"2027"},
                 {label:"Technologie-Roadmap fixiert",quarter:"Q1",year:"2030"}
@@ -1737,6 +1781,7 @@
                 </select>
             </div>
             <div style="display:flex;gap:8px;align-items:center;margin-left:14px;">
+                <button onclick="duplicateActiveProjectCard()" style="background:#495a6b;padding:4px 12px;font-size:12px;margin-right:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="4" y="4" width="9" height="9" rx="1"/><path d="M3 3h8M3 3v8" opacity="0.5"/></svg> Duplicate</button>
                 <button onclick="deleteActiveProjectCard()" style="background:#a80000;padding:4px 12px;font-size:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete card</button>
                 <button class="secondary" onclick="closeProjectModal()" style="padding:4px 8px;">&times;</button>
             </div>
