@@ -2,46 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accelerate Strategy – 10-Year Product Board</title>
     <style>
         :root {
-            --primary: #31b7bc;
-            --primary-hover: #005a9e;
-            --bg-color: #f3f2f1;
+            /* Getinge Primary */
+            --getinge-blue: #18274a;
+            --white: #ffffff;
+            /* Getinge Secondary */
+            --snow: #e9e4e3;
+            --oat: #d4cac8;
+            --clay: #bfb1ac;
+            --cliff: #8b7e79;
+            --granite: #595857;
+            --midnight: #495a6b;
+            /* Getinge Accent */
+            --berry: #e56b78;
+            --sun: #f39200;
+            --grass: #94b654;
+            --ocean: #31b7bc;
+            /* UI mappings */
+            --primary: #18274a;
+            --primary-hover: #0d1a32;
+            --bg-color: #e9e4e3;
             --surface: #ffffff;
-            --text-main: #495a6b;
-            --text-secondary: #495a6b;
-            --border: #edebe9;
+            --text-main: #18274a;
+            --text-secondary: #595857;
+            --border: #d4cac8;
             --border-hover: #495a6b;
         }
-        * { box-sizing: border-box; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
-        body { margin: 0; padding: 0; background-color: #002D5B; color: var(--text-main); overflow-x: auto; }
-        .workspace-container { padding: 28px; position: relative; width: fit-content; min-width: 100%; }
+        * { box-sizing: border-box; font-family: 'Adelle Sans', 'Source Sans 3', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+        html, body { margin: 0; padding: 0; height: 100%; }
+        body { background-color: #18274a;  color: var(--text-main); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        .workspace-container { padding: 0; position: relative; width: 100%; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        .top-bar { padding: 14px 28px 10px 28px; flex-shrink: 0; background: transparent; }
+        .board-scroll-area { flex: 1; min-height: 0; overflow: auto; padding: 12px 28px 28px 28px; position: relative; }
 
         /* HEADER */
-        .header-panel { background: var(--surface); padding: 14px 28px; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .header-panel { background: #ffffff; padding: 12px 28px; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
         .header-title h1 { margin: 0; font-size: 21px; color: #201f1e; font-weight: 700; }
         .header-title p { margin: 2px 0 0 0; color: var(--text-secondary); font-size: 11px; }
         #board-kpi-strip { display: flex; gap: 16px; font-size: 12px; color: #495a6b; flex-wrap: wrap; }
 
         /* FILTER BAR */
-        .filter-bar { background: #eaf6f6; border: 1px solid #b2e4e6; padding: 9px 18px; border-radius: 4px; margin-bottom: 12px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .filter-bar { background: #f0eeed; border: 1px solid var(--oat,#d4cac8); padding: 9px 18px; border-radius: 4px; margin-bottom: 10px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
         .filter-bar label { font-size: 12px; font-weight: 600; color: var(--text-main); }
         .filter-bar select, .filter-bar input[type="text"] { padding: 5px 9px; border: 1px solid var(--border); border-radius: 2px; background: #fff; color: var(--text-main); font-size: 12px; }
         .filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; opacity: 0.45; }
         .filter-chip.active { border-color: var(--primary); opacity: 1; }
-        .chip-idea    { background: #f3f2f1; color: #605e5c; }
-        .chip-planned { background: #deecf9; color: #004578; }
+        .chip-idea    { background: #ede9e8; color: #595857; }
+        .chip-planned { background: #d0d5e0; color: #18274a; }
         .chip-active  { background: #fff4ce; color: #835600; }
-        .chip-done    { background: #dff6dd; color: #054320; }
-        .chip-blocked { background: #fde7e9; color: #8e0a12; }
+        .chip-done    { background: #e8f0d8; color: #4a6020; }
+        .chip-blocked { background: #fae0e3; color: #8a2030; }
         .view-toggle { margin-left: auto; display: flex; gap: 6px; }
         .view-btn { padding: 4px 12px; font-size: 12px; border: 1px solid var(--border-hover); background: #fff; color: var(--text-main); border-radius: 2px; cursor: pointer; font-weight: 600; }
         .view-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
         /* CONTROL BAR */
-        .control-bar { background: var(--surface); padding: 10px 18px; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .control-bar { background: var(--surface); padding: 0; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 10px; display: flex; align-items: stretch; flex-wrap: wrap; overflow: hidden; }
+        .cb-group { display: flex; flex-direction: column; padding: 7px 14px 8px 14px; gap: 6px; border-right: 1px solid var(--border); }
+        .cb-group:last-child { border-right: none; }
+        .cb-group-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #a0aab4; line-height: 1; }
+        .cb-group-content { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .control-group { display: flex; align-items: center; gap: 6px; }
         label { font-size: 13px; font-weight: 600; color: var(--text-main); }
         input[type="text"], select, textarea { padding: 7px 10px; border: 1px solid var(--border); border-radius: 2px; background-color: #fff; color: var(--text-main); font-size: 13px; }
@@ -49,44 +74,84 @@
         button:hover { background-color: var(--primary-hover); }
         button.secondary { background-color: #e9e4e3; color: var(--text-main); border: 1px solid var(--border-hover); }
         button.secondary:hover { background-color: #edebe9; }
-        button.action-green { background-color: #107c41; color: white; }
-        button.action-green:hover { background-color: #0b5930; }
-        .io-group { background: #e7f2fa; border: 1px solid #cce4f5; border-radius: 4px; padding: 5px 10px; display: flex; gap: 7px; align-items: center; }
+        button.action-green { background-color: #94b654; color: white; }
+        button.action-green:hover { background-color: #7a9a44; }
+
 
         /* BOARD */
-        .strategy-board { display: grid; grid-template-columns: 250px repeat(4, minmax(300px, auto)); background: var(--surface); border-radius: 4px; box-shadow: 0 6.4px 14.4px rgba(0,0,0,0.132); position: relative; z-index: 1; width: max-content; }
-        .board-header { background-color: #495a6b; color: #fff; padding: 14px 12px; text-align: center; font-weight: 600; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.1); }
-        .swimlane-title { background-color: #f8f9fa; padding: 18px 14px; font-weight: 700; font-size: 20px; color: #495a6b; border-top: 1px solid var(--border); border-right: 2px solid var(--border-hover); outline: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+        .strategy-board { display: grid; grid-template-columns: 250px repeat(8, minmax(260px, auto)); background: var(--surface); border-radius: 4px; box-shadow: 0 6.4px 14.4px rgba(0,0,0,0.132); position: relative; z-index: 1; width: max-content; }
+        .board-header { background-color: #18274a; color: #fff; padding: 10px 10px; text-align: center; font-weight: 600; font-size: 13px; border-right: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 10; }
+        .bh-group { font-size: 9px; font-weight: 400; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+        .bh-year { font-size: 14px; font-weight: 600; }
+        .swimlane-title { background-color: #f5f2f1; padding: 18px 14px; font-weight: 700; font-size: 20px; color: #495a6b; border-top: 1px solid var(--border); border-right: 2px solid var(--border-hover); outline: none; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+        
+        .swimlane-drag-handle { cursor: grab; color: #c8c6c4; font-size: 16px; padding: 2px 4px; flex-shrink: 0; user-select: none; line-height: 1; margin-right: 4px; }
+        .swimlane-drag-handle:hover { color: #495a6b; }
+        .swimlane-title.lane-dragging { opacity: 0.4; }
+        .swimlane-title.lane-drag-over { border-top: 3px solid var(--primary); }
         .swimlane-title-inner { flex: 1; min-width: 0; }
         .lane-effort-summary { font-size: 10px; font-weight: 600; color: #a0aab4; margin-top: 5px; line-height: 1.7; }
-        .lane-cell { padding: 14px; border-top: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 300px; min-width: 300px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; align-content: flex-start; position: relative; transition: background-color 0.2s; }
+        .lane-cell { padding: 14px; border-top: 1px solid var(--border); border-right: 1px solid var(--border); min-height: 300px; min-width: 260px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; align-content: flex-start; position: relative; transition: background-color 0.2s; }
         .lane-cell.drag-over { background-color: rgba(49,183,188,0.1) !important; }
         .lane-cell:last-child { border-right: none; }
-        .cell-short { background-color: rgba(229,107,120,0.06); }
-        .cell-mid   { background-color: rgba(243,146,0,0.06); }
-        .cell-long  { background-color: rgba(148,182,84,0.06); }
-        .cell-vision{ background-color: rgba(49,183,188,0.06); }
+        .cell-short { background-color: rgba(229,107,120,0.08); }
+        .cell-mid   { background-color: rgba(243,146,0,0.08); }
+        .cell-long  { background-color: rgba(148,182,84,0.08); }
+        .cell-vision{ background-color: rgba(49,183,188,0.08); }
         .lane-col-summary { padding: 7px 12px; background: rgba(73,90,107,0.06); border-top: 2px solid var(--border); font-size: 11px; font-weight: 600; color: #495a6b; display: flex; flex-wrap: wrap; gap: 5px; align-items: center; width: 100%; order: 999; margin-top: auto; }
         .effort-pill { padding: 2px 7px; border-radius: 9px; font-size: 10px; font-weight: 700; background: #edebe9; color: #323130; }
 
         /* CARD */
-        .project-card { background: var(--surface); border: 1px solid var(--border-hover); border-left: 5px solid var(--primary); border-radius: 4px; padding: 0 11px 11px 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); cursor: move; position: relative; width: 230px; user-select: none; flex-shrink: 0; transition: box-shadow 0.15s, opacity 0.15s; overflow: hidden; }
+        .card-with-prestudy { display: flex; align-items: stretch; flex-shrink: 0; }
+        .prestudy-tab {
+            width: 22px; background: #f39200; border-radius: 8px 0 0 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; flex-shrink: 0; padding: 8px 0; gap: 5px;
+            transition: background 0.15s; border: 1px solid #d07a00; border-right: none;
+        }
+        .prestudy-tab:hover { background: #d07a00; }
+        .prestudy-tab.ps-empty { background: #e9e4e3; border-color: #d4cac8; }
+        .prestudy-tab.ps-empty:hover { background: #d4cac8; }
+        .prestudy-tab .ps-tab-label {
+            font-size: 9px; font-weight: 400; color: white;
+            writing-mode: vertical-rl; text-orientation: mixed;
+            transform: rotate(180deg); letter-spacing: 0.06em;
+            text-transform: uppercase; line-height: 1;
+        }
+        .prestudy-tab.ps-empty .ps-tab-label { color: #8b7e79; }
+        .prestudy-tab svg { width: 12px; height: 12px; stroke: white; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .prestudy-tab.ps-empty svg { stroke: #8b7e79; }
+        .prestudy-panel {
+            width: 150px; background: #fff8f0; border: 1px solid #f39200;
+            border-right: none; border-radius: 8px 0 0 8px;
+            padding: 10px 11px; flex-shrink: 0; display: none;
+        }
+        .prestudy-panel.ps-open { display: block; }
+        .ps-panel-title { font-size: 10px; font-weight: 400; color: #835600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+        .ps-panel-row { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; border-bottom: 0.5px solid #fde0b0; }
+        .ps-panel-row:last-of-type { border-bottom: none; }
+        .ps-panel-lbl { color: #8b7e79; font-weight: 400; }
+        .ps-panel-val { color: #18274a; font-weight: 400; }
+        .project-card { background: var(--surface); border: 1px solid var(--oat,#d4cac8); border-left: 5px solid var(--getinge-blue,#18274a); border-radius: 0 4px 4px 0; padding: 0 11px 11px 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); cursor: move; position: relative; width: 230px; user-select: none; flex-shrink: 0; transition: box-shadow 0.15s, opacity 0.15s; overflow: hidden; }
         .project-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); border-color: var(--primary); }
         .project-card.dragging { opacity: 0.4; }
         .project-card.drag-insert-before { outline: 3px dashed var(--primary); outline-offset: 2px; }
         .board-compact .project-card { width: 155px; }
         .board-compact .card-radar-row, .board-compact .card-body-details { display: none; }
+        .board-compact .prestudy-tab { width: 16px; }
+        .board-compact .prestudy-tab .ps-tab-label { display: none; }
+        .board-compact .prestudy-panel { width: 120px; }
         /* STATUS STRIPE */
         .status-stripe { height: 5px; margin: 0 -11px 8px -11px; border-radius: 0; }
-        .status-idea    { background: #a19f9d; }
-        .status-planned { background: #0078d4; }
+        .status-idea    { background: #bfb1ac; }
+        .status-planned { background: #18274a; }
         .status-active  { background: #f39200; }
-        .status-done    { background: #107c41; }
-        .status-blocked { background: #e81123; }
+        .status-done    { background: #94b654; }
+        .status-blocked { background: #e56b78; }
 
         .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; gap: 4px; }
         .card-title-text { font-weight: 700; font-size: 13px; color: #201f1e; line-height: 1.3; flex: 1; }
-        .dependency-dot { width: 11px; height: 11px; border-radius: 50%; background: #a19f9d; cursor: crosshair; flex-shrink: 0; margin-top: 2px; }
+        .dependency-dot { width: 11px; height: 11px; border-radius: 50%; background: #bfb1ac; cursor: crosshair; flex-shrink: 0; margin-top: 2px; }
         .dependency-dot:hover { background: #e81123; transform: scale(1.3); }
         .card-body-details { font-size: 11px; color: var(--text-secondary); margin-bottom: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .card-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 7px; align-items: center; }
@@ -94,7 +159,7 @@
         .badge-eff { background: #edebe9; color: #323130; }
         .badge-cos { background: #fff1cc; color: #8a6508; }
         .badge-score { color: #fff; }
-        .score-high   { background: #107c41; }
+        .score-high   { background: #94b654; }
         .score-medium { background: #f39200; }
         .score-low    { background: #a19f9d; }
         .badge-status { font-size: 9px; padding: 2px 5px; border-radius: 8px; font-weight: 700; color: #fff; }
@@ -105,7 +170,7 @@
         .card-mini-radar { display: block; }
         .dep-delete-mode .dependency-dot { background: #e81123 !important; cursor: crosshair; }
         .connection-line-group:hover path { stroke-width: 5; cursor: pointer; }
-        #connections-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        #connections-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; min-width: 100%; min-height: 100%; }
         .delete-lane-btn { color: #a80000; cursor: pointer; font-weight: bold; font-size: 14px; padding: 0 4px; }
         .delete-lane-btn:hover { color: #e81123; }
 
@@ -135,14 +200,95 @@
         .confirm-popup h3 { margin: 0 0 8px 0; font-size: 15px; color: #201f1e; }
         .confirm-popup p { margin: 0 0 18px 0; font-size: 13px; color: #495a6b; }
         .confirm-popup-btns { display: flex; gap: 10px; justify-content: center; }
+
+        #neural-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: -1;
+            background: #18274a;
+        }
     </style>
 </head>
 <body>
-<div class="workspace-container">
 
+<canvas id="neural-bg"></canvas>
+<script>
+(function() {
+    var canvas = document.getElementById('neural-bg');
+    var ctx = canvas.getContext('2d');
+    var nodes = [];
+    var NODE_COUNT = 90;
+    var MAX_DIST = 220;
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Create nodes
+    for (var i = 0; i < NODE_COUNT; i++) {
+        nodes.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            r: Math.random() * 2.8 + 1.4
+        });
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#18274a';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Move nodes
+        nodes.forEach(function(n) {
+            n.x += n.vx;
+            n.y += n.vy;
+            if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
+            if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+        });
+
+        // Draw connections
+        for (var i = 0; i < nodes.length; i++) {
+            for (var j = i + 1; j < nodes.length; j++) {
+                var dx = nodes[i].x - nodes[j].x;
+                var dy = nodes[i].y - nodes[j].y;
+                var dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < MAX_DIST) {
+                    var alpha = (1 - dist / MAX_DIST) * 0.32;
+                    ctx.beginPath();
+                    ctx.moveTo(nodes[i].x, nodes[i].y);
+                    ctx.lineTo(nodes[j].x, nodes[j].y);
+                    ctx.strokeStyle = 'rgba(255,255,255,' + alpha + ')';
+                    ctx.lineWidth = 1.0;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Draw nodes
+        nodes.forEach(function(n) {
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.75)';
+            ctx.fill();
+        });
+
+        requestAnimationFrame(draw);
+    }
+    draw();
+})();
+</script>
+
+<div class="workspace-container">
+    <div class="top-bar">
     <div class="header-panel">
         <div class="header-title">
-            <h1>&#x1F680; Accelerate Strategy &#x2013; 10-Year Product Board</h1>
+            <h1><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#18274a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:10px;"><path d="M12 2s6 3 6 10-6 10-6 10S6 19 6 12 12 2 12 2z"/><circle cx="12" cy="12" r="2.5" fill="#18274a" stroke="none"/><path d="M10 21l-1.5 3h7L14 21"/></svg> Accelerate Strategy &#x2013; 10-Year Product Board</h1>
             
         </div>
         <div id="board-kpi-strip"></div>
@@ -154,17 +300,21 @@
         <select id="filter-product" onchange="applyFilters()"><option value="">All product lines</option></select>
         <select id="filter-horizon" onchange="applyFilters()">
             <option value="">All horizons</option>
-            <option value="short">Short Term</option>
-            <option value="mid">Mid Term</option>
-            <option value="long">Long Term</option>
-            <option value="vision">BU Vision</option>
+            <option value="y2026">2026</option>
+            <option value="y2027">2027</option>
+            <option value="y2028">2028</option>
+            <option value="y2029">2029</option>
+            <option value="y2030">2030</option>
+            <option value="y2031_33">2031–2033</option>
+            <option value="y2034_35">2034–2035</option>
+            <option value="vision">2036+</option>
         </select>
         <label style="margin-left:4px;">Status:</label>
-        <span class="filter-chip chip-idea active"    data-status="idea"    onclick="toggleStatusFilter('idea',this)">&#x1F4A1; Idea</span>
-        <span class="filter-chip chip-planned active" data-status="planned" onclick="toggleStatusFilter('planned',this)">&#x1F4CB; Planned</span>
-        <span class="filter-chip chip-active active"  data-status="active"  onclick="toggleStatusFilter('active',this)">&#x1F504; Active</span>
-        <span class="filter-chip chip-done active"    data-status="done"    onclick="toggleStatusFilter('done',this)">&#x2705; Done</span>
-        <span class="filter-chip chip-blocked active" data-status="blocked" onclick="toggleStatusFilter('blocked',this)">&#x1F6AB; Blocked</span>
+        <span class="filter-chip chip-idea active"    data-status="idea"    onclick="toggleStatusFilter('idea',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#595857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="6.5" r="3.5"/><path d="M6 10h4M6.5 12h3M7 14h2"/></svg> Idea</span>
+        <span class="filter-chip chip-planned active" data-status="planned" onclick="toggleStatusFilter('planned',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5 6h6M5 9h6M5 12h3"/></svg> Planned</span>
+        <span class="filter-chip chip-active active"  data-status="active"  onclick="toggleStatusFilter('active',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#835600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M13 2v4h-4"/><path d="M3 14v-4h4"/><path d="M13 6A6 6 0 0 0 3 10"/><path d="M3 10a6 6 0 0 0 10-4"/></svg> Active</span>
+        <span class="filter-chip chip-done active"    data-status="done"    onclick="toggleStatusFilter('done',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#4a6020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 8l4 4 8-8"/></svg> Done</span>
+        <span class="filter-chip chip-blocked active" data-status="blocked" onclick="toggleStatusFilter('blocked',this)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a2030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="8" r="6"/><path d="M4 4l8 8"/></svg> Blocked</span>
         <div class="view-toggle">
             <button class="view-btn active" id="view-full-btn"    onclick="setView('full')">Full</button>
             <button class="view-btn"        id="view-compact-btn" onclick="setView('compact')">Compact</button>
@@ -172,64 +322,86 @@
     </div>
 
     <div class="control-bar">
-        <div class="control-group">
-            <label>Project name:</label>
-            <input type="text" id="new-title" placeholder="+ new project" style="width:160px;">
+
+        <div class="cb-group">
+            <div class="cb-group-label">New Project</div>
+            <div class="cb-group-content">
+                <input type="text" id="new-title" placeholder="Project name..." style="width:150px;">
+                <select id="select-product"></select>
+                <select id="select-horizon">
+                    <option value="y2026">2026 — Short Term</option>
+                    <option value="y2027">2027 — Short Term</option>
+                    <option value="y2028">2028 — Mid Term</option>
+                    <option value="y2029">2029 — Mid Term</option>
+                    <option value="y2030">2030 — Mid Term</option>
+                    <option value="y2031_33">2031–2033 — Long Term</option>
+                    <option value="y2034_35">2034–2035 — Long Term</option>
+                    <option value="vision">2036+ — BU Vision</option>
+                </select>
+                <button onclick="addNewProjectCard()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M8 2v12M2 8h12"/></svg> Add card</button>
+            </div>
         </div>
-        <div class="control-group">
-            <label>Product line:</label>
-            <select id="select-product"></select>
+
+        <div class="cb-group">
+            <div class="cb-group-label">Product Lines</div>
+            <div class="cb-group-content">
+                <button class="action-green" onclick="promptAddNewProductLine()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 8h12M8 3v5M3 13h10"/></svg> Add product line</button>
+            </div>
         </div>
-        <div class="control-group">
-            <label>Horizon:</label>
-            <select id="select-horizon">
-                <option value="short">Short Term (1-2 Y.)</option>
-                <option value="mid">Mid Term (3-5 Y.)</option>
-                <option value="long">Long Term (6-10 Y.)</option>
-                <option value="vision">CC Vision (10+ Y.)</option>
-            </select>
+
+        <div class="cb-group">
+            <div class="cb-group-label">Connections</div>
+            <div class="cb-group-content">
+                <button class="secondary" onclick="toggleDependencyMode()" id="dep-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add</button>
+                <button class="secondary" onclick="deleteSingleConnectionMode()" id="dep-del-btn" style="border-color:#f39200;color:#8a4500;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><path d="M5.5 4.5l7-1.5M5.5 11.5l7 1.5M12 8h2"/></svg> Delete one</button>
+                <button class="secondary" onclick="clearConnections()" style="border-color:#f1707b;color:#a80000;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a80000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete all</button>
+            </div>
         </div>
-        <button onclick="addNewProjectCard()">&#xFF0B; Add card</button>
-        <button class="action-green" onclick="promptAddNewProductLine()">&#xFF0B; Add product line</button>
-        <button class="secondary" onclick="toggleDependencyMode()" id="dep-btn">&#x26D3;&#xFE0F; Add connection</button>
-        <button class="secondary" onclick="deleteSingleConnectionMode()" id="dep-del-btn" style="border-color:#f39200;color:#8a4500;">&#x2702;&#xFE0F; Delete connection</button>
-        <button class="secondary" onclick="clearConnections()" style="border-color:#f1707b;color:#a80000;">&#x1F5D1;&#xFE0F; Delete all connections</button>
-        <div class="io-group">
-            <button onclick="exportStrategyBoard()">&#x1F4BE; Export JSON</button>
-            <input type="file" id="import-file" style="display:none" onchange="importStrategyBoard(this.files[0])">
-            <button class="secondary" onclick="document.getElementById('import-file').click()">&#x1F4C2; Import JSON</button>
+
+        <div class="cb-group">
+            <div class="cb-group-label">Save &amp; Load</div>
+            <div class="cb-group-content">
+                <button onclick="exportStrategyBoard()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 2h8l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M5 2v4h6V2M5 11h6"/></svg> Export JSON</button>
+                <input type="file" id="import-file" style="display:none" onchange="importStrategyBoard(this.files[0])">
+                <button class="secondary" onclick="document.getElementById('import-file').click()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 4a1 1 0 0 1 1-1h3l2 2h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/></svg> Import JSON</button>
+            </div>
         </div>
+
     </div>
 
-    <div style="position:relative;">
+    </div><div class="board-scroll-area" id="board-scroll-area">
+    <div style="position:relative; width:max-content; min-width:100%;">
         <svg id="connections-svg"></svg>
         <div class="strategy-board" id="strategy-board">
             <div class="board-header">Product lines</div>
-            <div class="board-header" style="background-color:#e56b78;">Short Term (2026&#x2013;2027)<br><small style="font-weight:normal;">immediate market need</small></div>
-            <div class="board-header" style="background-color:#f39200;">Mid Term (2028&#x2013;2030)<br><small style="font-weight:normal;">stay competitive</small></div>
-            <div class="board-header" style="background-color:#94b654;">Long Term (2031&#x2013;2035)<br><small style="font-weight:normal;">be future proof</small></div>
-            <div class="board-header" style="background-color:#31b7bc;">BU Vision (10+ Years)<br><small style="font-weight:normal;">Calm Critical Care</small></div>
+            <div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div>
+            <div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div>
+            <div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div>
+            <div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div>
+            <div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div>
+            <div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031–33</div></div>
+            <div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034–35</div></div>
+            <div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>
         </div>
     </div>
 </div>
 
-<!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal-window">
         <div class="modal-header">
             <div style="display:flex;align-items:center;gap:12px;flex:1;">
                 <input type="text" id="modal-project-title" placeholder="Project name..." style="font-size:16px;font-weight:700;border:none;border-bottom:2px solid var(--primary);background:transparent;color:#201f1e;padding:2px 4px;flex:1;outline:none;">
                 <select id="modal-status" style="font-size:12px;font-weight:700;border-radius:10px;padding:4px 10px;border:2px solid var(--border);">
-                    <option value="idea">&#x1F4A1; Idea</option>
-                    <option value="planned">&#x1F4CB; Planned</option>
-                    <option value="active">&#x1F504; Active</option>
-                    <option value="done">&#x2705; Done</option>
-                    <option value="blocked">&#x1F6AB; Blocked</option>
+                    <option value="idea"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#595857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="6.5" r="3.5"/><path d="M6 10h4M6.5 12h3M7 14h2"/></svg> Idea</option>
+                    <option value="planned"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5 6h6M5 9h6M5 12h3"/></svg> Planned</option>
+                    <option value="active"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#835600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M13 2v4h-4"/><path d="M3 14v-4h4"/><path d="M13 6A6 6 0 0 0 3 10"/><path d="M3 10a6 6 0 0 0 10-4"/></svg> Active</option>
+                    <option value="done"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#4a6020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 8l4 4 8-8"/></svg> Done</option>
+                    <option value="blocked"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a2030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="8" r="6"/><path d="M4 4l8 8"/></svg> Blocked</option>
                 </select>
             </div>
             <div style="display:flex;gap:8px;align-items:center;margin-left:14px;">
-                <button onclick="deleteActiveProjectCard()" style="background:#a80000;padding:4px 12px;font-size:12px;">&#x1F5D1;&#xFE0F; Delete card</button>
-                <button class="secondary" onclick="closeProjectModal()" style="padding:4px 8px;">&#x2715;</button>
+                <button onclick="deleteActiveProjectCard()" style="background:#a80000;padding:4px 12px;font-size:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete card</button>
+                <button class="secondary" onclick="closeProjectModal()" style="padding:4px 8px;">&times;</button>
             </div>
         </div>
         <div class="modal-body">
@@ -257,8 +429,8 @@
                     <div style="margin-top:10px;">
                         <label style="font-size:12px;">New connection type (applied on next link)</label>
                         <select id="modal-dep-type" style="width:100%;margin-top:4px;">
-                            <option value="blocking">&#x1F534; Blocking (must finish before)</option>
-                            <option value="informal">&#x26AA; Informational (related)</option>
+                            <option value="blocking">Blocking (must finish before)</option>
+                            <option value="informal">Informational (related)</option>
                         </select>
                     </div>
                 </div>
@@ -273,7 +445,7 @@
             </div>
 
             <div class="radar-container">
-                <label style="font-size:12px;font-weight:700;">&#x1F4C8; Customer Benefit</label>
+                <label style="font-size:12px;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 12l4-4 3 3 5-7"/><path d="M2 14h12"/></svg> Customer Benefit</label>
                 <div style="display:flex;justify-content:center;margin:5px 0;">
                     <svg id="svg-radar-benefit" width="320" height="270"></svg>
                 </div>
@@ -286,7 +458,7 @@
             </div>
 
             <div class="radar-container full-width">
-                <label style="font-size:12px;font-weight:700;">&#x2699;&#xFE0F; 10 Types of Innovation</label>
+                <label style="font-size:12px;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="8" r="2.5"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.8 3.8l1 1M11.2 11.2l1 1M3.8 12.2l1-1M11.2 4.8l1-1"/></svg> 10 Types of Innovation</label>
                 <div style="display:flex;justify-content:center;margin:5px 0;">
                     <svg id="svg-radar-innovation" width="460" height="310"></svg>
                 </div>
@@ -305,7 +477,7 @@
             </div>
 
             <div class="roadmap-editor-box full-width">
-                <label style="font-size:13px;color:#10253f;display:block;margin-bottom:7px;font-weight:700;">&#x1F5FA;&#xFE0F; Project Roadmap (Quarter + Year)</label>
+                <label style="font-size:13px;color:#10253f;display:block;margin-bottom:7px;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M1 3l5 2 4-2 5 2v10l-5-2-4 2-5-2V3z"/><path d="M6 5v10M10 3v10"/></svg> Project Roadmap (Quarter + Year)</label>
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
                     <span style="font-size:11px;font-weight:600;color:#495a6b;">Scroll:</span>
                     <input type="range" id="timeline-scroll" min="0" max="6" step="0.25" value="0" style="flex:1;" oninput="scrollTimeline(this.value)">
@@ -325,7 +497,7 @@
                     <input type="text" id="ms-desc" placeholder="Description (optional)..." style="width:170px;">
                     <select id="ms-quarter"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select>
                     <select id="ms-year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option><option>2032</option><option>2033</option><option>2034</option><option>2035</option></select>
-                    <button type="button" onclick="addMilestoneToActiveProject()">&#xFF0B; Add</button>
+                    <button type="button" onclick="addMilestoneToActiveProject()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M8 2v12M2 8h12"/></svg> Add</button>
                 </div>
             </div>
         </div>
@@ -337,7 +509,62 @@
 </div>
 
 
-    <!-- Input popup for "Add product line" and other text inputs -->
+
+    <div id="conn-label-overlay" class="confirm-popup-overlay" style="display:none;">
+        <div class="confirm-popup" style="max-width:340px;">
+            <h3 id="conn-label-title" style="margin-bottom:6px;">Edit connection</h3>
+            <p id="conn-label-type" style="margin:0 0 12px 0;font-size:12px;"></p>
+            <input type="text" id="conn-label-field" maxlength="40"
+                style="width:100%;padding:8px 10px;border:1px solid #edebe9;border-radius:2px;font-size:13px;margin-bottom:16px;box-sizing:border-box;"
+                placeholder="e.g. needs API first, regulatory approval...">
+            <div class="confirm-popup-btns">
+                <button id="conn-label-ok">Save</button>
+                <button class="secondary" id="conn-label-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="ps-modal-overlay" class="confirm-popup-overlay" style="display:none;">
+        <div class="confirm-popup" style="max-width:340px;text-align:left;">
+            <h3 id="ps-modal-title" style="margin-bottom:16px;font-size:15px;color:#18274a;font-weight:400;"></h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                <div>
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Status</label>
+                    <select id="ps-status" style="width:100%;font-size:13px;padding:6px 8px;">
+                        <option value="idea">Idea</option>
+                        <option value="planned">Planned</option>
+                        <option value="active">Active</option>
+                        <option value="done">Done</option>
+                        <option value="blocked">Blocked</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Effort</label>
+                    <select id="ps-effort" style="width:100%;font-size:13px;padding:6px 8px;">
+                        <option value="XS">XS</option><option value="S">S</option>
+                        <option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Cost</label>
+                    <select id="ps-cost" style="width:100%;font-size:13px;padding:6px 8px;">
+                        <option value="XS">XS</option><option value="S">S</option>
+                        <option value="M">M</option><option value="L">L</option><option value="XL">XL</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-bottom:16px;">
+                <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Note</label>
+                <textarea id="ps-note" style="width:100%;height:60px;font-size:12px;padding:6px 8px;border:1px solid #d4cac8;border-radius:3px;resize:vertical;font-weight:400;" placeholder="Brief description of scope or goal..."></textarea>
+            </div>
+            <div class="confirm-popup-btns">
+                <button onclick="savePreStudy()" style="background:#f39200;">Save</button>
+                <button class="secondary" onclick="document.getElementById('ps-modal-overlay').style.display='none';">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div id="input-popup-overlay" class="confirm-popup-overlay" style="display:none;">
         <div class="confirm-popup">
             <h3 id="input-popup-title">Enter value</h3>
@@ -368,15 +595,16 @@
     var dependencySourceId = null;
     var connectionsList = [];
     var deleteConnectionMode = false;
+    var activePsId = null;
     var currentView = 'full';
     var activeStatusFilters = new Set(['idea','planned','active','done','blocked']);
 
     var STATUS_META = {
-        idea:    { label: 'Idea',    color: '#a19f9d', stripe: 'status-idea' },
-        planned: { label: 'Planned', color: '#0078d4', stripe: 'status-planned' },
+        idea:    { label: 'Idea',    color: '#bfb1ac', stripe: 'status-idea' },
+        planned: { label: 'Planned', color: '#18274a', stripe: 'status-planned' },
         active:  { label: 'Active',  color: '#f39200', stripe: 'status-active' },
-        done:    { label: 'Done',    color: '#107c41', stripe: 'status-done' },
-        blocked: { label: 'Blocked', color: '#e81123', stripe: 'status-blocked' }
+        done:    { label: 'Done',    color: '#94b654', stripe: 'status-done' },
+        blocked: { label: 'Blocked', color: '#e56b78', stripe: 'status-blocked' }
     };
     var EFFORT_W = { XS:1, S:2, M:3, L:4, XL:5 };
 
@@ -426,6 +654,7 @@
         document.getElementById('view-compact-btn').classList.toggle('active',mode==='compact');
         document.getElementById('strategy-board').classList.toggle('board-compact',mode==='compact');
         document.querySelectorAll('.project-card').forEach(function(c){c.style.width=mode==='compact'?'155px':'230px';});
+        if(mode==='compact') document.querySelectorAll('.prestudy-panel.ps-open').forEach(function(p){p.classList.remove('ps-open');});
         setTimeout(function(){redrawAllConnections();},50);
     }
 
@@ -436,18 +665,18 @@
         vis.forEach(function(d){counts[d.status||'idea']++;});
         document.getElementById('board-kpi-strip').innerHTML=
             '<span style="font-weight:700;">Visible: '+vis.length+' / '+all.length+'</span>'+
-            ' <span>&#x1F4A1; '+counts.idea+'</span>'+
-            ' <span>&#x1F4CB; '+counts.planned+'</span>'+
-            ' <span>&#x1F504; '+counts.active+'</span>'+
-            ' <span>&#x2705; '+counts.done+'</span>'+
-            ' <span>&#x1F6AB; '+counts.blocked+'</span>';
+            ' <span>Idea: '+counts.idea+'</span>'+
+            ' <span>Planned: '+counts.planned+'</span>'+
+            ' <span>Active: '+counts.active+'</span>'+
+            ' <span>Done: '+counts.done+'</span>'+
+            ' <span>Blocked: '+counts.blocked+'</span>';
     }
 
     function updateEffortSummaries() {
         productLines.forEach(function(line) {
             var el=document.getElementById('effort-summary-'+line.id); if(!el) return;
             var parts=[];
-            ['short','mid','long','vision'].forEach(function(h) {
+            ['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'].forEach(function(h) {
                 var cell=document.getElementById(line.id+'-'+h); if(!cell) return;
                 var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){return c.style.display!=='none';});
                 if(!cards.length) return;
@@ -493,6 +722,12 @@
         var titleCell=document.createElement('div');
         titleCell.className='swimlane-title'; titleCell.id='title-box-'+id;
         titleCell.innerHTML = '';
+        var handle = document.createElement('span');
+        handle.className = 'swimlane-drag-handle';
+        handle.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#bfb1ac" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="5" cy="5" r="1" fill="#bfb1ac" stroke="none"/><circle cx="5" cy="8" r="1" fill="#bfb1ac" stroke="none"/><circle cx="5" cy="11" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="5" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="8" r="1" fill="#bfb1ac" stroke="none"/><circle cx="9" cy="11" r="1" fill="#bfb1ac" stroke="none"/></svg>'; // hamburger/grip icon
+        handle.title = 'Drag to reorder';
+        titleCell.appendChild(handle);
+
         var inner = document.createElement('div');
         inner.className = 'swimlane-title-inner';
         var span = document.createElement('input');
@@ -514,10 +749,42 @@
         delBtn.innerHTML = '&times;';
         titleCell.appendChild(inner);
         titleCell.appendChild(delBtn);
-        var horizons=['short','mid','long','vision'];
+
+        // Swimlane row drag-to-reorder
+        titleCell.draggable = true;
+        titleCell.dataset.laneid = id;
+        titleCell.addEventListener('dragstart', function(e) {
+            if (!e.target.classList.contains('swimlane-drag-handle') && e.target !== titleCell) return;
+            titleCell.classList.add('lane-dragging');
+            e.dataTransfer.setData('lane-drag', id);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        titleCell.addEventListener('dragend', function() {
+            titleCell.classList.remove('lane-dragging');
+            document.querySelectorAll('.lane-drag-over').forEach(function(el){ el.classList.remove('lane-drag-over'); });
+        });
+        titleCell.addEventListener('dragover', function(e) {
+            if (!e.dataTransfer.types.includes('lane-drag')) return;
+            e.preventDefault();
+            document.querySelectorAll('.lane-drag-over').forEach(function(el){ el.classList.remove('lane-drag-over'); });
+            titleCell.classList.add('lane-drag-over');
+        });
+        titleCell.addEventListener('dragleave', function() {
+            titleCell.classList.remove('lane-drag-over');
+        });
+        titleCell.addEventListener('drop', function(e) {
+            if (!e.dataTransfer.types.includes('lane-drag')) return;
+            e.preventDefault();
+            titleCell.classList.remove('lane-drag-over');
+            var fromId = e.dataTransfer.getData('lane-drag');
+            if (fromId && fromId !== id) reorderProductLine(fromId, id);
+        });
+
+        var horizons=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+        var cellClasses={'y2026':'cell-short','y2027':'cell-short','y2028':'cell-mid','y2029':'cell-mid','y2030':'cell-mid','y2031_33':'cell-long','y2034_35':'cell-long','vision':'cell-vision'};
         var cells=horizons.map(function(h) {
             var cell=document.createElement('div');
-            cell.className='lane-cell cell-'+h; cell.id=id+'-'+h;
+            cell.className='lane-cell '+(cellClasses[h]||'cell-vision'); cell.id=id+'-'+h;
             var summary=document.createElement('div');
             summary.className='lane-col-summary'; summary.dataset.cell=id+'-'+h;
             summary.innerHTML='<span style="color:#bbb;">&#x2013;</span>';
@@ -527,7 +794,7 @@
                 e.preventDefault(); cell.classList.remove('drag-over');
                 var cardId=e.dataTransfer.getData('text/plain');
                 var card=document.getElementById(cardId);
-                if(card){cell.insertBefore(card,summary);setTimeout(function(){redrawAllConnections();},50);}
+                if(card){var w=document.getElementById('wrap-'+cardId)||card; cell.insertBefore(w,summary);setTimeout(function(){redrawAllConnections();},50);}
             });
             cell.appendChild(summary); return cell;
         });
@@ -544,7 +811,9 @@
 
     function deleteProductLine(id) {
         showConfirm('Delete product line?','This will delete the product line and all its cards. Cannot be undone.',function() {
-            ['title-box-'+id,id+'-short',id+'-mid',id+'-long',id+'-vision'].forEach(function(sel){var el=document.getElementById(sel);if(el)el.remove();});
+            ['title-box-'+id,id+'-y2026',id+'-y2027',id+'-y2028',id+'-y2029',id+'-y2030',id+'-y2031_33',id+'-y2034_35',id+'-vision'].forEach(function(sel){var el=document.getElementById(sel);if(el)el.remove();});
+            // Remove card wrappers belonging to this lane
+
             productLines=productLines.filter(function(l){return l.id!==id;}); syncProductDropdown();
             setTimeout(function(){redrawAllConnections();},50);
         });
@@ -562,27 +831,46 @@
     function createProjectCard(prod,horizon,title,initialData,forcedId) {
         var id=forcedId||('proj-'+Date.now()+Math.floor(Math.random()*1000));
         var container=document.getElementById(prod+'-'+horizon); if(!container) return;
-        projectsData[id]=initialData||{title:title,prodLineId:prod,horizonId:horizon,persona:'',effort:'M',cost:'M',status:'idea',depType:'blocking',benefitValues:[0,0,0,0],innovationValues:[0,0,0,0,0,0,0,0,0,0],milestones:[]};
+        projectsData[id]=initialData||{title:title,prodLineId:prod,horizonId:horizon,persona:'',effort:'M',cost:'M',status:'idea',depType:'blocking',benefitValues:[0,0,0,0],innovationValues:[0,0,0,0,0,0,0,0,0,0],milestones:[],preStudy:null};
         var d=projectsData[id];
         if(!d.prodLineId) d.prodLineId=prod; if(!d.horizonId) d.horizonId=horizon;
         if(!d.status) d.status='idea'; if(!d.depType) d.depType='blocking';
+        if(d.preStudy===undefined) d.preStudy=null;
         if(!d.benefitValues) d.benefitValues=[0,0,0,0];
         if(!d.innovationValues) d.innovationValues=[0,0,0,0,0,0,0,0,0,0];
+
+        var wrapper=document.createElement('div');
+        wrapper.className='card-with-prestudy'; wrapper.id='wrap-'+id;
+
+        var psTab=document.createElement('div');
+        psTab.className='prestudy-tab ps-empty'; psTab.id='pstab-'+id;
+        psTab.title='Pre-study';
+        psTab.innerHTML='<svg viewBox="0 0 12 12"><path d="M6 1v10M1 6h10"/></svg><span class="ps-tab-label">Pre-study</span>';
+        psTab.addEventListener('click', function(e){ e.stopPropagation(); togglePreStudy(id); });
+
+        var psPanel=document.createElement('div');
+        psPanel.className='prestudy-panel'; psPanel.id='pspanel-'+id;
 
         var card=document.createElement('div');
         card.className='project-card'; card.id=id; card.draggable=true;
         card.style.width=currentView==='compact'?'155px':'230px';
-        renderCardContent(card,id);
+        
+        wrapper.appendChild(psPanel);
+        wrapper.appendChild(psTab);
+        wrapper.appendChild(card);
 
         card.addEventListener('dragstart',function(e){card.classList.add('dragging');e.dataTransfer.setData('text/plain',id);});
         card.addEventListener('dragend',function(){card.classList.remove('dragging');document.querySelectorAll('.drag-insert-before').forEach(function(c){c.classList.remove('drag-insert-before');});});
         card.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();document.querySelectorAll('.drag-insert-before').forEach(function(c){c.classList.remove('drag-insert-before');});card.classList.add('drag-insert-before');});
         card.addEventListener('dragleave',function(){card.classList.remove('drag-insert-before');});
-        card.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();card.classList.remove('drag-insert-before');var did=e.dataTransfer.getData('text/plain');var dc=document.getElementById(did);if(dc&&dc!==card){card.parentElement.insertBefore(dc,card);setTimeout(function(){redrawAllConnections();},50);}});
+        card.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();card.classList.remove('drag-insert-before');var did=e.dataTransfer.getData('text/plain');var dc=document.getElementById(did);if(dc&&dc!==card){var dw=document.getElementById('wrap-'+did)||dc;var tw=card.closest('.card-with-prestudy')||card;card.parentElement.insertBefore(dw,tw);setTimeout(function(){redrawAllConnections();},50);}});
         card.addEventListener('click',function(e){if(e.target.classList.contains('dependency-dot'))return;openProjectModal(id);});
 
         var summary=container.querySelector('.lane-col-summary');
-        if(summary) container.insertBefore(card,summary); else container.appendChild(card);
+        if(summary) container.insertBefore(wrapper,summary); else container.appendChild(wrapper);
+        
+        renderCardContent(card,id);
+        
         updateEffortSummaries(); setTimeout(function(){redrawAllConnections();},50);
     }
 
@@ -630,8 +918,8 @@
         card.appendChild(badges);
         card.appendChild(radarRow);
 
-        var bs = document.getElementById(id+'-mini-benefit');
-        var is = document.getElementById(id+'-mini-innovation');
+        var bs = card.querySelector('#' + id + '-mini-benefit');
+        var is = card.querySelector('#' + id + '-mini-innovation');
         if(bs) drawMiniRadar(bs, d.benefitValues||[0,0,0,0], 10);
         if(is) drawMiniRadar(is, d.innovationValues||new Array(10).fill(0), 10);
     }
@@ -639,6 +927,19 @@
         var card=document.getElementById(id); if(!card) return;
         renderCardContent(card,id);
         card.style.width=currentView==='compact'?'155px':'230px';
+        // Refresh prestudy panel if open
+        var panel = document.getElementById('pspanel-'+id);
+        if (panel && panel.classList.contains('ps-open')) renderPreStudyPanel(id);
+        // Refresh tab state
+        var d = projectsData[id];
+        var tab = document.getElementById('pstab-'+id);
+        if (tab && d) {
+            if (d.preStudy) {
+                tab.classList.remove('ps-empty');
+            } else {
+                tab.classList.add('ps-empty');
+            }
+        }
     }
 
     function drawMiniRadar(svg,values,maxVal) {
@@ -686,6 +987,10 @@
         d.cost=document.getElementById('modal-cost').value;
         d.status=document.getElementById('modal-status').value;
         d.depType=document.getElementById('modal-dep-type').value;
+        // Update all existing connections from this card to reflect new depType
+        connectionsList.forEach(function(conn) {
+            if (conn.from === activeProjectId) conn.type = d.depType;
+        });
         for(var i=1;i<=4;i++) d.benefitValues[i-1]=parseInt(document.getElementById('b-val'+i).value);
         for(var i=1;i<=10;i++) d.innovationValues[i-1]=parseInt(document.getElementById('i-val'+i).value);
         updateCardUIPreview(activeProjectId);updateEffortSummaries();updateKpiStrip();closeProjectModal();
@@ -751,7 +1056,7 @@
             var yr=parseInt(ms.year)-2026,qv=(parseInt(ms.quarter.replace('Q',''))-1)*0.25;
             var pin=document.createElement('div');pin.className='milestone-pin-ui';
             pin.style.left=((yr+qv)*100+10)+'px';pin.style.top=(20+(idx*30)%80)+'px';
-            pin.innerHTML='<div class="pin-icon">&#x1F4CD;</div><div class="pin-label">'+ms.quarter+'/'+ms.year+' &#x2013; <strong>'+ms.label+'</strong> <span onclick="deleteMilestone('+idx+')" style="color:red;font-weight:bold;cursor:pointer;margin-left:4px;">&times;</span></div>';
+            pin.innerHTML='<div class="pin-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M8 1a4 4 0 0 1 4 4c0 3-4 9-4 9S4 8 4 5a4 4 0 0 1 4-4z"/><circle cx="8" cy="5" r="1.5" fill="#18274a" stroke="none"/></svg></div><div class="pin-label">'+ms.quarter+'/'+ms.year+' &#x2013; <strong>'+ms.label+'</strong> <span onclick="deleteMilestone('+idx+')" style="color:red;font-weight:bold;cursor:pointer;margin-left:4px;">&times;</span></div>';
             zone.appendChild(pin);
         });
     }
@@ -765,24 +1070,30 @@
 
     function toggleDependencyMode(){
         dependencyMode=!dependencyMode;var btn=document.getElementById('dep-btn');
-        if(dependencyMode){btn.style.background='#e81123';btn.style.color='#fff';btn.innerText='Click source node...';}
-        else{btn.style.background='';btn.style.color='';btn.innerText='\u26D3\uFE0F Add connection';dependencySourceId=null;}
+        if(dependencyMode){btn.style.background='#e81123';btn.style.color='#fff';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Click source…';}
+        else{btn.style.background='';btn.style.color='';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add connection';dependencySourceId=null;}
     }
     function handleDepClick(e,id){
-        e.stopPropagation();if(!dependencyMode) return;
-        if(!dependencySourceId){dependencySourceId=id;document.getElementById('dep-btn').innerText='Click target node...';}
-        else{
+        e.stopPropagation();
+        // Auto-activate dependency mode when clicking a dot
+        if(!dependencyMode) toggleDependencyMode();
+        if(!dependencySourceId){
+            dependencySourceId=id;
+            document.getElementById('dep-btn').innerText='Click target node...';
+        } else {
             if(dependencySourceId!==id){
                 var depType=(projectsData[dependencySourceId]||{}).depType||'blocking';
                 connectionsList.push({from:dependencySourceId,to:id,type:depType});
             }
-            dependencySourceId=null;toggleDependencyMode();redrawAllConnections();
+            dependencySourceId=null;
+            toggleDependencyMode();
+            redrawAllConnections();
         }
     }
     function deleteSingleConnectionMode(){
         deleteConnectionMode=!deleteConnectionMode;var btn=document.getElementById('dep-del-btn');
         if(deleteConnectionMode){btn.style.background='#e81123';btn.style.color='#fff';btn.innerText='Click connection to delete...';document.getElementById('strategy-board').parentElement.classList.add('dep-delete-mode');}
-        else{btn.style.background='';btn.style.color='#8a4500';btn.innerText='\u2702\uFE0F Delete connection';document.getElementById('strategy-board').parentElement.classList.remove('dep-delete-mode');}
+        else{btn.style.background='';btn.style.color='#8a4500';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><path d="M5.5 4.5l7-1.5M5.5 11.5l7 1.5M12 8h2"/></svg> Delete connection';document.getElementById('strategy-board').parentElement.classList.remove('dep-delete-mode');}
         redrawAllConnections();
     }
     function deleteConnection(index){connectionsList.splice(index,1);redrawAllConnections();if(deleteConnectionMode)deleteSingleConnectionMode();}
@@ -795,30 +1106,102 @@
             if(!eF||!eT||eF.style.display==='none'||eT.style.display==='none') return;
             var rF=eF.getBoundingClientRect(),rT=eT.getBoundingClientRect(),rB=svg.getBoundingClientRect();
             var x1=rF.left+rF.width-rB.left,y1=rF.top+rF.height/2-rB.top,x2=rT.left-rB.left,y2=rT.top+rT.height/2-rB.top;
-            var g=document.createElementNS("http://www.w3.org/2000/svg","g");g.setAttribute("class","connection-line-group");
-            var path=document.createElementNS("http://www.w3.org/2000/svg","path");
-            path.setAttribute("d","M "+x1+" "+y1+" C "+(x1+60)+" "+y1+", "+(x2-60)+" "+y2+", "+x2+" "+y2);
+            var mx=(x1+x2)/2, my=(y1+y2)/2;
             var isBlocking=(conn.type||'blocking')==='blocking';
-            path.setAttribute("stroke",isBlocking?'#e81123':'#a19f9d');
+            var lineColor = isBlocking ? '#e56b78' : '#bfb1ac';
+            var d = "M "+x1+" "+y1+" C "+(x1+60)+" "+y1+", "+(x2-60)+" "+y2+", "+x2+" "+y2;
+
+            var g=document.createElementNS("http://www.w3.org/2000/svg","g");
+            g.setAttribute("class","connection-line-group");
+
+            // Main visible path
+            var path=document.createElementNS("http://www.w3.org/2000/svg","path");
+            path.setAttribute("d",d);
+            path.setAttribute("stroke",lineColor);
             path.setAttribute("stroke-width",isBlocking?'3':'2');
             path.setAttribute("fill","none");
             path.setAttribute("stroke-dasharray",isBlocking?'5 3':'2 5');
             g.appendChild(path);
+
+            // Wide invisible hit area for clicking
+            var hit=document.createElementNS("http://www.w3.org/2000/svg","path");
+            hit.setAttribute("d",d);
+            hit.setAttribute("stroke","transparent");
+            hit.setAttribute("stroke-width","18");
+            hit.setAttribute("fill","none");
+            hit.setAttribute("cursor","pointer");
+            hit.setAttribute("pointer-events","stroke");
+
             if(deleteConnectionMode){
-                var hit=document.createElementNS("http://www.w3.org/2000/svg","path");
-                hit.setAttribute("d","M "+x1+" "+y1+" C "+(x1+60)+" "+y1+", "+(x2-60)+" "+y2+", "+x2+" "+y2);
-                hit.setAttribute("stroke","transparent");hit.setAttribute("stroke-width","18");hit.setAttribute("fill","none");
-                hit.setAttribute("cursor","pointer");hit.setAttribute("pointer-events","stroke");
                 hit.addEventListener('click',function(ev){ev.stopPropagation();deleteConnection(index);});
-                g.appendChild(hit);
-                var mx=(x1+x2)/2,my=(y1+y2)/2-10;
-                var txt=document.createElementNS("http://www.w3.org/2000/svg","text");
-                txt.setAttribute("x",mx);txt.setAttribute("y",my);txt.setAttribute("text-anchor","middle");
-                txt.setAttribute("font-size","11px");txt.setAttribute("fill","#e81123");txt.setAttribute("pointer-events","none");
-                txt.textContent="\u2715 delete";g.appendChild(txt);
+                // Delete label
+                var dtxt=document.createElementNS("http://www.w3.org/2000/svg","text");
+                dtxt.setAttribute("x",mx);dtxt.setAttribute("y",my-10);
+                dtxt.setAttribute("text-anchor","middle");dtxt.setAttribute("font-size","11px");
+                dtxt.setAttribute("fill","#e81123");dtxt.setAttribute("pointer-events","none");
+                dtxt.textContent="\u2715 delete";g.appendChild(dtxt);
+            } else {
+                // Click to edit label
+                hit.addEventListener('click',(function(i){ return function(ev){ev.stopPropagation();openConnLabelEditor(i);}; })(index));
             }
+            g.appendChild(hit);
+
+            // Label pill on the line midpoint
+            var icon = isBlocking ? '●' : '○'; // 🔴 or ⚪
+            var labelText = (conn.label && conn.label.trim()) ? (icon+' '+conn.label) : (isBlocking ? icon+' Blocking' : icon+' Related');
+            var labelLen = labelText.length * 6.5 + 14;
+
+            // Pill background
+            var rect=document.createElementNS("http://www.w3.org/2000/svg","rect");
+            rect.setAttribute("x",mx-labelLen/2);rect.setAttribute("y",my-10);
+            rect.setAttribute("width",labelLen);rect.setAttribute("height",18);
+            rect.setAttribute("rx","9");
+            rect.setAttribute("fill", isBlocking?'#fae0e3':'#ede9e8');
+            rect.setAttribute("stroke",lineColor);rect.setAttribute("stroke-width","1");
+            rect.setAttribute("pointer-events","none");
+            g.appendChild(rect);
+
+            // Pill text
+            var ltxt=document.createElementNS("http://www.w3.org/2000/svg","text");
+            ltxt.setAttribute("x",mx);ltxt.setAttribute("y",my+4);
+            ltxt.setAttribute("text-anchor","middle");ltxt.setAttribute("font-size","10px");
+            ltxt.setAttribute("font-weight","600");ltxt.setAttribute("font-family","Segoe UI,Arial,sans-serif");
+            ltxt.setAttribute("fill",isBlocking?'#8a2030':'#595857');
+            ltxt.setAttribute("pointer-events","none");
+            ltxt.textContent=labelText;
+            g.appendChild(ltxt);
+
             svg.appendChild(g);
         });
+    }
+
+    function openConnLabelEditor(index) {
+        var conn = connectionsList[index];
+        if (!conn) return;
+        var isBlocking = (conn.type||'blocking') === 'blocking';
+        var overlay = document.getElementById('conn-label-overlay');
+        var fromTitle = (projectsData[conn.from]||{}).title || conn.from;
+        var toTitle   = (projectsData[conn.to]||{}).title   || conn.to;
+        document.getElementById('conn-label-title').textContent = fromTitle + ' \u2192 ' + toTitle;
+        document.getElementById('conn-label-type').textContent = isBlocking ? '● Blocking connection' : '○ Informational / Related';
+        var field = document.getElementById('conn-label-field');
+        field.value = conn.label || '';
+        overlay.style.display = 'flex';
+        setTimeout(function(){ field.focus(); }, 50);
+        var ok = document.getElementById('conn-label-ok').cloneNode(true);
+        var cancel = document.getElementById('conn-label-cancel').cloneNode(true);
+        document.getElementById('conn-label-ok').replaceWith(ok);
+        document.getElementById('conn-label-cancel').replaceWith(cancel);
+        ok.addEventListener('click', function() {
+            conn.label = field.value.trim();
+            overlay.style.display = 'none';
+            redrawAllConnections();
+        });
+        field.addEventListener('keydown', function(e){
+            if(e.key==='Enter'){ conn.label=field.value.trim(); overlay.style.display='none'; redrawAllConnections(); }
+            if(e.key==='Escape'){ overlay.style.display='none'; }
+        });
+        cancel.addEventListener('click', function(){ overlay.style.display='none'; });
     }
     window.addEventListener('resize',function(){redrawAllConnections();});
 
@@ -879,10 +1262,14 @@
     function exportStrategyBoard(){
         var cp={};
         document.querySelectorAll('.lane-cell').forEach(function(cell){
-            Array.from(cell.querySelectorAll('.project-card')).forEach(function(card,order){
+            Array.from(cell.querySelectorAll('.card-with-prestudy,.project-card')).forEach(function(wrapper,order){
+                var card = wrapper.classList.contains('project-card') ? wrapper : wrapper.querySelector('.project-card');
+                if (!card) return;
                 cp[card.id]={cellId:cell.id,order:order};
-                var ld=cell.id.lastIndexOf('-');
-                if(projectsData[card.id]){projectsData[card.id].horizonId=cell.id.substring(ld+1);projectsData[card.id].prodLineId=cell.id.substring(0,ld);}
+                var horizIds=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+                var cid=cell.id; var horizId='',prodId=cid;
+                for(var hi=0;hi<horizIds.length;hi++){if(cid.endsWith('-'+horizIds[hi])){horizId=horizIds[hi];prodId=cid.slice(0,-(horizIds[hi].length+1));break;}}
+                if(projectsData[card.id]){projectsData[card.id].horizonId=horizId||cid;projectsData[card.id].prodLineId=prodId;}
             });
         });
         var data={version:3,projectsData:projectsData,productLines:productLines,connectionsList:connectionsList,cardPositions:cp};
@@ -897,16 +1284,22 @@
             try{
                 var data=JSON.parse(e.target.result);
                 var board=document.getElementById('strategy-board');
-                board.innerHTML='<div class="board-header">Product lines</div><div class="board-header" style="background-color:#e56b78;">Short Term (2026&#x2013;2027)<br><small style="font-weight:normal;">immediate market need</small></div><div class="board-header" style="background-color:#f39200;">Mid Term (2028&#x2013;2030)<br><small style="font-weight:normal;">stay competitive</small></div><div class="board-header" style="background-color:#94b654;">Long Term (2031&#x2013;2035)<br><small style="font-weight:normal;">be future proof</small></div><div class="board-header" style="background-color:#31b7bc;">BU Vision (10+ Years)<br><small style="font-weight:normal;">Calm Critical Care</small></div>';
+                board.innerHTML='<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
                 productLines=[];projectsData={};connectionsList=data.connectionsList||[];
                 data.productLines.forEach(function(l){addNewProductLineVisual(l.id,l.title);});
                 var cp=data.cardPositions||{};
                 var sorted=Object.keys(data.projectsData).sort(function(a,b){return (cp[a]?cp[a].order:0)-(cp[b]?cp[b].order:0);});
+                var horizonMap={'short':'y2026','mid':'y2028','long':'y2031_33'};
                 sorted.forEach(function(id){
                     var p=data.projectsData[id];
                     var cellId=cp[id]?cp[id].cellId:(p.prodLineId+'-'+p.horizonId);
-                    var ld=cellId.lastIndexOf('-');
-                    createProjectCard(cellId.substring(0,ld),cellId.substring(ld+1),p.title,p,id);
+                    var horizIds2=['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+                    var prod=cellId,horiz='';
+                    for(var hj=0;hj<horizIds2.length;hj++){if(cellId.endsWith('-'+horizIds2[hj])){horiz=horizIds2[hj];prod=cellId.slice(0,-(horizIds2[hj].length+1));break;}}
+                    if(!horiz){var ld=cellId.lastIndexOf('-');prod=cellId.substring(0,ld);horiz=cellId.substring(ld+1);}
+                    // Migrate old horizon IDs to new year-based IDs
+                    if(horizonMap[horiz]) horiz=horizonMap[horiz];
+                    createProjectCard(prod,horiz,p.title,p,id);
                 });
                 redrawAllConnections();updateKpiStrip();updateEffortSummaries();
                 showAlert("Import successful!");
@@ -930,12 +1323,123 @@
         }
     });
 
+
+
+    function togglePreStudy(id) {
+        var d = projectsData[id];
+        var panel = document.getElementById('pspanel-'+id);
+        var tab = document.getElementById('pstab-'+id);
+        if (!panel || !tab) return;
+
+        if (!d.preStudy) {
+            // Create pre-study with defaults
+            d.preStudy = { status: 'idea', effort: 'S', cost: 'S', note: '' };
+            tab.classList.remove('ps-empty');
+            tab.innerHTML = '<svg viewBox="0 0 12 12" style="width:12px;height:12px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M3 1h6M2 3h8l-1 7H3L2 3z"/><path d="M5 6h2"/></svg><span class="ps-tab-label">Pre-study</span>';
+        }
+
+        var isOpen = panel.classList.contains('ps-open');
+        if (isOpen) {
+            panel.classList.remove('ps-open');
+        } else {
+            renderPreStudyPanel(id);
+            panel.classList.add('ps-open');
+        }
+        setTimeout(function(){ redrawAllConnections(); }, 50);
+    }
+
+    function renderPreStudyPanel(id) {
+        var d = projectsData[id];
+        var ps = d.preStudy;
+        var panel = document.getElementById('pspanel-'+id);
+        if (!panel || !ps) return;
+
+        var statusColors = { idea:'#bfb1ac', planned:'#18274a', active:'#f39200', done:'#94b654', blocked:'#e56b78' };
+        var sc = statusColors[ps.status] || '#bfb1ac';
+
+        panel.innerHTML =
+            '<div class="ps-panel-title">' +
+                '<svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#835600" stroke-width="2" stroke-linecap="round"><path d="M3 1h6M2 3h8l-1 7H3L2 3z"/><path d="M5 6h2"/></svg>' +
+                ' Pre-study' +
+            '</div>' +
+            '<div class="ps-panel-row"><span class="ps-panel-lbl">Status</span>' +
+                '<span style="font-size:10px;padding:1px 6px;border-radius:8px;background:'+sc+';color:white;font-weight:400;">'+ps.status+'</span></div>' +
+            '<div class="ps-panel-row"><span class="ps-panel-lbl">Effort</span><span class="ps-panel-val">'+ps.effort+'</span></div>' +
+            '<div class="ps-panel-row"><span class="ps-panel-lbl">Cost</span><span class="ps-panel-val">'+ps.cost+'</span></div>' +
+            (ps.note ? '<div style="font-size:10px;color:#8b7e79;margin-top:6px;line-height:1.4;">'+ps.note+'</div>' : '') +
+            '<button onclick="openPreStudyEditor(\''+id+'\')" style="margin-top:8px;width:100%;padding:4px;font-size:10px;background:#f39200;color:white;border:none;border-radius:3px;cursor:pointer;font-weight:400;">Edit</button>' +
+            '<button onclick="removePreStudy(\''+id+'\')" style="margin-top:4px;width:100%;padding:4px;font-size:10px;background:transparent;color:#8b7e79;border:1px solid #d4cac8;border-radius:3px;cursor:pointer;font-weight:400;">Remove</button>';
+    }
+
+    function removePreStudy(id) {
+        projectsData[id].preStudy = null;
+        var panel = document.getElementById('pspanel-'+id);
+        var tab = document.getElementById('pstab-'+id);
+        if (panel) { panel.classList.remove('ps-open'); panel.innerHTML = ''; }
+        if (tab) {
+            tab.classList.add('ps-empty');
+            tab.innerHTML = '<svg viewBox="0 0 12 12" style="width:12px;height:12px;stroke:#8b7e79;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M6 1v10M1 6h10"/></svg><span class="ps-tab-label">Pre-study</span>';
+        }
+        setTimeout(function(){ redrawAllConnections(); }, 50);
+    }
+
+    function openPreStudyEditor(id) {
+        var d = projectsData[id];
+        if (!d.preStudy) return;
+        activePsId = id;
+        var ps = d.preStudy;
+        document.getElementById('ps-modal-title').textContent = 'Pre-study: ' + d.title;
+        document.getElementById('ps-status').value = ps.status;
+        document.getElementById('ps-effort').value = ps.effort;
+        document.getElementById('ps-cost').value = ps.cost;
+        document.getElementById('ps-note').value = ps.note || '';
+        document.getElementById('ps-modal-overlay').style.display = 'flex';
+    }
+
+    function savePreStudy() {
+        if (!activePsId) return;
+        var ps = projectsData[activePsId].preStudy;
+        ps.status = document.getElementById('ps-status').value;
+        ps.effort = document.getElementById('ps-effort').value;
+        ps.cost   = document.getElementById('ps-cost').value;
+        ps.note   = document.getElementById('ps-note').value.trim();
+        renderPreStudyPanel(activePsId);
+        document.getElementById('ps-modal-overlay').style.display = 'none';
+        activePsId = null;
+    }
+
+    function reorderProductLine(fromId, toId) {
+        var board = document.getElementById('strategy-board');
+        var horizons = ['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+
+        // Collect the 5 DOM nodes of the FROM row
+        var fromNodes = [document.getElementById('title-box-' + fromId)]
+            .concat(horizons.map(function(h){ return document.getElementById(fromId+'-'+h); }));
+
+        // Reference node: the title cell of the TO row (insert our row before this)
+        var toTitle = document.getElementById('title-box-' + toId);
+
+        // Insert all 5 from-nodes consecutively before toTitle
+        // Use a DocumentFragment so they land in one operation, preserving order
+        var frag = document.createDocumentFragment();
+        fromNodes.forEach(function(node){ frag.appendChild(node); });
+        board.insertBefore(frag, toTitle);
+
+        // Update productLines array order
+        var fromIdx = productLines.findIndex(function(l){ return l.id === fromId; });
+        var toIdx   = productLines.findIndex(function(l){ return l.id === toId; });
+        var item = productLines.splice(fromIdx, 1)[0];
+        productLines.splice(toIdx, 0, item);
+
+        setTimeout(function(){ redrawAllConnections(); updateEffortSummaries(); }, 50);
+    }
+
     window.onload=function(){
         addNewProductLineVisual("prod-a","Product line 1");
         addNewProductLineVisual("prod-b","Product line 2");
         addNewProductLineVisual("prod-c","Product line 3");
-        createProjectCard("prod-a","short","Example project",{
-            title:"Example project",prodLineId:"prod-a",horizonId:"short",
+        createProjectCard("prod-a","y2026","Example project",{
+            title:"Example project",prodLineId:"prod-a",horizonId:"y2026",
             persona:"ICU nurse \u2013 needs fast access in high-stress situations",
             effort:"M",cost:"S",status:"active",depType:"blocking",
             benefitValues:[7,4,6,8],innovationValues:[3,5,0,4,7,5,6,8,3,4],milestones:[]
@@ -944,7 +1448,6 @@
     };
 </script>
 
-    <!-- Getinge branding: fixed bottom-right -->
     <div id="getinge-brand" style="
         position: fixed;
         bottom: 22px;
@@ -956,7 +1459,6 @@
         z-index: 9000;
         pointer-events: none;
     ">
-        <!-- Getinge real vector logo from EPS -->
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 945 140" width="300" height="45" style="display:block;"><g transform="scale(1,-1) translate(0,-140)">
   <path d="M 885.049 2.100 C 885.049 0.950 884.110 0.010 882.950 0.010 L 859.939 0.000 C 858.799 0.000 857.870 0.920 857.870 2.060 L 857.870 38.520 L 826.380 20.340 C 825.390 19.770 824.130 20.110 823.560 21.100 L 812.040 41.060 C 811.470 42.050 811.799 43.310 812.790 43.880 L 844.140 61.920 C 857.179 69.450 873.860 64.991 881.380 51.950 C 883.780 47.800 884.950 43.280 885.040 38.810 L 885.049 2.100 Z" fill="white"/>
   <path d="M 882.980 139.750 L 859.929 139.750 C 858.790 139.750 857.870 138.831 857.870 137.690 L 857.870 101.331 L 826.280 119.560 C 825.299 120.130 824.040 119.790 823.470 118.800 L 811.970 98.870 C 811.390 97.860 811.730 96.581 812.740 96.001 L 844.530 77.661 C 848.439 75.491 852.939 74.251 857.740 74.251 C 872.790 74.251 884.990 86.459 884.990 101.520 L 885.019 105.280 L 885.040 112.959 L 885.040 137.690 C 885.040 138.831 884.120 139.750 882.980 139.750 Z" fill="white"/>
@@ -969,7 +1471,6 @@
   <path d="M 550.473 29.381 C 537.479 29.381 526.946 39.915 526.946 52.909 L 526.946 86.585 C 526.946 99.580 537.479 110.114 550.473 110.114 L 618.563 110.114 L 611.550 97.050 L 555.117 97.050 C 549.011 97.050 544.061 92.101 544.061 85.995 L 544.061 53.906 C 544.061 47.800 549.011 42.851 555.117 42.851 L 599.063 42.851 C 605.169 42.851 610.118 47.800 610.118 53.906 L 610.118 62.751 L 578.714 62.744 L 578.714 75.807 L 626.849 75.807 L 626.849 52.909 C 626.849 39.915 616.316 29.381 603.322 29.381 L 550.473 29.381 Z" fill="white"/>
   <path d="M 481.212 29.381 L 481.212 86.279 C 481.212 92.228 476.388 97.050 470.439 97.050 L 420.319 97.047 L 420.319 29.381 L 402.970 29.381 L 402.970 110.124 L 474.862 110.124 C 487.856 110.124 498.390 99.591 498.390 86.597 L 498.390 29.381 L 481.212 29.381 Z" fill="white"/>
 </g></svg>
-        <!-- Copyright -->
         <div style="
             color: rgba(255,255,255,0.65);
             font-size: 10px;
