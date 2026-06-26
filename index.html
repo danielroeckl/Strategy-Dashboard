@@ -242,13 +242,16 @@
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(2px); }
         .modal-window { background: var(--surface); width: 1060px; max-height: 95vh; border-radius: 4px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; }
         .modal-header { padding: 12px 20px; background: rgba(73,90,107,0.15); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 16px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 1; min-height: 0; }
+        .modal-body { padding: 16px; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 1; min-height: 0; background: #f5f2f1; }
         .full-width { grid-column: span 2; }
         .form-section { border: 1px solid var(--border); border-radius: 4px; padding: 12px; background: #fafafa; }
         .form-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #a0aab4; margin-bottom: 8px; }
         .radar-container { border: 1px solid var(--border); border-radius: 4px; padding: 12px; background: rgba(233,228,227,0.1); text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .radar-sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; text-align: left; margin-top: 8px; font-size: 11px; width: 100%; }
-        .slider-row { display: flex; flex-direction: column; }
+        .radar-sliders { display: grid; grid-template-columns: 1fr; gap: 3px; text-align: left; margin-top: 4px; font-size: 11px; width: 100%; }
+        .slider-row { display: flex; flex-direction: row; align-items: center; gap: 6px; }
+        .slider-row label { flex-shrink: 0; width: 120px; font-size: 11px; color: #595857; }
+        .slider-row input[type=range] { flex: 1; min-width: 0; }
+        .slider-row .slider-val { flex-shrink: 0; width: 18px; text-align: right; font-size: 11px; font-weight: 600; color: #18274a; }
         .slider-label-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
         .slider-val-badge { background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 6px; min-width: 22px; text-align: center; }
         .roadmap-editor-box { border: 1px solid var(--border); border-radius: 4px; padding: 14px; background: #fff; }
@@ -1110,6 +1113,21 @@
     // ║  Detailansicht öffnen, bearbeiten, speichern, schließen          ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
+    // Status-Dropdown Farbe passend zu Filter-Chips
+        function updateStatusSelectColor(sel) {
+            var colors = {
+                idea:    { bg: '#ede9e8', color: '#595857', border: '#bfb1ac' },
+                planned: { bg: '#dce3f0', color: '#18274a', border: '#18274a' },
+                active:  { bg: '#fff4ce', color: '#835600', border: '#f39200' },
+                done:    { bg: '#e8f0d8', color: '#4a6020', border: '#94b654' },
+                blocked: { bg: '#fae0e3', color: '#8a2030', border: '#e56b78' },
+            };
+            var c = colors[sel.value] || colors.idea;
+            sel.style.background = c.bg;
+            sel.style.color = c.color;
+            sel.style.borderColor = c.border;
+        }
+
     // Projekt-Modal öffnen und alle Felder befüllen
         function openProjectModal(id) {
             activeProjectId=id;
@@ -1120,7 +1138,7 @@
             document.getElementById('modal-user-persona').value=d.persona||'';
             document.getElementById('modal-effort').value=d.effort||'M';
             document.getElementById('modal-cost').value=d.cost||'M';
-            document.getElementById('modal-status').value=d.status||'idea';
+            document.getElementById('modal-status').value=d.status||'idea'; updateStatusSelectColor(document.getElementById('modal-status'));
             document.getElementById('modal-dep-type').value=d.depType||'blocking';
             for(var i=1;i<=4;i++){document.getElementById('b-val'+i).value=d.benefitValues[i-1];document.getElementById('b-lbl'+i).textContent=d.benefitValues[i-1];}
             for(var i=1;i<=10;i++){document.getElementById('i-val'+i).value=d.innovationValues[i-1];document.getElementById('i-lbl'+i).textContent=d.innovationValues[i-1];}
@@ -1255,18 +1273,18 @@
         function renderBenefitRadar(){
             var svg=document.getElementById('svg-radar-benefit');svg.innerHTML='';
             var vals=[1,2,3,4].map(function(i){return parseInt(document.getElementById('b-val'+i).value);});
-            generateRadarPath(svg,160,135,78,vals,10,["Revenue (+)","Cost savings","Convenience","Clinical benefit"]);
+            generateRadarPath(svg,80,80,52,vals,10,["Revenue (+)","Cost savings","Convenience","Clinical benefit"],true);
         }
 
     // Innovations-Typen-Radar im Modal rendern
         function renderInnovationRadar(){
             var svg=document.getElementById('svg-radar-innovation');svg.innerHTML='';
             var vals=[1,2,3,4,5,6,7,8,9,10].map(function(i){return parseInt(document.getElementById('i-val'+i).value);});
-            generateRadarPath(svg,230,155,90,vals,10,["Profit Model","Network","Structure","Process","Product Perf.","Product System","Service","Channel","Brand","Cust. Engagement"]);
+            generateRadarPath(svg,170,170,120,vals,10,["Profit Model","Network","Structure","Process","Product Perf.","Product System","Service","Channel","Brand","Cust. Engagement"],false);
         }
 
     // SVG-Pfad für Radar-Polygon berechnen
-        function generateRadarPath(svg,cx,cy,r,values,maxVal,labels){
+        function generateRadarPath(svg,cx,cy,r,values,maxVal,labels,rotateLabels){
             var n=values.length;
             for(var i=2;i<=maxVal;i+=2){
                 var lr=(r/maxVal)*i;var pts=[];
@@ -1282,12 +1300,21 @@
                 ln.setAttribute("stroke","#f3f2f1");svg.appendChild(ln);
                 dp.push((cx+Math.cos(ang)*((r/maxVal)*values[a]))+','+(cy+Math.sin(ang)*((r/maxVal)*values[a])));
                 var txt=document.createElementNS("http://www.w3.org/2000/svg","text");
-                var td=r+18,tx=cx+Math.cos(ang)*td,ty=cy+Math.sin(ang)*td;
-                txt.setAttribute("x",tx);txt.setAttribute("y",ty+3);txt.setAttribute("font-size","10px");txt.setAttribute("font-weight","600");
-                if(Math.abs(Math.cos(ang))<0.1) txt.setAttribute("text-anchor","middle");
-                else if(Math.cos(ang)>0) txt.setAttribute("text-anchor","start");
-                else txt.setAttribute("text-anchor","end");
-                txt.setAttribute("fill","#323130");txt.textContent=labels[a];svg.appendChild(txt);
+                var td=r+16,tx=cx+Math.cos(ang)*td,ty=cy+Math.sin(ang)*td;
+                txt.setAttribute("font-size","10px");txt.setAttribute("font-weight","600");txt.setAttribute("fill","#323130");
+                if(rotateLabels && Math.abs(Math.cos(ang))>0.15){
+                    // Left/right axis: rotate label 90 degrees
+                    var rot=Math.cos(ang)>0?90:-90;
+                    txt.setAttribute("x",tx);txt.setAttribute("y",ty+3);
+                    txt.setAttribute("text-anchor","middle");
+                    txt.setAttribute("transform","rotate("+rot+","+tx+","+ty+")");
+                } else {
+                    txt.setAttribute("x",tx);txt.setAttribute("y",ty+3);
+                    if(Math.abs(Math.cos(ang))<0.15) txt.setAttribute("text-anchor","middle");
+                    else if(Math.cos(ang)>0) txt.setAttribute("text-anchor","start");
+                    else txt.setAttribute("text-anchor","end");
+                }
+                txt.textContent=labels[a];svg.appendChild(txt);
             }
             var poly=document.createElementNS("http://www.w3.org/2000/svg","polygon");
             poly.setAttribute("points",dp.join(" "));poly.setAttribute("stroke","var(--primary)");
@@ -2075,116 +2102,141 @@
 
 <div class="modal-overlay" id="modal-overlay">
     <div class="modal-window">
+
+        <!-- HEADER: Duplicate + Delete + X -->
         <div class="modal-header">
-            <div style="display:flex;align-items:center;gap:12px;flex:1;">
-                <input type="text" id="modal-project-title" placeholder="Project name..." style="font-size:16px;font-weight:700;border:none;border-bottom:2px solid var(--primary);background:transparent;color:#201f1e;padding:2px 4px;flex:1;outline:none;">
-                <select id="modal-status" style="font-size:12px;font-weight:700;border-radius:10px;padding:4px 10px;border:2px solid var(--border);">
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button onclick="duplicateActiveProjectCard()" style="background:#495a6b;padding:4px 12px;font-size:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="4" y="4" width="9" height="9" rx="1"/><path d="M3 3h8M3 3v8" opacity="0.5"/></svg> Duplicate</button>
+                <button onclick="deleteActiveProjectCard()" style="background:#a80000;padding:4px 12px;font-size:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="2 4 14 4"/><path d="M5 4V2h6v2"/><path d="M3 4l1 10h8l1-10"/><line x1="6" y1="7" x2="6" y2="11"/><line x1="10" y1="7" x2="10" y2="11"/></svg> Delete</button>
+            </div>
+            <button class="secondary" onclick="closeProjectModal()" style="padding:4px 8px;">&times;</button>
+        </div>
+
+        <!-- BODY: 2-column grid -->
+        <div class="modal-body">
+
+            <!-- Col 1: Project Info -->
+            <div class="form-section">
+                <div class="form-section-title">Project info</div>
+                <div style="margin-bottom:8px;">
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Title</label>
+                    <input type="text" id="modal-project-title" placeholder="Project name..." style="width:100%;font-size:14px;font-weight:700;border:none;border-bottom:2px solid var(--primary);background:transparent;color:#201f1e;padding:2px 4px;outline:none;box-sizing:border-box;">
+                </div>
+                <div style="margin-bottom:8px;">
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Description</label>
+                    <textarea id="modal-description" style="width:100%;height:52px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;box-sizing:border-box;" placeholder="Brief project description..."></textarea>
+                </div>
+                <div>
+                    <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">User Persona</label>
+                    <textarea id="modal-user-persona" style="width:100%;height:65px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;box-sizing:border-box;" placeholder="Describe the primary user..."></textarea>
+                </div>
+            </div>
+
+            <!-- Col 2: Sizing + Status + Score -->
+            <div class="form-section">
+                <div class="form-section-title">Sizing &amp; Status</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                    <div>
+                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Effort</label>
+                        <select id="modal-effort" style="width:100%;margin-top:4px;" onchange="updateScoreDisplay()">
+                                <option value="XS">XS</option><option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option>
+                            </select>
+                    </div>
+                    <div>
+                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Cost</label>
+                        <select id="modal-cost" style="width:100%;margin-top:4px;" onchange="updateScoreDisplay()">
+                                <option value="XS">XS</option><option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option>
+                            </select>
+                    </div>
+                    <div>
+                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Status</label>
+                        <select id="modal-status" style="font-size:12px;font-weight:700;border-radius:10px;padding:4px 10px;border:2px solid var(--border);" onchange="updateStatusSelectColor(this)">
                     <option value="idea"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#595857" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="6.5" r="3.5"/><path d="M6 10h4M6.5 12h3M7 14h2"/></svg> Idea</option>
                     <option value="planned"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><rect x="3" y="2" width="10" height="12" rx="1"/><path d="M5 6h6M5 9h6M5 12h3"/></svg> Planned</option>
                     <option value="active"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#835600" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M13 2v4h-4"/><path d="M3 14v-4h4"/><path d="M13 6A6 6 0 0 0 3 10"/><path d="M3 10a6 6 0 0 0 10-4"/></svg> Active</option>
                     <option value="done"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#4a6020" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 8l4 4 8-8"/></svg> Done</option>
                     <option value="blocked"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a2030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="8" r="6"/><path d="M4 4l8 8"/></svg> Blocked</option>
                 </select>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;margin-left:14px;">
-                <button onclick="duplicateActiveProjectCard()" style="background:#495a6b;padding:4px 12px;font-size:12px;margin-right:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="4" y="4" width="9" height="9" rx="1"/><path d="M3 3h8M3 3v8" opacity="0.5"/></svg> Duplicate</button>
-                <button onclick="deleteActiveProjectCard()" style="background:#a80000;padding:4px 12px;font-size:12px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete card</button>
-                <button class="secondary" onclick="closeProjectModal()" style="padding:4px 8px;">&times;</button>
-            </div>
-        </div>
-        <div class="modal-body">
-            <div>
-                <div class="form-section" style="margin-bottom:12px;">
-                    <div class="form-section-title">Project Description</div>
-                    <textarea id="modal-description" style="width:100%;height:52px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;" placeholder="Brief project description..."></textarea>
-                </div>
-                <div class="form-section" style="margin-bottom:12px;">
-                    <div class="form-section-title">User Persona</div>
-                    <textarea id="modal-user-persona" style="width:100%;height:65px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;" placeholder="Describe the primary user..."></textarea>
-                </div>
-                <div class="form-section" style="margin-bottom:12px;">
-                    <div class="form-section-title">Sizing</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                        <div>
-                            <label style="font-size:12px;">Effort</label>
-                            <select id="modal-effort" style="width:100%;margin-top:4px;" onchange="updateScoreDisplay()">
-                                <option value="XS">XS</option><option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-size:12px;">Cost</label>
-                            <select id="modal-cost" style="width:100%;margin-top:4px;" onchange="updateScoreDisplay()">
-                                <option value="XS">XS</option><option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option>
-                            </select>
-                        </div>
                     </div>
-                    <div style="margin-top:10px;">
-                        <label style="font-size:12px;">New connection type (applied on next link)</label>
+                    <div>
+                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Dependency Type</label>
                         <select id="modal-dep-type" style="width:100%;margin-top:4px;">
                             <option value="blocking">Blocking (must finish before)</option>
                             <option value="informal">Informational (related)</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-section">
-                    <div class="form-section-title">Strategic Score</div>
-                    <div style="display:flex;align-items:baseline;gap:8px;">
-                        <div id="modal-score-display" style="font-size:28px;font-weight:800;color:var(--primary);">&#x2013;</div>
-                        <div id="modal-score-label" style="font-size:11px;color:#495a6b;"></div>
+                <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">
+                    <div class="form-section-title" style="margin-bottom:6px;">Strategic Score</div>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div id="modal-score-display" style="font-size:26px;font-weight:700;color:#595857;min-width:40px;text-align:center;line-height:1;"></div>
+                        <div>
+                            <div id="modal-score-label" style="font-size:11px;font-weight:600;color:#8b7e79;margin-bottom:3px;"></div>
+                            <div style="font-size:10px;color:#bfb1ac;line-height:1.4;">Top benefits &amp; innovations,<br>weighted by effort.</div>
+                        </div>
                     </div>
-                    <div style="font-size:10px;color:#a0aab4;margin-top:4px;">Top benefits &amp; innovations, weighted by effort — higher = more strategic value per investment.</div>
                 </div>
             </div>
 
-            <div class="radar-container">
-                <label style="font-size:12px;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 12l4-4 3 3 5-7"/><path d="M2 14h12"/></svg> Customer Benefit</label>
-                <div style="display:flex;justify-content:center;margin:5px 0;">
-                    <svg id="svg-radar-benefit" width="320" height="270"></svg>
-                </div>
-                <div class="radar-sliders">
-                    <div class="slider-row"><div class="slider-label-row"><span>Revenue (+)</span><span class="slider-val-badge" id="b-lbl1">0</span></div><input type="range" id="b-val1" min="0" max="10" step="1" value="0" oninput="document.getElementById('b-lbl1').textContent=this.value;renderBenefitRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Cost savings</span><span class="slider-val-badge" id="b-lbl2">0</span></div><input type="range" id="b-val2" min="0" max="10" step="1" value="0" oninput="document.getElementById('b-lbl2').textContent=this.value;renderBenefitRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Convenience</span><span class="slider-val-badge" id="b-lbl3">0</span></div><input type="range" id="b-val3" min="0" max="10" step="1" value="0" oninput="document.getElementById('b-lbl3').textContent=this.value;renderBenefitRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Clinical benefit</span><span class="slider-val-badge" id="b-lbl4">0</span></div><input type="range" id="b-val4" min="0" max="10" step="1" value="0" oninput="document.getElementById('b-lbl4').textContent=this.value;renderBenefitRadar();updateScoreDisplay();"></div>
-                </div>
-            </div>
-
-            <div class="radar-container full-width">
-                <label style="font-size:12px;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="8" cy="8" r="2.5"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.8 3.8l1 1M11.2 11.2l1 1M3.8 12.2l1-1M11.2 4.8l1-1"/></svg> 10 Types of Innovation</label>
-                <div style="display:flex;justify-content:center;margin:5px 0;">
-                    <svg id="svg-radar-innovation" width="460" height="310"></svg>
-                </div>
-                <div class="radar-sliders" style="grid-template-columns:repeat(4,1fr);">
-                    <div class="slider-row"><div class="slider-label-row"><span>Profit Model</span><span class="slider-val-badge" id="i-lbl1">0</span></div><input type="range" id="i-val1" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl1').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Network</span><span class="slider-val-badge" id="i-lbl2">0</span></div><input type="range" id="i-val2" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl2').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Structure</span><span class="slider-val-badge" id="i-lbl3">0</span></div><input type="range" id="i-val3" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl3').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Process</span><span class="slider-val-badge" id="i-lbl4">0</span></div><input type="range" id="i-val4" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl4').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Performance</span><span class="slider-val-badge" id="i-lbl5">0</span></div><input type="range" id="i-val5" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl5').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Product System</span><span class="slider-val-badge" id="i-lbl6">0</span></div><input type="range" id="i-val6" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl6').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Service</span><span class="slider-val-badge" id="i-lbl7">0</span></div><input type="range" id="i-val7" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl7').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Channel</span><span class="slider-val-badge" id="i-lbl8">0</span></div><input type="range" id="i-val8" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl8').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Brand</span><span class="slider-val-badge" id="i-lbl9">0</span></div><input type="range" id="i-val9" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl9').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
-                    <div class="slider-row"><div class="slider-label-row"><span>Cust. Engagement</span><span class="slider-val-badge" id="i-lbl10">0</span></div><input type="range" id="i-val10" min="0" max="10" step="1" value="0" oninput="document.getElementById('i-lbl10').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"></div>
+            <!-- Col 1: Customer Benefit -->
+            <div class="form-section">
+                <div class="form-section-title">Customer Benefit</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;">
+                    <div class="radar-sliders" style="display:grid;grid-template-columns:1fr;gap:4px;">
+                        <div class="slider-row"><label>Revenue (+)</label><input type="range" id="b-val1" min="0" max="10" step="1" value="5" oninput="document.getElementById('b-lbl1').textContent=this.value;renderBenefitRadar();updateScoreDisplay();"><span id="b-lbl1" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Cost savings</label><input type="range" id="b-val2" min="0" max="10" step="1" value="5" oninput="document.getElementById('b-lbl2').textContent=this.value;renderBenefitRadar();updateScoreDisplay();"><span id="b-lbl2" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Convenience</label><input type="range" id="b-val3" min="0" max="10" step="1" value="5" oninput="document.getElementById('b-lbl3').textContent=this.value;renderBenefitRadar();updateScoreDisplay();"><span id="b-lbl3" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Clinical benefit</label><input type="range" id="b-val4" min="0" max="10" step="1" value="5" oninput="document.getElementById('b-lbl4').textContent=this.value;renderBenefitRadar();updateScoreDisplay();"><span id="b-lbl4" class="slider-val">5</span></div>
+                    </div>
+                    <svg id="svg-radar-benefit" viewBox="0 0 160 160" width="160" height="160" style="display:block;margin:0 auto;"></svg>
                 </div>
             </div>
 
-            <div class="roadmap-editor-box full-width">
-                <label style="font-size:13px;color:#10253f;display:block;margin-bottom:7px;font-weight:700;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M1 3l5 2 4-2 5 2v10l-5-2-4 2-5-2V3z"/><path d="M6 5v10M10 3v10"/></svg> Project Roadmap</label>
-                <!-- Meilenstein-Liste nach Quartal gruppiert -->
-                <div id="editor-milestones-zone" style="max-height:200px;overflow-y:auto;margin-bottom:10px;"></div>
+            <!-- Col 2: Roadmap -->
+            <div class="form-section">
+                <div class="form-section-title">Project Roadmap</div>
+                <div id="editor-milestones-zone" style="max-height:160px;overflow-y:auto;margin-bottom:10px;"></div>
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                     <input type="text" id="ms-label" placeholder="Meilenstein-Titel..." style="flex:1;min-width:120px;">
                     <select id="ms-quarter"><option>Q1</option><option>Q2</option><option>Q3</option><option>Q4</option></select>
                     <select id="ms-year"><option>2026</option><option>2027</option><option>2028</option><option>2029</option><option>2030</option><option>2031</option><option>2032</option><option>2033</option><option>2034</option><option>2035</option><option>2036</option></select>
                     <button type="button" onclick="addMilestoneToActiveProject()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M8 2v12M2 8h12"/></svg> Add</button>
-                </div></div>
-        <div style="border-top:2px solid var(--border);padding:14px 24px;display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-shrink:0;background:rgba(73,90,107,0.08);width:100%;box-sizing:border-box;">
+                </div>
+            </div>
+
+            <!-- Full width: 10 Types of Innovation -->
+            <div class="form-section full-width" style="grid-column:span 2;">
+                <div class="form-section-title">10 Types of Innovation</div>
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) 1fr;gap:16px;align-items:center;">
+                    <div class="radar-sliders" style="display:grid;grid-template-columns:1fr;gap:4px;">
+                        <div class="slider-row"><label>Profit Model</label><input type="range" id="i-val1" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl1').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl1" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Network</label><input type="range" id="i-val2" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl2').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl2" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Structure</label><input type="range" id="i-val3" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl3').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl3" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Process</label><input type="range" id="i-val4" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl4').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl4" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Product Performance</label><input type="range" id="i-val5" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl5').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl5" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Product System</label><input type="range" id="i-val6" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl6').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl6" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Service</label><input type="range" id="i-val7" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl7').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl7" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Channel</label><input type="range" id="i-val8" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl8').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl8" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Brand</label><input type="range" id="i-val9" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl9').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl9" class="slider-val">5</span></div>
+                        <div class="slider-row"><label>Customer Engagement</label><input type="range" id="i-val10" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl10').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl10" class="slider-val">5</span></div>
+                    </div>
+                    <svg id="svg-radar-innovation" viewBox="0 0 340 340" width="340" height="340" style="display:block;margin:0 auto;"></svg>
+                </div>
+            </div>
+
+        </div><!-- end modal-body -->
+
+        <!-- FOOTER: always visible -->
+        <div style="border-top:2px solid var(--border);padding:12px 24px;display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-shrink:0;background:rgba(73,90,107,0.08);width:100%;box-sizing:border-box;">
             <button onclick="saveActiveProjectDetails()">Save &amp; Close</button>
             <button class="secondary" onclick="closeProjectModal()">Cancel</button>
         </div>
+
     </div>
 </div>
 
+
+</div><!-- end workspace-container -->
 
 </body>
 </html>
