@@ -9,7 +9,7 @@
     <!--
     ╔══════════════════════════════════════════════════════════════╗
     ║  ACCELERATE STRATEGY – 10-Year Product Board                 ║
-    ║  Version: v16  |  Erstellt: 2026  |  Autor: Daniel Röckl     ║
+    ║  Version: v18  |  Erstellt: 2026  |  Autor: Daniel Röckl     ║
     ║  Getinge AB – Internal Strategy Tool                         ║
     ╠══════════════════════════════════════════════════════════════╣
     ║  AUFBAU DER DATEI:                                           ║
@@ -528,6 +528,8 @@
                 <button onclick="exportStrategyBoard()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 2h8l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M5 2v4h6V2M5 11h6"/></svg> Export JSON</button>
                 <input type="file" id="import-file" style="display:none" onchange="importStrategyBoard(this.files[0])">
                 <button class="secondary" onclick="document.getElementById('import-file').click()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 4a1 1 0 0 1 1-1h3l2 2h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/></svg> Import JSON</button>
+                <input type="file" id="chase-merge-file" style="display:none" accept=".json" onchange="chaseMergePromptPassword(this.files[0])">
+                <button class="secondary" onclick="document.getElementById('chase-merge-file').click()" style="border-color:#c07000;color:#c07000;" title="Merge a colleague&#39;s JSON into this board (password protected)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c07000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:4px;"><circle cx="5" cy="5" r="2"/><circle cx="11" cy="5" r="2"/><circle cx="8" cy="11" r="2"/><path d="M7 5h-1M10 5h-1M6.5 8.5l1 1.5M9.5 8.5l-1 1.5"/></svg> Chase Merge</button>
             </div>
         </div>
 
@@ -1656,6 +1658,130 @@
     // ║  ABSCHNITT 10: EXPORT / IMPORT                                   ║
     // ║  Board-Zustand als JSON speichern und laden                      ║
     // ╚══════════════════════════════════════════════════════════════════╝
+
+
+    // ── CHASE MERGE ──────────────────────────────────────────────────────
+    // Passwortgeschützter Merge: neue Produktlinien aus JSON on top laden
+    // Regeln:
+    //   1. Bestehende Produktlinien (gleicher Name) → komplett ignoriert
+    //   2. Neue Produktlinien → on top hinzugefügt inkl. Karten
+    //   3. Connections innerhalb neuer Produktlinien → übertragen
+    //   4. Produktlinienübergreifende Connections → nicht übertragen
+
+    var _chaseMergePendingFile = null;
+
+        function chaseMergePromptPassword(file) {
+            if (!file) return;
+            _chaseMergePendingFile = file;
+            showPrompt('Chase Merge — Password', 'Enter password to continue', function(pw) {
+                if (pw !== 'Klara21') {
+                    showAlert('Wrong password. Merge cancelled.');
+                    _chaseMergePendingFile = null;
+                    return;
+                }
+                executeChaseMerge(_chaseMergePendingFile);
+                _chaseMergePendingFile = null;
+                // Reset file input so same file can be loaded again
+                document.getElementById('chase-merge-file').value = '';
+            });
+        }
+
+        function executeChaseMerge(file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    var data = JSON.parse(e.target.result);
+                    var importedLines = data.productLines || [];
+                    var importedProjects = data.projectsData || {};
+                    var importedConnections = data.connectionsList || [];
+                    var importedPositions = data.cardPositions || {};
+
+                    // Bestehende Produktlinien-Namen (lowercase für Vergleich)
+                    var existingNames = {};
+                    productLines.forEach(function(l) {
+                        existingNames[l.title.trim().toLowerCase()] = true;
+                    });
+
+                    // Neue Produktlinien identifizieren
+                    var newLines = importedLines.filter(function(l) {
+                        return !existingNames[l.title.trim().toLowerCase()];
+                    });
+
+                    if (newLines.length === 0) {
+                        showAlert('Chase Merge: No new product lines found. All product lines already exist in this board.');
+                        return;
+                    }
+
+                    // IDs der neuen Produktlinien für spätere Filterung
+                    var newLineIds = {};
+                    newLines.forEach(function(l) { newLineIds[l.id] = true; });
+
+                    // Karten der neuen Produktlinien
+                    var newCardIds = {};
+                    Object.keys(importedProjects).forEach(function(cardId) {
+                        var p = importedProjects[cardId];
+                        if (newLineIds[p.prodLineId]) {
+                            newCardIds[cardId] = true;
+                        }
+                    });
+
+                    // Connections filtern: nur wenn BEIDE Karten in neuen Linien
+                    var mergeConnections = importedConnections.filter(function(conn) {
+                        return newCardIds[conn.from] && newCardIds[conn.to];
+                    });
+
+                    // Neue Produktlinien anlegen und Karten einfügen
+                    var horizonOrder = ['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'];
+                    var horizonMap = {'short':'y2026','mid':'y2028','long':'y2031_33'};
+
+                    var addedLines = 0;
+                    var addedCards = 0;
+
+                    newLines.forEach(function(line) {
+                        addNewProductLineVisual(line.id, line.title);
+                        addedLines++;
+
+                        // Karten dieser Linie in korrekter Reihenfolge einfügen
+                        var lineCards = Object.keys(importedProjects)
+                            .filter(function(cid) { return importedProjects[cid].prodLineId === line.id; })
+                            .sort(function(a, b) {
+                                var oa = importedPositions[a] ? importedPositions[a].order : 0;
+                                var ob = importedPositions[b] ? importedPositions[b].order : 0;
+                                return oa - ob;
+                            });
+
+                        lineCards.forEach(function(cardId) {
+                            var p = importedProjects[cardId];
+                            var cellId = importedPositions[cardId] ? importedPositions[cardId].cellId : (p.prodLineId + '-' + p.horizonId);
+                            var horiz = p.horizonId || 'y2026';
+                            if (horizonMap[horiz]) horiz = horizonMap[horiz];
+                            createProjectCard(line.id, horiz, p.title, p, cardId);
+                            if (p.preStudy) {
+                                var tab = document.getElementById('pstab-' + cardId);
+                                if (tab) tab.classList.remove('ps-empty');
+                            }
+                            addedCards++;
+                        });
+                    });
+
+                    // Connections hinzufügen
+                    mergeConnections.forEach(function(conn) {
+                        connectionsList.push(conn);
+                    });
+
+                    syncProductDropdown();
+                    updateKpiStrip();
+                    updateEffortSummaries();
+                    setTimeout(function() { redrawAllConnections(); }, 100);
+
+                    showAlert('Chase Merge complete: ' + addedLines + ' product line(s) and ' + addedCards + ' card(s) added. ' + mergeConnections.length + ' connection(s) transferred.');
+
+                } catch(err) {
+                    showAlert('Chase Merge failed: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
 
     // Kompletten Board-Zustand als JSON-Datei herunterladen
         function exportStrategyBoard(){
