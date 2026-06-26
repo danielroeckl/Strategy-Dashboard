@@ -9,7 +9,7 @@
     <!--
     ╔══════════════════════════════════════════════════════════════╗
     ║  ACCELERATE STRATEGY – 10-Year Product Board                 ║
-    ║  Version: v18  |  Erstellt: 2026  |  Autor: Daniel Röckl     ║
+    ║  Version: v16  |  Erstellt: 2026  |  Autor: Daniel Röckl     ║
     ║  Getinge AB – Internal Strategy Tool                         ║
     ╠══════════════════════════════════════════════════════════════╣
     ║  AUFBAU DER DATEI:                                           ║
@@ -1683,7 +1683,7 @@
                 _chaseMergePendingFile = null;
                 // Reset file input so same file can be loaded again
                 document.getElementById('chase-merge-file').value = '';
-            });
+            }, true);
         }
 
         function executeChaseMerge(file) {
@@ -1845,13 +1845,14 @@
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Eingabe-Popup anzeigen (ersetzt nativen prompt())
-        function showPrompt(title, placeholder, onConfirm) {
+        function showPrompt(title, placeholder, onConfirm, isPassword) {
             _promptCallback = onConfirm;
             var overlay = document.getElementById('input-popup-overlay');
             document.getElementById('input-popup-title').textContent = title;
             var field = document.getElementById('input-popup-field');
             field.value = '';
             field.placeholder = placeholder || '';
+            field.type = isPassword ? 'password' : 'text';
             overlay.style.display = 'flex';
             setTimeout(function(){ field.focus(); }, 60);
         }
@@ -1931,19 +1932,24 @@
 
     // ── Welcome Screen: Neues leeres Board starten ──
     function welcomeNewProject() {
-        // Alle Daten zurücksetzen bevor neues Projekt gestartet wird
+        var overlay = document.getElementById('welcome-overlay');
+        if (overlay) overlay.style.display = 'none';
+        // Alle Daten zurücksetzen
         projectsData = {};
         productLines = [];
         connectionsList = [];
         activeProjectId = null;
+        _modalOpenSnapshot = null;
         // Board-HTML zurücksetzen
         var board = document.getElementById('strategy-board');
-        board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
-        document.getElementById('welcome-overlay').style.display = 'none';
+        if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+        // Connections SVG leeren
+        var svg = document.getElementById('connections-svg');
+        if (svg) svg.innerHTML = '';
         addNewProductLineVisual('prod-'+Date.now(), 'Product line 1');
         syncProductDropdown();
         updateKpiStrip();
-        redrawAllConnections();
+        updateEffortSummaries();
     }
 
     // ── Welcome Screen: Import-Picker öffnen ──
@@ -1954,13 +1960,33 @@
     // ── Welcome Screen: JSON importieren ──
     function welcomeImportFile(file) {
         if (!file) return;
-        document.getElementById('welcome-overlay').style.display = 'none';
+        var overlay = document.getElementById('welcome-overlay');
+        if (overlay) overlay.style.display = 'none';
+        // Reset before import
+        projectsData = {};
+        productLines = [];
+        connectionsList = [];
+        activeProjectId = null;
+        _modalOpenSnapshot = null;
+        var board = document.getElementById('strategy-board');
+        if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
         importStrategyBoard(file);
     }
 
     // ── Welcome Screen: Demo-Board laden ──
     function welcomeDemo() {
-        document.getElementById('welcome-overlay').style.display = 'none';
+        // Erst alles zurücksetzen, dann Demo laden
+        projectsData = {};
+        productLines = [];
+        connectionsList = [];
+        activeProjectId = null;
+        _modalOpenSnapshot = null;
+        var board = document.getElementById('strategy-board');
+        if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+        var svg = document.getElementById('connections-svg');
+        if (svg) svg.innerHTML = '';
+        var overlay = document.getElementById('welcome-overlay');
+        if (overlay) overlay.style.display = 'none';
         loadDemoBoard();
     }
 
@@ -2204,7 +2230,7 @@
 <div id="input-popup-overlay" class="confirm-popup-overlay" style="display:none;">
         <div class="confirm-popup">
             <h3 id="input-popup-title">Enter value</h3>
-            <input type="text" id="input-popup-field" onkeydown="if(event.key==='Enter')_promptOk();if(event.key==='Escape')_promptCancel();" style="width:100%;padding:8px 10px;border:1px solid #edebe9;border-radius:2px;font-size:14px;margin-bottom:16px;box-sizing:border-box;" placeholder="">
+            <input type="text" id="input-popup-field" autocomplete="new-password" onkeydown="if(event.key==='Enter')_promptOk();if(event.key==='Escape')_promptCancel();" style="width:100%;padding:8px 10px;border:1px solid #edebe9;border-radius:2px;font-size:14px;margin-bottom:16px;box-sizing:border-box;" placeholder="">
             <div class="confirm-popup-btns">
                 <button id="input-popup-ok" onclick="_promptOk()">OK</button>
                 <button class="secondary" id="input-popup-cancel" onclick="_promptCancel()">Cancel</button>
