@@ -1144,7 +1144,10 @@
             });
             for(var i=1;i<=4;i++) d.benefitValues[i-1]=parseInt(document.getElementById('b-val'+i).value);
             for(var i=1;i<=10;i++) d.innovationValues[i-1]=parseInt(document.getElementById('i-val'+i).value);
-            updateCardUIPreview(activeProjectId);updateEffortSummaries();updateKpiStrip();closeProjectModal();
+            updateCardUIPreview(activeProjectId);updateEffortSummaries();updateKpiStrip();
+            // Snapshot aktualisieren damit closeProjectModal keine Änderungen mehr erkennt
+            _modalOpenSnapshot = JSON.stringify(projectsData[activeProjectId]);
+            closeProjectModal(true);
             setTimeout(function(){redrawAllConnections();},50);
         }
 
