@@ -279,6 +279,73 @@
     </style>
 </head>
 <body>
+<!-- ══ WELCOME SCREEN OVERLAY ══ -->
+<div id="welcome-overlay" style="
+    position:fixed; top:0; left:0; width:100vw; height:100vh;
+    background:rgba(24,39,74,0.97);
+    z-index:99999; display:flex; align-items:center; justify-content:center;
+    backdrop-filter:blur(4px);">
+    <div style="
+        background:#ffffff; border-radius:8px; padding:48px 52px;
+        max-width:520px; width:90%; box-shadow:0 32px 64px rgba(0,0,0,0.4);
+        text-align:center;">
+
+        <!-- Getinge Logo SVG -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 945 140" width="180" height="27" style="display:block;margin:0 auto 28px auto;">
+            <g transform="scale(1,-1) translate(0,-140)">
+                <path d="M 885.049 2.100 C 885.049 0.950 884.110 0.010 882.950 0.010 L 859.939 0.000 C 858.799 0.000 857.870 0.920 857.870 2.060 L 857.870 38.520 L 826.380 20.340 C 825.390 19.770 824.130 20.110 823.560 21.100 L 812.040 41.060 C 811.470 42.050 811.799 43.310 812.790 43.880 L 844.140 61.920 C 857.179 69.450 873.860 64.991 881.380 51.950 C 883.780 47.800 884.950 43.280 885.040 38.810 L 885.049 2.100 Z" fill="#18274a"/>
+                <path d="M 882.980 139.750 L 859.929 139.750 C 858.790 139.750 857.870 138.831 857.870 137.690 L 857.870 101.331 L 826.280 119.560 C 825.299 120.130 824.040 119.790 823.470 118.800 L 811.970 98.870 C 811.390 97.860 811.730 96.581 812.740 96.001 L 844.530 77.661 C 848.439 75.491 852.939 74.251 857.740 74.251 C 872.790 74.251 884.990 86.459 884.990 101.520 L 885.019 105.280 L 885.040 112.959 L 885.040 137.690 C 885.040 138.831 884.120 139.750 882.980 139.750 Z" fill="#18274a"/>
+                <path d="M 929.939 28.200 C 930.929 27.630 932.189 27.959 932.759 28.950 L 944.290 48.920 C 944.849 49.900 944.519 51.161 943.530 51.730 L 912.040 69.911 L 943.620 88.150 C 944.599 88.709 944.939 89.980 944.370 90.970 L 932.839 110.920 C 932.269 111.911 931.000 112.251 930.009 111.670 L 898.210 93.300 C 894.380 90.991 891.049 87.720 888.660 83.560 C 881.130 70.530 885.599 53.850 898.640 46.331 L 929.939 28.200 Z" fill="#18274a"/>
+                <path d="M 129.054 29.381 L 129.054 110.114 L 210.479 110.114 L 203.006 97.100 L 146.403 97.100 L 146.403 77.704 L 200.127 77.725 L 200.127 65.444 L 146.403 65.452 L 146.403 42.881 L 210.328 42.879 L 210.328 29.381 L 129.054 29.381 Z" fill="#18274a"/>
+                <path d="M 656.008 29.381 L 656.008 110.114 L 737.177 110.114 L 729.725 97.100 L 673.357 97.100 L 673.357 77.704 L 727.081 77.725 L 727.081 65.444 L 673.357 65.452 L 673.357 42.881 L 737.282 42.879 L 737.282 29.381 L 656.008 29.381 Z" fill="#18274a"/>
+                <path d="M 272.089 29.381 L 272.089 97.053 L 234.213 97.046 L 234.213 110.114 L 327.613 110.114 L 320.138 97.039 L 289.448 97.056 L 289.448 29.381 L 272.089 29.381 Z" fill="#18274a"/>
+                <path d="M 353.137 29.381 L 353.137 110.124 L 370.489 110.124 L 370.489 29.410 C 370.489 29.394 370.476 29.381 370.461 29.381 L 353.137 29.381 Z" fill="#18274a"/>
+                <path d="M 23.528 29.381 C 10.534 29.381 -0.000 39.915 -0.000 52.909 L -0.000 86.585 C -0.000 99.580 10.534 110.114 23.528 110.114 L 91.618 110.114 L 84.604 97.050 L 28.117 97.050 C 22.041 97.050 17.116 92.124 17.116 86.049 L 17.116 54.093 C 17.116 47.884 22.149 42.851 28.358 42.851 L 72.076 42.851 C 78.204 42.851 83.172 47.819 83.172 53.948 L 83.172 62.751 L 51.768 62.744 L 51.768 75.807 L 99.904 75.807 L 99.904 52.909 C 99.904 39.915 89.370 29.381 76.376 29.381 L 23.528 29.381 Z" fill="#18274a"/>
+                <path d="M 550.473 29.381 C 537.479 29.381 526.946 39.915 526.946 52.909 L 526.946 86.585 C 526.946 99.580 537.479 110.114 550.473 110.114 L 618.563 110.114 L 611.550 97.050 L 555.117 97.050 C 549.011 97.050 544.061 92.101 544.061 85.995 L 544.061 53.906 C 544.061 47.800 549.011 42.851 555.117 42.851 L 599.063 42.851 C 605.169 42.851 610.118 47.800 610.118 53.906 L 610.118 62.751 L 578.714 62.744 L 578.714 75.807 L 626.849 75.807 L 626.849 52.909 C 626.849 39.915 616.316 29.381 603.322 29.381 L 550.473 29.381 Z" fill="#18274a"/>
+                <path d="M 481.212 29.381 L 481.212 86.279 C 481.212 92.228 476.388 97.050 470.439 97.050 L 420.319 97.047 L 420.319 29.381 L 402.970 29.381 L 402.970 110.124 L 474.862 110.124 C 487.856 110.124 498.390 99.591 498.390 86.597 L 498.390 29.381 L 481.212 29.381 Z" fill="#18274a"/>
+            </g>
+        </svg>
+
+        <h1 style="font-size:22px;font-weight:600;color:#18274a;margin:0 0 6px 0;font-family:'Adelle Sans','Source Sans 3','Segoe UI',sans-serif;">Accelerate Strategy</h1>
+        <p style="font-size:13px;color:#8b7e79;margin:0 0 36px 0;font-family:'Adelle Sans','Source Sans 3','Segoe UI',sans-serif;">10-Year Product Board</p>
+
+        <!-- New Project Button -->
+        <button onclick="welcomeNewProject()" style="
+            display:block; width:100%; padding:16px 20px; margin-bottom:12px;
+            background:#18274a; color:white; border:none; border-radius:6px;
+            font-size:15px; font-weight:500; cursor:pointer; text-align:left;
+            font-family:'Adelle Sans','Source Sans 3','Segoe UI',sans-serif;
+            transition:background 0.15s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:10px;"><path d="M8 2v12M2 8h12"/></svg>
+            New project
+            <span style="display:block;font-size:11px;font-weight:400;opacity:0.7;margin-top:3px;margin-left:28px;">Start with an empty board</span>
+        </button>
+
+        <!-- Import Button -->
+        <button onclick="welcomeImport()" style="
+            display:block; width:100%; padding:16px 20px; margin-bottom:12px;
+            background:white; color:#18274a; border:2px solid #d4cac8; border-radius:6px;
+            font-size:15px; font-weight:500; cursor:pointer; text-align:left;
+            font-family:'Adelle Sans','Source Sans 3','Segoe UI',sans-serif;
+            transition:border-color 0.15s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:10px;"><path d="M2 4a1 1 0 0 1 1-1h3l2 2h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/></svg>
+            Import existing board
+            <span style="display:block;font-size:11px;font-weight:400;color:#8b7e79;margin-top:3px;margin-left:28px;">Load a saved JSON file</span>
+        </button>
+
+        <!-- Demo Button -->
+        <button onclick="welcomeDemo()" style="
+            display:block; width:100%; padding:12px 20px;
+            background:transparent; color:#8b7e79; border:none;
+            font-size:13px; cursor:pointer; text-align:center;
+            font-family:'Adelle Sans','Source Sans 3','Segoe UI',sans-serif;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:6px;"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+            View demo board
+        </button>
+
+        <input type="file" id="welcome-import-file" style="display:none" accept=".json" onchange="welcomeImportFile(this.files[0])">
+    </div>
+</div>
 
 <canvas id="neural-bg"></canvas>
 <script>
@@ -1546,106 +1613,165 @@
     // ║  Beispieldaten beim Laden setzen                                 ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
-    window.onload=function(){
-        // ── Beispiel-Produktlinie: Closed Loop Patient Monitoring ──
+    
+    // ── Welcome Screen: Neues leeres Board starten ──
+    function welcomeNewProject() {
+        document.getElementById('welcome-overlay').style.display = 'none';
+        // Leeres Board — keine Demo-Daten laden
+        addNewProductLineVisual('prod-'+Date.now(), 'Product line 1');
+        syncProductDropdown();
+    }
+
+    // ── Welcome Screen: Import-Picker öffnen ──
+    function welcomeImport() {
+        document.getElementById('welcome-import-file').click();
+    }
+
+    // ── Welcome Screen: JSON importieren ──
+    function welcomeImportFile(file) {
+        if (!file) return;
+        document.getElementById('welcome-overlay').style.display = 'none';
+        importStrategyBoard(file);
+    }
+
+    // ── Welcome Screen: Demo-Board laden ──
+    function welcomeDemo() {
+        document.getElementById('welcome-overlay').style.display = 'none';
+        loadDemoBoard();
+    }
+
+    // ── Demo-Board mit Beispieldaten initialisieren ──
+    function loadDemoBoard() {
+
+        // ── Produktlinie 1: Closed Loop Patient Monitoring ──
         addNewProductLineVisual("clpm","Closed Loop Monitoring");
 
-        // Karte 1: Sensor Fusion Baseline (2026) – mit Pre-Study, hoch bewertet
         createProjectCard("clpm","y2026","Sensor Fusion Baseline",{
-            title:"Sensor Fusion Baseline",
-            prodLineId:"clpm", horizonId:"y2026",
-            persona:"ICU Nurse – benötigt zuverlässige Echtzeit-Vitaldaten ohne Alarm-Overload",
-            effort:"XS", cost:"XS", status:"active", depType:"blocking",
-            benefitValues:[9,7,3,2],
-            innovationValues:[0,0,8,9,8,7,0,0,0,0],
-            milestones:[
-                {label:"Kick-off & Datenerhebung",quarter:"Q1",year:"2026"},
-                {label:"Sensor-Validierung abgeschlossen",quarter:"Q3",year:"2026"},
-                {label:"Klinische Pilotstudie Start",quarter:"Q4",year:"2026"}
-            ],
-            preStudy:{status:"done", effort:"S", cost:"XS",
-                note:"Klinische Datenbasis & Sensor-Validierung – MDR-konforme Anforderungsanalyse abgeschlossen."}
+            title:"Sensor Fusion Baseline",prodLineId:"clpm",horizonId:"y2026",
+            description:"Foundation layer for real-time multi-sensor vital data fusion in the ICU.",
+            persona:"ICU Nurse — needs reliable real-time vitals without alarm overload",
+            effort:"XS",cost:"XS",status:"active",depType:"blocking",
+            benefitValues:[9,7,3,2],innovationValues:[0,0,8,9,8,7,0,0,0,0],
+            milestones:[{label:"Kick-off & data collection",quarter:"Q1",year:"2026"},{label:"Sensor validation complete",quarter:"Q3",year:"2026"}],
+            preStudy:{status:"done",effort:"S",cost:"XS",note:"Clinical data basis & sensor validation — MDR-compliant requirements analysis complete."}
         },"card-clpm-2026");
 
-        // Karte 2: Alarm Intelligence Engine (2027) – blockiert durch Sensor Fusion
         createProjectCard("clpm","y2027","Alarm Intelligence Engine",{
-            title:"Alarm Intelligence Engine",
-            prodLineId:"clpm", horizonId:"y2027",
-            persona:"Intensivpfleger – leidet unter Alarm-Fatigue bei >200 Alarmen/Schicht",
-            effort:"S", cost:"S", status:"planned", depType:"blocking",
-            benefitValues:[5,8,7,3],
-            innovationValues:[0,0,0,8,9,0,7,0,0,0],
-            milestones:[
-                {label:"Algorithm Freeze",quarter:"Q2",year:"2027"},
-                {label:"FDA/MDR Submission",quarter:"Q4",year:"2027"}
-            ],
+            title:"Alarm Intelligence Engine",prodLineId:"clpm",horizonId:"y2027",
+            description:"AI-driven alarm reduction system to combat alarm fatigue in intensive care.",
+            persona:"Intensive care nurse — suffers from alarm fatigue with 200+ alarms per shift",
+            effort:"S",cost:"S",status:"planned",depType:"blocking",
+            benefitValues:[5,8,7,3],innovationValues:[0,0,0,8,9,0,7,0,0,0],
+            milestones:[{label:"Algorithm freeze",quarter:"Q2",year:"2027"},{label:"FDA/MDR submission",quarter:"Q4",year:"2027"}],
             preStudy:null
         },"card-clpm-2027a");
 
-        // Karte 3: Regulatory Dossier EU MDR (2027) – informational zu Alarm Engine
         createProjectCard("clpm","y2027","Regulatory Dossier EU MDR",{
-            title:"Regulatory Dossier EU MDR",
-            prodLineId:"clpm", horizonId:"y2027",
-            persona:"Regulatory Affairs Manager – braucht lückenlose MDR-Dokumentation",
-            effort:"M", cost:"S", status:"planned", depType:"informal",
-            benefitValues:[2,4,2,3],
-            innovationValues:[0,0,7,6,0,0,0,0,0,0],
-            milestones:[
-                {label:"Gap-Analyse fertig",quarter:"Q1",year:"2027"},
-                {label:"Dossier eingereicht",quarter:"Q3",year:"2027"}
-            ],
-            preStudy:{status:"active", effort:"S", cost:"XS",
-                note:"MDR-Lückenanalyse: Welche klinischen Nachweise fehlen noch für Class IIb?"}
+            title:"Regulatory Dossier EU MDR",prodLineId:"clpm",horizonId:"y2027",
+            description:"Complete MDR gap analysis and compile clinical evidence dossier for Class IIb submission.",
+            persona:"Regulatory Affairs Manager — needs complete MDR documentation",
+            effort:"M",cost:"S",status:"planned",depType:"informal",
+            benefitValues:[2,4,2,3],innovationValues:[0,0,7,6,0,0,0,0,0,0],
+            milestones:[{label:"Gap analysis complete",quarter:"Q1",year:"2027"},{label:"Dossier submitted",quarter:"Q3",year:"2027"}],
+            preStudy:{status:"active",effort:"S",cost:"XS",note:"MDR gap analysis: which clinical evidence is still missing for Class IIb?"}
         },"card-clpm-2027b");
 
-        // Karte 4: Predictive Deterioration AI (2029) – strategisches Kernprojekt
         createProjectCard("clpm","y2029","Predictive Deterioration AI",{
-            title:"Predictive Deterioration AI",
-            prodLineId:"clpm", horizonId:"y2029",
-            persona:"Intensivmediziner – will 6h vor kritischem Ereignis gewarnt werden",
-            effort:"M", cost:"S", status:"idea", depType:"blocking",
-            benefitValues:[6,7,5,9],
-            innovationValues:[0,0,0,8,9,8,0,0,0,0],
-            milestones:[
-                {label:"AI-Modell Training abgeschlossen",quarter:"Q2",year:"2029"},
-                {label:"Prospektive Validierungsstudie",quarter:"Q4",year:"2029"}
-            ],
+            title:"Predictive Deterioration AI",prodLineId:"clpm",horizonId:"y2029",
+            description:"AI model to predict critical patient events 6 hours in advance using longitudinal vital data.",
+            persona:"Intensivist — wants to be warned 6h before a critical event",
+            effort:"M",cost:"S",status:"idea",depType:"blocking",
+            benefitValues:[6,7,5,9],innovationValues:[0,0,0,8,9,8,0,0,0,0],
+            milestones:[{label:"AI model training complete",quarter:"Q2",year:"2029"},{label:"Prospective validation study",quarter:"Q4",year:"2029"}],
             preStudy:null
         },"card-clpm-2029");
 
-        // Karte 5: Autonomous Closed Loop ICU Platform (Vision 2036+)
         createProjectCard("clpm","vision","Autonomous Closed Loop ICU Platform",{
-            title:"Autonomous Closed Loop ICU Platform",
-            prodLineId:"clpm", horizonId:"vision",
-            persona:"ICU Medical Director – will vollautonomes, lernfähiges Monitoring-System",
-            effort:"M", cost:"S", status:"idea", depType:"blocking",
-            benefitValues:[7,8,6,9],
-            innovationValues:[0,7,0,8,9,8,7,0,0,0],
-            milestones:[
-                {label:"Vision Paper veröffentlicht",quarter:"Q2",year:"2027"},
-                {label:"Technologie-Roadmap fixiert",quarter:"Q1",year:"2030"}
-            ],
+            title:"Autonomous Closed Loop ICU Platform",prodLineId:"clpm",horizonId:"vision",
+            description:"Fully autonomous, self-learning monitoring and response system for the ICU of the future.",
+            persona:"ICU Medical Director — wants a fully autonomous, learning monitoring system",
+            effort:"M",cost:"S",status:"idea",depType:"blocking",
+            benefitValues:[7,8,6,9],innovationValues:[0,7,0,8,9,8,7,0,0,0],
+            milestones:[{label:"Vision paper published",quarter:"Q2",year:"2027"},{label:"Technology roadmap fixed",quarter:"Q1",year:"2030"}],
             preStudy:null
         },"card-clpm-vision");
 
-        // Pre-Study Tabs für Karten mit Pre-Study aktivieren
-        ["card-clpm-2026","card-clpm-2027b"].forEach(function(id){
-            var tab = document.getElementById("pstab-"+id);
+        // ── Produktlinie 2: Surgical Workflows ──
+        addNewProductLineVisual("surg","Surgical Workflows");
+
+        createProjectCard("surg","y2027","Robotic Assistance Module",{
+            title:"Robotic Assistance Module",prodLineId:"surg",horizonId:"y2027",
+            description:"Modular robotic assistance layer for laparoscopic and open surgery procedures.",
+            persona:"Surgeon — wants precise, fatigue-reducing robotic support without workflow disruption",
+            effort:"M",cost:"S",status:"planned",depType:"blocking",
+            benefitValues:[8,9,3,2],innovationValues:[0,0,9,8,9,0,7,0,0,0],
+            milestones:[{label:"Prototype testing",quarter:"Q2",year:"2027"},{label:"Clinical pilot start",quarter:"Q4",year:"2027"}],
+            preStudy:null
+        },"card-surg-2027");
+
+        createProjectCard("surg","y2029","OR Scheduling AI",{
+            title:"OR Scheduling AI",prodLineId:"surg",horizonId:"y2029",
+            description:"AI-based operating room scheduling to reduce waiting times and improve utilisation.",
+            persona:"OR Manager — needs to optimise OR utilisation and reduce last-minute cancellations",
+            effort:"M",cost:"M",status:"idea",depType:"informal",
+            benefitValues:[6,7,4,2],innovationValues:[0,0,0,7,8,7,0,0,0,0],
+            milestones:[{label:"Pilot hospital onboarded",quarter:"Q3",year:"2029"}],
+            preStudy:{status:"idea",effort:"XS",cost:"XS",note:"Market analysis: existing OR scheduling tools and integration requirements."}
+        },"card-surg-2029");
+
+        createProjectCard("surg","y2031_33","Minimally Invasive Suite",{
+            title:"Minimally Invasive Suite",prodLineId:"surg",horizonId:"y2031_33",
+            description:"Next-generation integrated suite combining imaging, robotics and real-time navigation for MIS.",
+            persona:"Surgical team — needs a seamlessly integrated environment for complex minimally invasive procedures",
+            effort:"L",cost:"M",status:"idea",depType:"blocking",
+            benefitValues:[9,8,4,3],innovationValues:[0,8,0,7,9,8,0,0,0,0],
+            milestones:[{label:"Concept freeze",quarter:"Q1",year:"2031"},{label:"Regulatory pre-submission",quarter:"Q2",year:"2033"}],
+            preStudy:null
+        },"card-surg-2033");
+
+        // ── Produktlinie 3: Digital Infrastructure ──
+        addNewProductLineVisual("digi","Digital Infrastructure");
+
+        createProjectCard("digi","y2026","Clinical Data Platform",{
+            title:"Clinical Data Platform",prodLineId:"digi",horizonId:"y2026",
+            description:"Unified clinical data platform enabling secure, real-time data sharing across all Getinge devices.",
+            persona:"Clinical IT Manager — needs a reliable, GDPR-compliant data backbone for connected devices",
+            effort:"S",cost:"M",status:"active",depType:"informal",
+            benefitValues:[7,5,8,3],innovationValues:[0,0,8,9,0,0,7,8,0,0],
+            milestones:[{label:"Architecture sign-off",quarter:"Q1",year:"2026"},{label:"First device integration",quarter:"Q3",year:"2026"}],
+            preStudy:null
+        },"card-digi-2026");
+
+        createProjectCard("digi","y2030","Interoperability Hub",{
+            title:"Interoperability Hub",prodLineId:"digi",horizonId:"y2030",
+            description:"HL7 FHIR-based interoperability layer connecting Getinge ecosystem with hospital information systems.",
+            persona:"Hospital CIO — wants seamless integration between Getinge devices and the hospital HIS/EHR",
+            effort:"M",cost:"L",status:"planned",depType:"informal",
+            benefitValues:[5,6,7,4],innovationValues:[0,7,7,8,0,0,0,8,0,0],
+            milestones:[{label:"FHIR specification complete",quarter:"Q2",year:"2030"},{label:"Pilot go-live",quarter:"Q4",year:"2030"}],
+            preStudy:null
+        },"card-digi-2030");
+
+        // Pre-Study Tabs aktivieren
+        ["card-clpm-2026","card-clpm-2027b","card-surg-2029"].forEach(function(id){
+            var tab=document.getElementById("pstab-"+id);
             if(tab) tab.classList.remove("ps-empty");
         });
 
-        // Beispiel-Verbindungen einfügen
+        // Verbindungen
         connectionsList.push({from:"card-clpm-2026",  to:"card-clpm-2027a", type:"blocking"});
         connectionsList.push({from:"card-clpm-2027a", to:"card-clpm-2029",  type:"blocking"});
         connectionsList.push({from:"card-clpm-2029",  to:"card-clpm-vision",type:"blocking"});
         connectionsList.push({from:"card-clpm-2027a", to:"card-clpm-2027b", type:"informal"});
+        connectionsList.push({from:"card-digi-2026",  to:"card-clpm-2027a", type:"informal"});
+        connectionsList.push({from:"card-digi-2026",  to:"card-surg-2027",  type:"informal"});
 
-        // ── 3 leere Platzhalter-Produktlinien ──
-        addNewProductLineVisual("prod-b","Product line 2");
-        addNewProductLineVisual("prod-c","Product line 3");
-        addNewProductLineVisual("prod-d","Product line 4");
+        setTimeout(function(){ redrawAllConnections(); updateEffortSummaries(); }, 150);
+    }
 
-        setTimeout(function(){ redrawAllConnections(); updateEffortSummaries(); }, 100);
+    window.onload = function() {
+        // Zeige Welcome Screen beim Laden
+        document.getElementById('welcome-overlay').style.display = 'flex';
     }
 
     </script>
@@ -1826,7 +1952,7 @@
                         <div id="modal-score-display" style="font-size:28px;font-weight:800;color:var(--primary);">&#x2013;</div>
                         <div id="modal-score-label" style="font-size:11px;color:#495a6b;"></div>
                     </div>
-                    <div style="font-size:10px;color:#a0aab4;margin-top:4px;">Score = Top benefits &amp; innovations, weighted by effort — higher = more strategic value per investment.</div>
+                    <div style="font-size:10px;color:#a0aab4;margin-top:4px;">Top benefits &amp; innovations, weighted by effort — higher = more strategic value per investment.</div>
                 </div>
             </div>
 
@@ -1878,6 +2004,7 @@
         </div>
     </div>
 </div>
+
 
 </body>
 </html>
