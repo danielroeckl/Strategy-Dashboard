@@ -281,7 +281,31 @@
             z-index: -1;
             background: #18274a;
         }
-    </style>
+    
+        /* ═══ CONTAINER CARD ══════════════════════════════════════════════════ */
+        .container-card { background:#f0f5ec; border:1px solid #b5cc99; border-left:5px solid #4a7c2f; border-radius:0 4px 4px 0; padding:0 11px 11px 11px; cursor:pointer; width:230px; min-width:0; user-select:none; position:relative; flex-shrink:0; transition:box-shadow 0.15s; }
+        .container-card:hover { box-shadow:0 3px 8px rgba(74,124,47,0.2); }
+        .container-header { display:flex; align-items:center; justify-content:space-between; padding:9px 0 6px 0; border-bottom:1px solid #c8d9b8; margin-bottom:8px; }
+        .container-label { font-size:9px; font-weight:600; color:#4a7c2f; text-transform:uppercase; letter-spacing:0.06em; }
+        .container-count { font-size:10px; color:#6a9a4e; background:#ddeeca; padding:2px 6px; border-radius:10px; }
+        .container-title { font-size:13px; font-weight:600; color:#2d4a1c; margin-bottom:8px; }
+        .container-items { display:flex; flex-direction:column; gap:4px; }
+        .container-item { display:flex; align-items:center; gap:7px; font-size:11px; color:#2d4a1c; }
+        .container-status-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .container-footer { margin-top:9px; padding-top:6px; border-top:1px solid #c8d9b8; font-size:10px; color:#6a9a4e; display:flex; align-items:center; gap:4px; }
+        .container-empty { font-size:11px; color:#6a9a4e; font-style:italic; padding:10px 0 6px; text-align:center; }
+        #container-modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.4); display:none; justify-content:center; align-items:center; z-index:2000; }
+        .container-modal-window { background:white; border-radius:4px; box-shadow:0 25px 50px rgba(0,0,0,0.25); width:680px; max-height:85vh; display:flex; flex-direction:column; }
+        .container-modal-header { background:#4a7c2f; color:white; padding:14px 20px; display:flex; align-items:center; justify-content:space-between; border-radius:4px 4px 0 0; }
+        .container-modal-body { padding:20px; overflow-y:auto; flex:1; }
+        .container-modal-footer { border-top:2px solid #c8d9b8; padding:12px 20px; display:flex; justify-content:flex-end; gap:8px; background:#f5f9f0; }
+        .container-card-list-item { display:flex; align-items:center; gap:10px; padding:10px 12px; background:#f5f9f0; border:1px solid #c8d9b8; border-radius:4px; margin-bottom:4px; }
+        .ci-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+        .ci-title { flex:1; font-size:13px; font-weight:500; color:#2d4a1c; }
+        .ci-status { font-size:10px; color:#6a9a4e; }
+        .ci-remove { background:none; border:none; cursor:pointer; color:#c85060; font-size:16px; padding:0 4px; line-height:1; }
+
+        </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
@@ -513,6 +537,7 @@
             <div class="cb-group-label">Product Lines</div>
             <div class="cb-group-content">
                 <button class="action-green" onclick="promptAddNewProductLine()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 8h12M8 3v5M3 13h10"/></svg> Add product line</button>
+                <button class="secondary" onclick="createContainer()" style="border-color:#4a7c2f;color:#4a7c2f;" title="Create a new bundle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#4a7c2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M2 5l6-3 6 3v6l-6 3-6-3V5z"/><path d="M8 2v12M2 5l6 3 6-3"/></svg> Add bundle</button>
             </div>
         </div>
 
@@ -557,6 +582,261 @@
 </div>
 
     <script>
+    // ═══════════════════════════════════════════════════════════════════════
+    // CONTAINER FEATURE
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  BUNDLE FEATURE — BACKLOG (Nice-to-have)                         ║
+    // ║                                                                   ║
+    // ║  1. Aggregated Score for Bundle                                   ║
+    // ║     - Calculate average or weighted score of all contained cards  ║
+    // ║     - Display as score badge on the bundle card face              ║
+    // ║                                                                   ║
+    // ║  2. Bundle PNG Export                                             ║
+    // ║     - A4 layout listing all contained cards with their scores     ║
+    // ║     - Similar to card PNG export but for the whole bundle         ║
+    // ║                                                                   ║
+    // ║  3. Card sort order within bundle                                 ║
+    // ║     - Drag-to-reorder cards inside the bundle modal               ║
+    // ║                                                                   ║
+    // ║  4. Bundle status rollup                                          ║
+    // ║     - Automatically derive bundle status from contained cards      ║
+    // ║     - e.g. "blocked" if any card is blocked                       ║
+    // ║                                                                   ║
+    // ║  5. Click card in bundle modal → return to bundle after saving    ║
+    // ║     - "Back to bundle" flow after editing a card from bundle      ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    var containersData = {};
+    var activeContainerId = null;
+
+    function createContainer() {
+        if (!productLines.length) { showAlert('Add a product line first.'); return; }
+        var o = document.getElementById('container-create-overlay');
+        if (!o) {
+            o = document.createElement('div');
+            o.id = 'container-create-overlay';
+            o.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2001;';
+            var inner = document.createElement('div');
+            inner.style.cssText = 'background:white;border-radius:4px;padding:24px;width:420px;box-shadow:0 25px 50px rgba(0,0,0,0.25);';
+            inner.innerHTML = '<div style="font-size:15px;font-weight:600;color:#18274a;margin-bottom:16px;">New Bundle</div>'
+                + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Title</label>'
+                + '<input id="cc-title" type="text" placeholder="e.g. Software Release 2.0" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;box-sizing:border-box;"></div>'
+                + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Product Line</label>'
+                + '<select id="cc-line" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;"></select></div>'
+                + '<div style="margin-bottom:20px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Year Column</label>'
+                + '<select id="cc-horiz" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;">'
+                + '<option value="y2026">2026 - Short Term</option>'
+                + '<option value="y2027">2027 - Short Term</option>'
+                + '<option value="y2028">2028 - Mid Term</option>'
+                + '<option value="y2029">2029 - Mid Term</option>'
+                + '<option value="y2030">2030 - Mid Term</option>'
+                + '<option value="y2031_33">2031-33 - Long Term</option>'
+                + '<option value="y2034_35">2034-35 - Long Term</option>'
+                + '<option value="vision">2036+ - BU Vision</option>'
+                + '</select></div>'
+                + '<div style="display:flex;gap:8px;justify-content:flex-end;">'
+                + '<button onclick="containerCreateConfirm()" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:8px 18px;font-size:13px;cursor:pointer;">Create</button>'
+                + '<button onclick="containerCreateCancel()" style="background:white;color:#595857;border:1px solid #d4cac8;border-radius:3px;padding:8px 14px;font-size:13px;cursor:pointer;">Cancel</button>'
+                + '</div>';
+            o.appendChild(inner);
+            document.body.appendChild(o);
+        }
+        var sel = document.getElementById('cc-line');
+        sel.innerHTML = productLines.map(function(l){ return '<option value="'+l.id+'">'+l.title+'</option>'; }).join('');
+        o.style.display = 'flex';
+        setTimeout(function(){ var t=document.getElementById('cc-title'); if(t){t.value='';t.focus();} }, 60);
+    }
+
+    function containerCreateCancel() {
+        var o=document.getElementById('container-create-overlay'); if(o) o.style.display='none';
+    }
+
+    function containerCreateConfirm() {
+        var title = (document.getElementById('cc-title')||{}).value||'';
+        title = title.trim();
+        if (!title) { var t=document.getElementById('cc-title'); if(t) t.focus(); return; }
+        var lineId = document.getElementById('cc-line').value;
+        var horiz  = document.getElementById('cc-horiz').value;
+        containerCreateCancel();
+        var cid = 'container-' + Date.now();
+        containersData[cid] = { title:title, prodLineId:lineId, horizonId:horiz, cardIds:[] };
+        renderContainerCard(lineId, horiz, cid);
+        updateEffortSummaries();
+    }
+
+    function renderContainerCard(lineId, horizId, cid) {
+        var cell = document.getElementById(lineId+'-'+horizId);
+        if (!cell) return;
+        var ex = document.getElementById(cid); if(ex) ex.remove();
+        var c = containersData[cid]; if(!c) return;
+        var div = document.createElement('div');
+        div.className = 'container-card'; div.id = cid;
+        div.setAttribute('draggable', 'true');
+        div.addEventListener('dragstart', function(e){ div.style.opacity='0.5'; e.dataTransfer.setData('text/plain',cid); });
+        div.addEventListener('dragend',   function(){ div.style.opacity='1'; });
+        div.addEventListener('click', function(e){
+            // If dep dot was clicked, don't open modal - let dep dot handle it
+            if(e.target && e.target.classList.contains('dependency-dot')) return;
+            openContainerModal(cid);
+        });
+        div.addEventListener('dragover',  function(e){
+            var dragId = e.dataTransfer.types.includes('text/plain') ? true : false;
+            if(!dragId) return;
+            e.preventDefault(); e.stopPropagation();
+            div.style.outline = '2px dashed #4a7c2f';
+        });
+        div.addEventListener('dragleave', function(){ div.style.outline = ''; });
+        div.addEventListener('drop', function(e){
+            e.preventDefault(); e.stopPropagation();
+            div.style.outline = '';
+            var cardId = e.dataTransfer.getData('text/plain');
+            if(!cardId || cardId === cid) return;
+            // Only add project cards (not other containers)
+            if(!projectsData[cardId]) return;
+            var c2 = containersData[cid]; if(!c2) return;
+            if(c2.cardIds.indexOf(cardId) !== -1) return; // already in
+            c2.cardIds.push(cardId);
+            // Delete all connections involving this card
+            connectionsList = connectionsList.filter(function(conn){ return conn.from !== cardId && conn.to !== cardId; });
+            var wrap = document.getElementById('wrap-'+cardId) || document.getElementById(cardId);
+            if(wrap) wrap.style.display = 'none';
+            refreshContainerCard(cid);
+            updateEffortSummaries();
+            redrawAllConnections();
+        });
+        refreshContainerCard(cid, div);
+        var sum = cell.querySelector('.lane-col-summary');
+        if(sum) cell.insertBefore(div, sum); else cell.appendChild(div);
+    }
+
+    function refreshContainerCard(cid, div) {
+        if(!div) div = document.getElementById(cid); if(!div) return;
+        var c = containersData[cid]; if(!c) return;
+        var sc = {idea:'#bfb1ac',planned:'#18274a',active:'#f39200',done:'#94b654',blocked:'#e56b78'};
+        var items = c.cardIds.map(function(id){
+            var d = projectsData[id]; if(!d) return '';
+            return '<div class="container-item"><div class="container-status-dot" style="background:'+(sc[d.status||'idea']||'#bfb1ac')+'"></div>'
+                +'<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;">'+(d.title||'?')+'</span></div>';
+        }).join('');
+        div.innerHTML = '<div class="container-header">'
+            +'<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;">&#x1F4E6;</span><span class="container-label">Bundle</span></div>'
+            +'<span class="container-count">'+c.cardIds.length+' card'+(c.cardIds.length!==1?'s':'')+'</span>'
+            +'</div>'
+            +'<div class="container-title">'+c.title+'</div>'
+            +(c.cardIds.length ? '<div class="container-items">'+items+'</div>' : '<div class="container-empty">no cards yet — drag cards here</div>')
+            +'<div class="container-footer" style="justify-content:space-between;">'
+            +'<span style="color:#6a9a4e;font-size:10px;">click to manage bundle</span>'
+            +'<div id="cdot-'+cid+'" class="dependency-dot" data-containerid="'+cid+'" title="Link dependency" style="width:14px;height:14px;border-radius:50%;border:2px solid #4a7c2f;background:white;cursor:pointer;flex-shrink:0;"></div>'
+            +'</div>';
+        // Attach dep dot handler after innerHTML is set
+        var dot = div.querySelector('.dependency-dot');
+        if(dot) {
+            dot.onclick = function(e) {
+                e.stopPropagation();
+                handleDepClick(e, cid);
+            };
+        }
+    }
+
+    function openContainerModal(cid) {
+        activeContainerId = cid;
+        var c = containersData[cid]; if(!c) return;
+        document.getElementById('container-modal-title').textContent = c.title;
+        refreshContainerModal();
+        document.getElementById('container-modal-overlay').style.display = 'flex';
+    }
+
+    function refreshContainerModal() {
+        var c = containersData[activeContainerId]; if(!c) return;
+        var sc = {idea:'#bfb1ac',planned:'#18274a',active:'#f39200',done:'#94b654',blocked:'#e56b78'};
+        var sl = {idea:'Idea',planned:'Planned',active:'Active',done:'Done',blocked:'Blocked'};
+        var listEl = document.getElementById('container-card-list');
+        listEl.innerHTML = c.cardIds.length
+            ? c.cardIds.map(function(id){
+                var d = projectsData[id]||{};
+                return '<div class="container-card-list-item">'
+                    +'<div class="ci-dot" style="background:'+(sc[d.status||'idea']||'#bfb1ac')+'"></div>'
+                    +'<span class="ci-title">'+(d.title||'?')+'</span>'
+                    +'<span class="ci-status">'+(sl[d.status||'idea']||'')+'</span>'
+                    +'<button class="ci-open" data-cardid="'+id+'" onclick="closeContainerModal();openProjectModal(this.dataset.cardid)" title="Open card" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:3px 8px;font-size:11px;cursor:pointer;font-weight:600;flex-shrink:0;">Open ↗</button>'
+                    +'<button class="ci-remove" data-cardid="'+id+'" onclick="containerRemoveCard(this.dataset.cardid)" title="Remove from container">&times;</button>'
+                    +'</div>';
+              }).join('')
+            : '<div style="font-size:12px;color:#6a9a4e;font-style:italic;padding:8px 0;">No cards added yet.</div>';
+        var sel = document.getElementById('container-add-select');
+        sel.innerHTML = '<option value="">-- select a card --</option>';
+        Object.keys(projectsData).forEach(function(id){
+            if(c.cardIds.indexOf(id) !== -1) return;
+            var d = projectsData[id]; if(!d||!d.title) return;
+            var op = document.createElement('option');
+            op.value = id; op.textContent = d.title+' ('+(d.status||'idea')+')';
+            sel.appendChild(op);
+        });
+    }
+
+    function containerAddCard() {
+        var id = document.getElementById('container-add-select').value;
+        if(!id || !activeContainerId) return;
+        var c = containersData[activeContainerId];
+        if(!c || c.cardIds.indexOf(id) !== -1) return;
+        c.cardIds.push(id);
+        // Delete all connections involving this card
+        connectionsList = connectionsList.filter(function(conn){ return conn.from !== id && conn.to !== id; });
+        // Hide card on board
+        var wrap = document.getElementById('wrap-'+id) || document.getElementById(id);
+        if(wrap) wrap.style.display = 'none';
+        refreshContainerModal();
+        refreshContainerCard(activeContainerId);
+        updateEffortSummaries();
+        redrawAllConnections();
+    }
+
+    function containerRemoveCard(id) {
+        if(!activeContainerId) return;
+        var c = containersData[activeContainerId]; if(!c) return;
+        c.cardIds = c.cardIds.filter(function(x){ return x !== id; });
+        // Show card back on board
+        var wrap = document.getElementById('wrap-'+id) || document.getElementById(id);
+        if(wrap) wrap.style.display = '';
+        refreshContainerModal();
+        refreshContainerCard(activeContainerId);
+        updateEffortSummaries();
+    }
+
+    function renameContainer() {
+        if(!activeContainerId) return;
+        var c = containersData[activeContainerId]; if(!c) return;
+        showPrompt('Rename bundle', 'New title...', function(t){
+            if(!t||!t.trim()) return;
+            c.title = t.trim();
+            document.getElementById('container-modal-title').textContent = c.title;
+            refreshContainerCard(activeContainerId);
+        });
+    }
+
+    function closeContainerModal() {
+        document.getElementById('container-modal-overlay').style.display = 'none';
+        activeContainerId = null;
+    }
+
+    function deleteContainer() {
+        if(!activeContainerId) return;
+        showConfirm('Delete bundle', 'Delete this bundle? Cards will be restored to the board.', function(){
+            var c = containersData[activeContainerId];
+            if(c) c.cardIds.forEach(function(id){
+                var w=document.getElementById('wrap-'+id)||document.getElementById(id);
+                if(w) w.style.display='';
+            });
+            var el = document.getElementById(activeContainerId); if(el) el.remove();
+            delete containersData[activeContainerId];
+            closeContainerModal();
+            updateEffortSummaries();
+        });
+    }
+
+
     // ╔══════════════════════════════════════════════════════════════════╗
     // ║  GLOBALE VARIABLEN & KONSTANTEN                                  ║
     // ╚══════════════════════════════════════════════════════════════════╝
@@ -647,17 +927,47 @@
         function applyFilters() {
             var search = document.getElementById('filter-search').value.toLowerCase();
 
+            // Track which cards are in bundles (they stay hidden from board)
+            var inBundle = {};
+            Object.keys(containersData).forEach(function(cid){
+                var c = containersData[cid]; if(!c) return;
+                c.cardIds.forEach(function(id){ inBundle[id] = cid; });
+            });
+
             Object.keys(projectsData).forEach(function(id) {
                 var d = projectsData[id];
                 var card = document.getElementById(id); if(!card) return;
+                // Cards in bundles stay hidden regardless of search
+                if(inBundle[id]) {
+                    card.style.display = 'none';
+                    var wrapB = document.getElementById('wrap-'+id);
+                    if(wrapB) wrapB.style.display = 'none';
+                    return;
+                }
                 var score = calcScore(d);
                 var scoreLvl = score>=45?'high':score>=25?'medium':'low';
-                var ok = (!search || d.title.toLowerCase().indexOf(search)>=0) &&
+                var ok = (!search || d.title.toLowerCase().indexOf(search)>=0 ||
+                          (d.description||'').toLowerCase().indexOf(search)>=0 ||
+                          (d.persona||'').toLowerCase().indexOf(search)>=0) &&
                          activeStatusFilters.has(d.status||'idea') &&
                          activeScoreFilters.has(scoreLvl);
                 card.style.display = ok ? '' : 'none';
                 var wrap = document.getElementById('wrap-'+id);
                 if(wrap) wrap.style.display = ok ? '' : 'none';
+            });
+
+            // Show/hide bundles: visible if search matches any contained card or bundle title
+            Object.keys(containersData).forEach(function(cid){
+                var bundleEl = document.getElementById(cid); if(!bundleEl) return;
+                var c = containersData[cid]; if(!c) return;
+                if(!search) { bundleEl.style.display = ''; return; }
+                var titleMatch = c.title.toLowerCase().indexOf(search) >= 0;
+                var cardMatch = c.cardIds.some(function(id){
+                    var d = projectsData[id]; if(!d) return false;
+                    return d.title.toLowerCase().indexOf(search) >= 0 ||
+                           (d.description||'').toLowerCase().indexOf(search) >= 0;
+                });
+                bundleEl.style.display = (titleMatch || cardMatch) ? '' : 'none';
             });
 
             updateKpiStrip(); updateEffortSummaries(); updateLaneCellLayout(); redrawAllConnections();
@@ -669,8 +979,12 @@
             document.getElementById('view-full-btn').classList.toggle('active',mode==='full');
             document.getElementById('view-compact-btn').classList.toggle('active',mode==='compact');
             document.getElementById('strategy-board').classList.toggle('board-compact',mode==='compact');
-            document.querySelectorAll('.project-card').forEach(function(c){c.style.width=mode==='compact'?'155px':'230px';});
             if(mode==='compact') document.querySelectorAll('.prestudy-panel.ps-open').forEach(function(p){p.classList.remove('ps-open');});
+            Object.keys(projectsData).forEach(function(id){
+                var card=document.getElementById(id); if(!card) return;
+                renderCardContent(card,id);
+                card.style.width=mode==='compact'?'155px':'230px';
+            });
             setTimeout(function(){redrawAllConnections();},50);
         }
 
@@ -705,7 +1019,19 @@
                 var parts=[];
                 ['y2026','y2027','y2028','y2029','y2030','y2031_33','y2034_35','vision'].forEach(function(h) {
                     var cell=document.getElementById(line.id+'-'+h); if(!cell) return;
-                    var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){return c.style.display!=='none';});
+                    var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){
+                        return c.style.display!=='none' && (!c.parentElement||c.parentElement.style.display!=='none');
+                    });
+                    // Also count cards inside containers in this cell
+                    Array.from(cell.querySelectorAll('.container-card')).forEach(function(contEl){
+                        var cont=containersData[contEl.id]; if(!cont) return;
+                        cont.cardIds.forEach(function(cardId){
+                            var d2=projectsData[cardId]; if(!d2) return;
+                            // Only count if no visible card with same id (avoid double-count)
+                            if(!cards.find(function(c){return c.id===cardId;}))
+                                cards = cards.concat([{id:cardId, _virtual:true}]);
+                        });
+                    });
                     if(!cards.length) return;
                     var ec={};
                     cards.forEach(function(c){var e=(projectsData[c.id]||{}).effort||'M';ec[e]=(ec[e]||0)+1;});
@@ -715,7 +1041,16 @@
             });
             document.querySelectorAll('.lane-col-summary').forEach(function(el) {
                 var cell=document.getElementById(el.dataset.cell); if(!cell) return;
-                var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){return c.style.display!=='none';});
+                var cards=Array.from(cell.querySelectorAll('.project-card')).filter(function(c){
+                    return c.style.display!=='none' && (!c.parentElement||c.parentElement.style.display!=='none');
+                });
+                Array.from(cell.querySelectorAll('.container-card')).forEach(function(contEl){
+                    var cont=containersData[contEl.id]; if(!cont) return;
+                    cont.cardIds.forEach(function(cardId){
+                        if(!cards.find(function(c){return c.id===cardId;}))
+                            cards = cards.concat([{id:cardId, _virtual:true}]);
+                    });
+                });
                 if(!cards.length){el.innerHTML='<span style="color:#bbb;">&#x2013;</span>';return;}
                 var ec={};
                 cards.forEach(function(c){var e=(projectsData[c.id]||{}).effort||'M';ec[e]=(ec[e]||0)+1;});
@@ -843,6 +1178,8 @@
                         var cid=cell.id; var horiz='',prod=cid;
                         for(var hi=0;hi<horizIds.length;hi++){if(cid.endsWith('-'+horizIds[hi])){horiz=horizIds[hi];prod=cid.slice(0,-(horizIds[hi].length+1));break;}}
                         if(projectsData[cardId]){projectsData[cardId].horizonId=horiz;projectsData[cardId].prodLineId=prod;}
+                        // Also update bundle position if a bundle was dragged
+                        if(containersData[cardId]){containersData[cardId].horizonId=horiz;containersData[cardId].prodLineId=prod;}
                         setTimeout(function(){redrawAllConnections();updateEffortSummaries();},50);
                     }
                 });
@@ -866,6 +1203,19 @@
                 ['title-box-'+id,id+'-y2026',id+'-y2027',id+'-y2028',id+'-y2029',id+'-y2030',id+'-y2031_33',id+'-y2034_35',id+'-vision'].forEach(function(sel){var el=document.getElementById(sel);if(el)el.remove();});
                 // Remove card wrappers belonging to this lane
     
+                // Clean up cards of this product line from containers
+                Object.keys(containersData).forEach(function(cid){
+                    var cont=containersData[cid]; if(!cont) return;
+                    var lineCards=Object.keys(projectsData).filter(function(cardId){
+                        return (projectsData[cardId]||{}).prodLineId===id;
+                    });
+                    if(lineCards.some(function(cardId){return cont.cardIds.indexOf(cardId)!==-1;})){
+                        cont.cardIds=cont.cardIds.filter(function(x){
+                            return lineCards.indexOf(x)===-1;
+                        });
+                        refreshContainerCard(cid);
+                    }
+                });
                 productLines=productLines.filter(function(l){return l.id!==id;}); syncProductDropdown();
                 setTimeout(function(){redrawAllConnections();},50);
             });
@@ -917,10 +1267,10 @@
         function createProjectCard(prod,horizon,title,initialData,forcedId) {
             var id=forcedId||('proj-'+Date.now()+Math.floor(Math.random()*1000));
             var container=document.getElementById(prod+'-'+horizon); if(!container) return;
-            projectsData[id]=initialData||{title:title,prodLineId:prod,horizonId:horizon,persona:'',effort:'M',cost:'M',status:'idea',depType:'blocking',benefitValues:[0,0,0,0],innovationValues:[0,0,0,0,0,0,0,0,0,0],milestones:[],preStudy:null};
+            projectsData[id]=initialData||{title:title,prodLineId:prod,horizonId:horizon,persona:'',effort:'M',cost:'M',status:'idea',competition:'gold',benefitValues:[0,0,0,0],innovationValues:[0,0,0,0,0,0,0,0,0,0],milestones:[],preStudy:null};
             var d=projectsData[id];
             if(!d.prodLineId) d.prodLineId=prod; if(!d.horizonId) d.horizonId=horizon;
-            if(!d.status) d.status='idea'; if(!d.depType) d.depType='blocking';
+            if(!d.status) d.status='idea'; if(!d.competition) d.competition='gold';
             if(d.preStudy===undefined) d.preStudy=null;
             if(!d.benefitValues) d.benefitValues=[0,0,0,0];
             if(!d.innovationValues) d.innovationValues=[0,0,0,0,0,0,0,0,0,0];
@@ -986,14 +1336,24 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 '<span class="card-badge badge-eff">Effort: ' + d.effort + '</span>' +
                 '<span class="card-badge badge-cos">Cost: ' + d.cost + '</span>' +
                 '<span class="card-badge badge-score ' + sc + '">Score ' + score + '</span>' +
-                '<span class="card-badge badge-status" style="background:' + sm.color + ';">' + sm.label + '</span>';
+                '<span class="card-badge badge-status" style="background:' + sm.color + ';">' + sm.label + '</span>' +
+                (currentView==='compact' ? '<span style="font-size:14px;line-height:1;margin-left:2px;" title="'+({gold:'Pioneer',silver:'Fast Follower',bronze:'Me-Too'}[d.competition||'gold'])+'">'+({gold:'\uD83E\uDD47',silver:'\uD83E\uDD48',bronze:'\uD83E\uDD49'}[d.competition||'gold'])+'</span>' : '');
     
             var radarRow = document.createElement('div');
             radarRow.className = 'card-radar-row';
             if (currentView === 'compact') radarRow.style.display = 'none';
+            var _me={gold:'\uD83E\uDD47',silver:'\uD83E\uDD48',bronze:'\uD83E\uDD49'};
+            var _ml={gold:'Pioneer',silver:'Fast Follower',bronze:'Me-Too'};
+            var _mc=d.competition||'gold';
+            var _mcol={gold:'#fffbe6;border:1px solid #f5c400;color:#7a5800',silver:'#f0f0f0;border:1px solid #aaaaaa;color:#404040',bronze:'#fef0e6;border:1px solid #c87040;color:#7a3800'};
             radarRow.innerHTML =
-                '<div class="card-radar-wrap"><div class="card-radar-label">Benefit</div><svg id="' + id + '-mini-benefit" class="card-mini-radar" width="62" height="62"></svg></div>' +
-                '<div class="card-radar-wrap"><div class="card-radar-label">Innovation</div><svg id="' + id + '-mini-innovation" class="card-mini-radar" width="62" height="62"></svg></div>';
+                '<div class="card-radar-wrap"><div class="card-radar-label">Benefit</div><svg id="' + id + '-mini-benefit" class="card-mini-radar" width="55" height="55"></svg></div>' +
+                '<div class="card-radar-wrap"><div class="card-radar-label">Innovation</div><svg id="' + id + '-mini-innovation" class="card-mini-radar" width="55" height="55"></svg></div>' +
+                '<div class="card-radar-wrap" style="align-items:center;justify-content:center;">' +
+                  '<div class="card-radar-label">Competition</div>' +
+                  '<div style="font-size:22px;line-height:1;margin:4px 0 2px 0;" title="'+_ml[_mc]+'">'+_me[_mc]+'</div>' +
+                  '<div style="font-size:9px;padding:1px 5px;border-radius:8px;background:'+_mcol[_mc]+';">'+_ml[_mc]+'</div>' +
+                '</div>';
     
             card.innerHTML = '';
             card.appendChild(stripe);
@@ -1145,6 +1505,49 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             sel.style.borderColor = c.border;
         }
 
+
+
+
+    // ── resetBoard: zentrales Board-Reset (alle Daten + DOM) ──────────────────
+        function resetBoard() {
+            // Restore bundle-hidden cards
+            Object.keys(containersData||{}).forEach(function(cid){
+                var c=containersData[cid]; if(!c) return;
+                c.cardIds.forEach(function(id){
+                    var w=document.getElementById('wrap-'+id)||document.getElementById(id);
+                    if(w) w.style.display='';
+                });
+            });
+            containersData = {};
+            projectsData = {};
+            productLines = [];
+            connectionsList = [];
+            activeProjectId = null;
+            _modalOpenSnapshot = null;
+            var board = document.getElementById('strategy-board');
+            if(board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+            var svg = document.getElementById('connections-svg');
+            if(svg) svg.innerHTML = '';
+            document.getElementById('modal-overlay').style.display = 'none';
+            updateKpiStrip();
+        }
+
+    // ── Find which container holds a given card ──
+        function findContainerForCard(cardId) {
+            var found = null;
+            Object.keys(containersData).forEach(function(cid) {
+                if(containersData[cid] && containersData[cid].cardIds.indexOf(cardId) !== -1) found = cid;
+            });
+            return found;
+        }
+
+    // ── Competition Status ────────────────────────────────────────────────────
+        function updateCompetitionSelect(sel) {
+            var colors = {gold:{bg:'#fffbe6',color:'#7a5800',border:'#f5c400'},silver:{bg:'#f0f0f0',color:'#404040',border:'#aaaaaa'},bronze:{bg:'#fef0e6',color:'#7a3800',border:'#c87040'}};
+            var c = colors[sel.value]||colors.gold;
+            sel.style.background=c.bg; sel.style.color=c.color; sel.style.borderColor=c.border;
+        }
+
     // Projekt-Modal öffnen und alle Felder befüllen
         function openProjectModal(id) {
             activeProjectId=id;
@@ -1156,7 +1559,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             document.getElementById('modal-effort').value=d.effort||'M';
             document.getElementById('modal-cost').value=d.cost||'M';
             document.getElementById('modal-status').value=d.status||'idea'; updateStatusSelectColor(document.getElementById('modal-status'));
-            document.getElementById('modal-dep-type').value=d.depType||'blocking';
+            var _cEl=document.getElementById('modal-competition'); if(_cEl){_cEl.value=d.competition||'gold'; updateCompetitionSelect(_cEl);}
             for(var i=1;i<=4;i++){document.getElementById('b-val'+i).value=d.benefitValues[i-1];document.getElementById('b-lbl'+i).textContent=d.benefitValues[i-1];}
             for(var i=1;i<=10;i++){document.getElementById('i-val'+i).value=d.innovationValues[i-1];document.getElementById('i-lbl'+i).textContent=d.innovationValues[i-1];}
             renderBenefitRadar();renderInnovationRadar();renderRoadmapEditorList();updateScoreDisplay();
@@ -1172,14 +1575,16 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             d.effort=document.getElementById('modal-effort').value;
             d.cost=document.getElementById('modal-cost').value;
             d.status=document.getElementById('modal-status').value;
-            d.depType=document.getElementById('modal-dep-type').value;
-            // Update all existing connections from this card to reflect new depType
-            connectionsList.forEach(function(conn) {
-                if (conn.from === activeProjectId) conn.type = d.depType;
-            });
+            d.competition=document.getElementById('modal-competition').value;
+            // connection type is managed per-connection
             for(var i=1;i<=4;i++) d.benefitValues[i-1]=parseInt(document.getElementById('b-val'+i).value);
             for(var i=1;i<=10;i++) d.innovationValues[i-1]=parseInt(document.getElementById('i-val'+i).value);
             updateCardUIPreview(activeProjectId);updateEffortSummaries();updateKpiStrip();
+            // Refresh any container that holds this card (name may have changed)
+            Object.keys(containersData).forEach(function(cid){
+                if(containersData[cid] && containersData[cid].cardIds.indexOf(activeProjectId)!==-1)
+                    refreshContainerCard(cid);
+            });
             // Snapshot aktualisieren damit closeProjectModal keine Änderungen mehr erkennt
             _modalOpenSnapshot = JSON.stringify(projectsData[activeProjectId]);
             closeProjectModal(true);
@@ -1201,7 +1606,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     ['modal-effort',          snap.effort||'M'],
                     ['modal-cost',            snap.cost||'M'],
                     ['modal-status',          snap.status||'idea'],
-                    ['modal-dep-type',        snap.depType||'blocking'],
+                    ['modal-competition',     snap.competition||'gold'],
                 ];
                 fields.forEach(function(pair) {
                     var el = document.getElementById(pair[0]);
@@ -1271,11 +1676,20 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             if(!activeProjectId) return;
             var title=(projectsData[activeProjectId]||{}).title||'this card';
             showConfirm('Delete card?','Delete "'+title+'"? This cannot be undone.',function(){
-                var wrap=document.getElementById('wrap-'+activeProjectId);
-                var card=document.getElementById(activeProjectId);
+                var _delId = activeProjectId;
+                // Remove from any containers first
+                Object.keys(containersData).forEach(function(cid){
+                    var cont=containersData[cid]; if(!cont) return;
+                    if(cont.cardIds.indexOf(_delId)!==-1){
+                        cont.cardIds=cont.cardIds.filter(function(x){return x!==_delId;});
+                        refreshContainerCard(cid);
+                    }
+                });
+                var wrap=document.getElementById('wrap-'+_delId);
+                var card=document.getElementById(_delId);
                 if(wrap) wrap.remove(); else if(card) card.remove();
-                connectionsList=connectionsList.filter(function(c){return c.from!==activeProjectId&&c.to!==activeProjectId;});
-                delete projectsData[activeProjectId];
+                connectionsList=connectionsList.filter(function(c){return c.from!==_delId&&c.to!==_delId;});
+                delete projectsData[_delId];
                 closeProjectModal();updateEffortSummaries();updateKpiStrip();
                 setTimeout(function(){redrawAllConnections();},50);
             });
@@ -1538,8 +1952,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 document.getElementById('dep-btn').innerText='Click target node...';
             } else {
                 if(dependencySourceId!==id){
-                    var depType=(projectsData[dependencySourceId]||{}).depType||'blocking';
-                    connectionsList.push({from:dependencySourceId,to:id,type:depType});
+                    connectionsList.push({from:dependencySourceId,to:id,type:'blocking'});
                 }
                 dependencySourceId=null;
                 toggleDependencyMode();
@@ -1566,7 +1979,10 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             var svg=document.getElementById('connections-svg');svg.innerHTML='';
             connectionsList.forEach(function(conn,index){
                 var eF=document.getElementById(conn.from),eT=document.getElementById(conn.to);
-                if(!eF||!eT||eF.style.display==='none'||eT.style.display==='none') return;
+                if(!eF||!eT) return;
+                // Skip connections involving hidden cards (they're in containers)
+                if(eF.style.display==='none'||(eF.parentElement&&eF.parentElement.style.display==='none')) return;
+                if(eT.style.display==='none'||(eT.parentElement&&eT.parentElement.style.display==='none')) return;
                 var rF=eF.getBoundingClientRect(),rT=eT.getBoundingClientRect(),rB=svg.getBoundingClientRect();
                 var x1=rF.left+rF.width-rB.left,y1=rF.top+rF.height/2-rB.top,x2=rT.left-rB.left,y2=rT.top+rT.height/2-rB.top;
                 var mx=(x1+x2)/2, my=(y1+y2)/2;
@@ -1787,12 +2203,36 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                         connectionsList.push(conn);
                     });
 
+                    // Transfer bundles that belong to new product lines
+                    var importedContainers = data.containersData || {};
+                    var addedBundles = 0;
+                    Object.keys(importedContainers).forEach(function(cid){
+                        var c = importedContainers[cid]; if(!c) return;
+                        // Only transfer if bundle's product line is a new line
+                        if(!newLineIds[c.prodLineId]) return;
+                        // Only transfer card IDs that were successfully imported
+                        var validCardIds = c.cardIds.filter(function(id){ return newCardIds[id]; });
+                        containersData[cid] = {
+                            title: c.title,
+                            prodLineId: c.prodLineId,
+                            horizonId: c.horizonId,
+                            cardIds: validCardIds
+                        };
+                        renderContainerCard(c.prodLineId, c.horizonId, cid);
+                        // Hide cards that are in this bundle
+                        validCardIds.forEach(function(id){
+                            var w = document.getElementById('wrap-'+id)||document.getElementById(id);
+                            if(w) w.style.display = 'none';
+                        });
+                        addedBundles++;
+                    });
+
                     syncProductDropdown();
                     updateKpiStrip();
                     updateEffortSummaries();
                     setTimeout(function() { redrawAllConnections(); }, 100);
 
-                    showAlert('Chase Merge complete: ' + addedLines + ' product line(s) and ' + addedCards + ' card(s) added. ' + mergeConnections.length + ' connection(s) transferred.');
+                    showAlert('Chase Merge complete: ' + addedLines + ' line(s), ' + addedCards + ' card(s), ' + addedBundles + ' bundle(s) added. ' + mergeConnections.length + ' connection(s) transferred.');
 
                 } catch(err) {
                     showAlert('Chase Merge failed: ' + err.message);
@@ -1916,7 +2356,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 '<div style="display:flex;gap:16px;margin-bottom:28px;">',
                   '<div style="background:#f5f2f1;border-radius:6px;padding:12px 20px;"><div style="font-size:10px;color:#8b7e79;margin-bottom:3px;">Effort</div><div style="font-size:18px;font-weight:700;color:#18274a;">' + (d.effort||'M') + '</div></div>',
                   '<div style="background:#f5f2f1;border-radius:6px;padding:12px 20px;"><div style="font-size:10px;color:#8b7e79;margin-bottom:3px;">Cost</div><div style="font-size:18px;font-weight:700;color:#18274a;">' + (d.cost||'M') + '</div></div>',
-                  '<div style="background:#f5f2f1;border-radius:6px;padding:12px 20px;"><div style="font-size:10px;color:#8b7e79;margin-bottom:3px;">Dependency Type</div><div style="font-size:18px;font-weight:700;color:#18274a;">' + (d.depType||'blocking') + '</div></div>',
+                  '<div style="background:#f5f2f1;border-radius:6px;padding:12px 20px;"><div style="font-size:10px;color:#8b7e79;margin-bottom:3px;">Competition</div><div style="font-size:18px;font-weight:700;color:#18274a;">' + ({gold:'🥇 Pioneer',silver:'🥈 Fast Follower',bronze:'🥉 Me-Too'}[d.competition||'gold']) + '</div></div>',
                 '</div>',
 
                 // Radars placeholder (SVG will be added by JS)
@@ -1996,7 +2436,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     if(projectsData[card.id]){projectsData[card.id].horizonId=horizId||cid;projectsData[card.id].prodLineId=prodId;}
                 });
             });
-            var data={version:3,projectsData:projectsData,productLines:productLines,connectionsList:connectionsList,cardPositions:cp};
+            var data={version:3,projectsData:projectsData,productLines:productLines,connectionsList:connectionsList,containersData:containersData,cardPositions:cp};
             var a=document.createElement('a');
             a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
             a.download="accelerate_strategy_export.json";a.click();
@@ -2010,7 +2450,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     var data=JSON.parse(e.target.result);
                     var board=document.getElementById('strategy-board');
                     board.innerHTML='<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
-                    productLines=[];projectsData={};connectionsList=data.connectionsList||[];
+                    productLines=[];projectsData={};containersData=data.containersData||{};connectionsList=data.connectionsList||[];
                     data.productLines.forEach(function(l){addNewProductLineVisual(l.id,l.title);});
                     var cp=data.cardPositions||{};
                     var sorted=Object.keys(data.projectsData).sort(function(a,b){return (cp[a]?cp[a].order:0)-(cp[b]?cp[b].order:0);});
@@ -2032,7 +2472,14 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                         }
                     });
                     redrawAllConnections();updateKpiStrip();updateEffortSummaries();
-                    showAlert("Import successful!");
+                    Object.keys(containersData).forEach(function(cid){
+                        var c=containersData[cid]; if(!c) return;
+                        renderContainerCard(c.prodLineId,c.horizonId,cid);
+                        c.cardIds.forEach(function(id){
+                            var w=document.getElementById('wrap-'+id)||document.getElementById(id);
+                            if(w) w.style.display='none';
+                        });
+                    }); showAlert("Import successful!");
                 }catch(err){showAlert("Import failed: "+err.message);}
             };
             reader.readAsText(file);
@@ -2117,6 +2564,15 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 'All unsaved changes will be lost. Export your board first if you want to keep your work.',
                 function() {
                     // Board komplett zurücksetzen
+                    // Restore hidden container cards before reset
+                    Object.keys(containersData||{}).forEach(function(cid){
+                        var c=containersData[cid]; if(!c) return;
+                        c.cardIds.forEach(function(id){
+                            var w=document.getElementById('wrap-'+id)||document.getElementById(id);
+                            if(w) w.style.display='';
+                        });
+                    });
+                    containersData = {};
                     projectsData = {};
                     productLines = [];
                     connectionsList = [];
@@ -2136,7 +2592,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     function welcomeNewProject() {
         var overlay = document.getElementById('welcome-overlay');
         if (overlay) overlay.style.display = 'none';
-        // Alle Daten zurücksetzen
+        // Alle Daten zurücksetzen — Bundles zuerst
+        Object.keys(containersData||{}).forEach(function(cid){
+            var c=containersData[cid]; if(!c) return;
+            c.cardIds.forEach(function(id){var w=document.getElementById('wrap-'+id)||document.getElementById(id); if(w) w.style.display='';});
+        });
+        containersData={};
         projectsData = {};
         productLines = [];
         connectionsList = [];
@@ -2164,7 +2625,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         if (!file) return;
         var overlay = document.getElementById('welcome-overlay');
         if (overlay) overlay.style.display = 'none';
-        // Reset before import
+        // Reset before import — Bundles zuerst
+        Object.keys(containersData||{}).forEach(function(cid){
+            var c=containersData[cid]; if(!c) return;
+            c.cardIds.forEach(function(id){var w=document.getElementById('wrap-'+id)||document.getElementById(id); if(w) w.style.display='';});
+        });
+        containersData={};
         projectsData = {};
         productLines = [];
         connectionsList = [];
@@ -2177,7 +2643,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
 
     // ── Welcome Screen: Demo-Board laden ──
     function welcomeDemo() {
-        // Erst alles zurücksetzen, dann Demo laden
+        // Erst alles zurücksetzen, dann Demo laden — Bundles zuerst
+        Object.keys(containersData||{}).forEach(function(cid){
+            var c=containersData[cid]; if(!c) return;
+            c.cardIds.forEach(function(id){var w=document.getElementById('wrap-'+id)||document.getElementById(id); if(w) w.style.display='';});
+        });
+        containersData={};
         projectsData = {};
         productLines = [];
         connectionsList = [];
@@ -2202,7 +2673,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Sensor Fusion Baseline",prodLineId:"clpm",horizonId:"y2026",
             description:"Foundation layer for real-time multi-sensor vital data fusion in the ICU.",
             persona:"ICU Nurse — needs reliable real-time vitals without alarm overload",
-            effort:"XS",cost:"XS",status:"active",depType:"blocking",
+            effort:"XS",cost:"XS",status:"active",competition:"gold",
             benefitValues:[9,7,3,2],innovationValues:[0,0,8,9,8,7,0,0,0,0],
             milestones:[{label:"Kick-off & data collection",quarter:"Q1",year:"2026"},{label:"Sensor validation complete",quarter:"Q3",year:"2026"}],
             preStudy:{status:"done",effort:"S",cost:"XS",note:"Clinical data basis & sensor validation — MDR-compliant requirements analysis complete."}
@@ -2212,7 +2683,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Alarm Intelligence Engine",prodLineId:"clpm",horizonId:"y2027",
             description:"AI-driven alarm reduction system to combat alarm fatigue in intensive care.",
             persona:"Intensive care nurse — suffers from alarm fatigue with 200+ alarms per shift",
-            effort:"S",cost:"S",status:"planned",depType:"blocking",
+            effort:"S",cost:"S",status:"planned",competition:"gold",
             benefitValues:[5,8,7,3],innovationValues:[0,0,0,8,9,0,7,0,0,0],
             milestones:[{label:"Algorithm freeze",quarter:"Q2",year:"2027"},{label:"FDA/MDR submission",quarter:"Q4",year:"2027"}],
             preStudy:null
@@ -2222,7 +2693,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Regulatory Dossier EU MDR",prodLineId:"clpm",horizonId:"y2027",
             description:"Complete MDR gap analysis and compile clinical evidence dossier for Class IIb submission.",
             persona:"Regulatory Affairs Manager — needs complete MDR documentation",
-            effort:"M",cost:"S",status:"planned",depType:"informal",
+            effort:"M",cost:"S",status:"planned",competition:"silver",
             benefitValues:[2,4,2,3],innovationValues:[0,0,7,6,0,0,0,0,0,0],
             milestones:[{label:"Gap analysis complete",quarter:"Q1",year:"2027"},{label:"Dossier submitted",quarter:"Q3",year:"2027"}],
             preStudy:{status:"active",effort:"S",cost:"XS",note:"MDR gap analysis: which clinical evidence is still missing for Class IIb?"}
@@ -2232,7 +2703,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Predictive Deterioration AI",prodLineId:"clpm",horizonId:"y2029",
             description:"AI model to predict critical patient events 6 hours in advance using longitudinal vital data.",
             persona:"Intensivist — wants to be warned 6h before a critical event",
-            effort:"M",cost:"S",status:"idea",depType:"blocking",
+            effort:"M",cost:"S",status:"idea",competition:"gold",
             benefitValues:[6,7,5,9],innovationValues:[0,0,0,8,9,8,0,0,0,0],
             milestones:[{label:"AI model training complete",quarter:"Q2",year:"2029"},{label:"Prospective validation study",quarter:"Q4",year:"2029"}],
             preStudy:null
@@ -2242,7 +2713,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Autonomous Closed Loop ICU Platform",prodLineId:"clpm",horizonId:"vision",
             description:"Fully autonomous, self-learning monitoring and response system for the ICU of the future.",
             persona:"ICU Medical Director — wants a fully autonomous, learning monitoring system",
-            effort:"M",cost:"S",status:"idea",depType:"blocking",
+            effort:"M",cost:"S",status:"idea",competition:"gold",
             benefitValues:[7,8,6,9],innovationValues:[0,7,0,8,9,8,7,0,0,0],
             milestones:[{label:"Vision paper published",quarter:"Q2",year:"2027"},{label:"Technology roadmap fixed",quarter:"Q1",year:"2030"}],
             preStudy:null
@@ -2255,7 +2726,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Robotic Assistance Module",prodLineId:"surg",horizonId:"y2027",
             description:"Modular robotic assistance layer for laparoscopic and open surgery procedures.",
             persona:"Surgeon — wants precise, fatigue-reducing robotic support without workflow disruption",
-            effort:"M",cost:"S",status:"planned",depType:"blocking",
+            effort:"M",cost:"S",status:"planned",competition:"gold",
             benefitValues:[8,9,3,2],innovationValues:[0,0,9,8,9,0,7,0,0,0],
             milestones:[{label:"Prototype testing",quarter:"Q2",year:"2027"},{label:"Clinical pilot start",quarter:"Q4",year:"2027"}],
             preStudy:null
@@ -2265,7 +2736,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"OR Scheduling AI",prodLineId:"surg",horizonId:"y2029",
             description:"AI-based operating room scheduling to reduce waiting times and improve utilisation.",
             persona:"OR Manager — needs to optimise OR utilisation and reduce last-minute cancellations",
-            effort:"M",cost:"M",status:"idea",depType:"informal",
+            effort:"M",cost:"M",status:"idea",competition:"silver",
             benefitValues:[6,7,4,2],innovationValues:[0,0,0,7,8,7,0,0,0,0],
             milestones:[{label:"Pilot hospital onboarded",quarter:"Q3",year:"2029"}],
             preStudy:{status:"idea",effort:"XS",cost:"XS",note:"Market analysis: existing OR scheduling tools and integration requirements."}
@@ -2275,7 +2746,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Minimally Invasive Suite",prodLineId:"surg",horizonId:"y2031_33",
             description:"Next-generation integrated suite combining imaging, robotics and real-time navigation for MIS.",
             persona:"Surgical team — needs a seamlessly integrated environment for complex minimally invasive procedures",
-            effort:"L",cost:"M",status:"idea",depType:"blocking",
+            effort:"L",cost:"M",status:"idea",competition:"gold",
             benefitValues:[9,8,4,3],innovationValues:[0,8,0,7,9,8,0,0,0,0],
             milestones:[{label:"Concept freeze",quarter:"Q1",year:"2031"},{label:"Regulatory pre-submission",quarter:"Q2",year:"2033"}],
             preStudy:null
@@ -2288,7 +2759,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Clinical Data Platform",prodLineId:"digi",horizonId:"y2026",
             description:"Unified clinical data platform enabling secure, real-time data sharing across all Getinge devices.",
             persona:"Clinical IT Manager — needs a reliable, GDPR-compliant data backbone for connected devices",
-            effort:"S",cost:"M",status:"active",depType:"informal",
+            effort:"S",cost:"M",status:"active",competition:"silver",
             benefitValues:[7,5,8,3],innovationValues:[0,0,8,9,0,0,7,8,0,0],
             milestones:[{label:"Architecture sign-off",quarter:"Q1",year:"2026"},{label:"First device integration",quarter:"Q3",year:"2026"}],
             preStudy:null
@@ -2298,7 +2769,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             title:"Interoperability Hub",prodLineId:"digi",horizonId:"y2030",
             description:"HL7 FHIR-based interoperability layer connecting Getinge ecosystem with hospital information systems.",
             persona:"Hospital CIO — wants seamless integration between Getinge devices and the hospital HIS/EHR",
-            effort:"M",cost:"L",status:"planned",depType:"informal",
+            effort:"M",cost:"L",status:"planned",competition:"silver",
             benefitValues:[5,6,7,4],innovationValues:[0,7,7,8,0,0,0,8,0,0],
             milestones:[{label:"FHIR specification complete",quarter:"Q2",year:"2030"},{label:"Pilot go-live",quarter:"Q4",year:"2030"}],
             preStudy:null
@@ -2513,10 +2984,11 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 </select>
                     </div>
                     <div>
-                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Dependency Type</label>
-                        <select id="modal-dep-type" style="width:100%;margin-top:4px;">
-                            <option value="blocking">Blocking (must finish before)</option>
-                            <option value="informal">Informational (related)</option>
+                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Competition Status</label>
+                        <select id="modal-competition" style="width:100%;margin-top:4px;" onchange="updateCompetitionSelect(this)">
+                            <option value="gold">🥇 Pioneer — first to market</option>
+                            <option value="silver">🥈 Fast Follower — early mover</option>
+                            <option value="bronze">🥉 Me-Too — market driven</option>
                         </select>
                     </div>
                 </div>
@@ -2594,6 +3066,37 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
 
 
 </div><!-- end workspace-container -->
+
+
+<div id="container-modal-overlay">
+    <div class="container-modal-window">
+        <div class="container-modal-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:18px;">&#x1F4E6;</span>
+                <span id="container-modal-title" style="font-size:15px;font-weight:600;"></span>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button onclick="renameContainer()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.4);color:white;border-radius:3px;padding:4px 10px;cursor:pointer;font-size:12px;">&#x270F; Rename</button>
+                <button onclick="closeContainerModal()" style="background:none;border:1px solid rgba(255,255,255,0.4);color:white;border-radius:3px;padding:3px 9px;cursor:pointer;font-size:16px;">&times;</button>
+            </div>
+        </div>
+        <div class="container-modal-body">
+            <div style="font-size:11px;font-weight:600;color:#4a7c2f;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Included cards</div>
+            <div id="container-card-list" style="max-height:300px;overflow-y:auto;"></div>
+            <div style="border-top:1px solid #c8d9b8;padding-top:14px;margin-top:8px;">
+                <div style="font-size:11px;font-weight:600;color:#4a7c2f;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Add a card</div>
+                <select id="container-add-select" style="width:100%;padding:7px 10px;border:1px solid #c8d9b8;border-radius:3px;font-size:13px;background:#f5f9f0;color:#2d4a1c;margin-bottom:8px;">
+                    <option value="">-- select a card --</option>
+                </select>
+                <button onclick="containerAddCard()" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:7px 16px;font-size:13px;cursor:pointer;">+ Add to container</button>
+            </div>
+        </div>
+        <div class="container-modal-footer">
+            <button onclick="closeContainerModal()" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:7px 18px;font-size:13px;cursor:pointer;">Done</button>
+            <button onclick="deleteContainer()" style="background:#a80000;color:white;border:none;border-radius:3px;padding:7px 14px;font-size:13px;cursor:pointer;">Delete container</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
