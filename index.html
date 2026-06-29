@@ -282,6 +282,7 @@
             background: #18274a;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <!-- ══ WELCOME SCREEN OVERLAY ══ -->
@@ -532,6 +533,7 @@
                 <button class="secondary" onclick="document.getElementById('import-file').click()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 4a1 1 0 0 1 1-1h3l2 2h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/></svg> Import JSON</button>
                 <input type="file" id="chase-merge-file" style="display:none" accept=".json" onchange="chaseMergePromptPassword(this.files[0])">
                 <button class="secondary" onclick="document.getElementById('chase-merge-file').click()" style="border-color:#c07000;color:#c07000;" title="Merge a colleague&#39;s JSON into this board (password protected)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c07000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:4px;"><circle cx="5" cy="5" r="2"/><circle cx="11" cy="5" r="2"/><circle cx="8" cy="11" r="2"/><path d="M7 5h-1M10 5h-1M6.5 8.5l1 1.5M9.5 8.5l-1 1.5"/></svg> Chase Merge</button>
+                <button class="secondary" onclick="exportBoardPNG()" title="Export board as high-resolution PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:4px;"><rect x="1" y="1" width="14" height="14" rx="2"/><circle cx="5" cy="5" r="1.5"/><path d="M1 11l4-4 3 3 2-2 5 5"/></svg> Export PNG</button>
             </div>
         </div>
 
@@ -1799,6 +1801,187 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             reader.readAsText(file);
         }
 
+
+    // ── PNG Export: Board ──────────────────────────────────────────────────
+        function exportBoardPNG() {
+            var board = document.getElementById('board-scroll-area');
+            if (!board) { showAlert('Board not found.'); return; }
+
+            showAlert('Generating PNG — this may take a few seconds...');
+
+            // Hide UI chrome temporarily
+            var toHide = [
+                document.querySelector('.top-bar'),
+                document.getElementById('getinge-brand'),
+            ];
+            toHide.forEach(function(el){ if(el) el.style.visibility='hidden'; });
+
+            setTimeout(function(){
+                html2canvas(board, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: '#f5f2f1',
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: board.scrollWidth,
+                    height: board.scrollHeight,
+                    windowWidth: board.scrollWidth,
+                    windowHeight: board.scrollHeight,
+                    onclone: function(doc) {
+                        var cloneBoard = doc.getElementById('board-scroll-area');
+                        if (cloneBoard) {
+                            cloneBoard.style.overflow = 'visible';
+                            cloneBoard.style.height = 'auto';
+                            cloneBoard.style.width = 'auto';
+                        }
+                    }
+                }).then(function(canvas){
+                    toHide.forEach(function(el){ if(el) el.style.visibility=''; });
+                    var link = document.createElement('a');
+                    link.download = 'accelerate-strategy-board.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(function(err){
+                    toHide.forEach(function(el){ if(el) el.style.visibility=''; });
+                    showAlert('PNG export failed: ' + err.message);
+                });
+            }, 100);
+        }
+
+    // ── PNG Export: einzelne Projektkarte ──────────────────────────────────
+        function exportCardPNG(id) {
+            if (!id) id = activeProjectId;
+            if (!id) return;
+            var d = projectsData[id];
+            if (!d) return;
+
+            // Build a self-contained A4-style card for export
+            var A4_W = 1240; // px @ 150dpi = A4 width
+            var A4_H = 1754; // px @ 150dpi = A4 height
+
+            // Create off-screen container
+            var container = document.createElement('div');
+            container.style.cssText = [
+                'position:fixed', 'left:-9999px', 'top:0',
+                'width:' + A4_W + 'px',
+                'min-height:' + A4_H + 'px',
+                'background:#ffffff',
+                'font-family:Adelle Sans, Source Sans 3, Segoe UI, sans-serif',
+                'padding:60px',
+                'box-sizing:border-box',
+                'color:#18274a',
+            ].join(';');
+
+            // Header
+            var status_colors = {
+                idea:'#ede9e8',planned:'#dce3f0',active:'#fff4ce',done:'#e8f0d8',blocked:'#fae0e3'
+            };
+            var status_text = {
+                idea:'#595857',planned:'#18274a',active:'#835600',done:'#4a6020',blocked:'#8a2030'
+            };
+            var st = d.status||'idea';
+            var score = calcScore(d);
+            var scoreColor = score>=45?'#4a6020':score>=25?'#835600':'#8a2030';
+            var scoreBg = score>=45?'#e8f0d8':score>=25?'#fff4ce':'#fae0e3';
+
+            container.innerHTML = [
+                // Top bar
+                '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;padding-bottom:20px;border-bottom:3px solid #18274a;">',
+                  '<div>',
+                    '<div style="font-size:11px;font-weight:600;color:#8b7e79;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Getinge — Accelerate Strategy</div>',
+                    '<div style="font-size:32px;font-weight:700;color:#18274a;line-height:1.1;">' + (d.title||'Untitled') + '</div>',
+                  '</div>',
+                  '<div style="display:flex;gap:10px;align-items:center;margin-top:4px;">',
+                    '<div style="background:' + (status_colors[st]||'#ede9e8') + ';color:' + (status_text[st]||'#595857') + ';font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px;">' + st.charAt(0).toUpperCase()+st.slice(1) + '</div>',
+                    '<div style="background:' + scoreBg + ';color:' + scoreColor + ';border-radius:8px;padding:8px 16px;text-align:center;">',
+                      '<div style="font-size:28px;font-weight:700;line-height:1;">' + score + '</div>',
+                      '<div style="font-size:10px;font-weight:600;">' + (score>=45?'HIGH':score>=25?'MEDIUM':'LOW') + '</div>',
+                    '</div>',
+                  '</div>',
+                '</div>',
+
+                // Info grid
+                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">',
+                  '<div>',
+                    '<div style="font-size:10px;font-weight:700;color:#8b7e79;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">Description</div>',
+                    '<div style="font-size:14px;color:#18274a;line-height:1.5;">' + (d.description||'—') + '</div>',
+                  '</div>',
+                  '<div>',
+                    '<div style="font-size:10px;font-weight:700;color:#8b7e79;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">User Persona</div>',
+                    '<div style="font-size:14px;color:#18274a;line-height:1.5;">' + (d.persona||'—') + '</div>',
+                  '</div>',
+                '</div>',
+
+                // Sizing
+                '<div style="display:flex;gap:16px;margin-bottom:28px;">',
+                  '<div style="background:#f5f2f1;border-radius:6px;padding:12px 20px;"><div style="font-size:10px;color:#8b7e79;margin-bottom:3px;">Effort</div><div style="font-size:18px;font-weight:700;color:#18274a;">' + (d.effort||'M') + '</div></div>',
+                  '<div style="background:#f5f2f1;border-radius:6px;padding:12px 20px;"><div style="font-size:10px;color:#8b7e79;margin-bottom:3px;">Cost</div><div style="font-size:18px;font-weight:700;color:#18274a;">' + (d.cost||'M') + '</div></div>',
+                  '<div style="background:#f5f2f1;border-radius:6px;padding:12px 20px;"><div style="font-size:10px;color:#8b7e79;margin-bottom:3px;">Dependency Type</div><div style="font-size:18px;font-weight:700;color:#18274a;">' + (d.depType||'blocking') + '</div></div>',
+                '</div>',
+
+                // Radars placeholder (SVG will be added by JS)
+                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">',
+                  '<div>',
+                    '<div style="font-size:10px;font-weight:700;color:#8b7e79;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Customer Benefit</div>',
+                    '<svg id="export-radar-benefit" width="360" height="360"></svg>',
+                  '</div>',
+                  '<div>',
+                    '<div style="font-size:10px;font-weight:700;color:#8b7e79;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">10 Types of Innovation</div>',
+                    '<svg id="export-radar-innovation" width="360" height="360"></svg>',
+                  '</div>',
+                '</div>',
+
+                // Milestones
+                (d.milestones && d.milestones.length > 0 ? [
+                  '<div>',
+                    '<div style="font-size:10px;font-weight:700;color:#8b7e79;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Project Roadmap</div>',
+                    d.milestones.map(function(ms){
+                        var yr = parseInt(ms.year); 
+                        var col = yr<=2027?'#c85060':yr<=2030?'#c07000':yr<=2035?'#6a8040':'#2090a0';
+                        return '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#f5f2f1;border-radius:4px;margin-bottom:6px;">'
+                            + '<div style="width:10px;height:10px;border-radius:50%;background:'+col+';flex-shrink:0;"></div>'
+                            + '<div style="font-size:13px;color:#18274a;flex:1;">' + ms.label + '</div>'
+                            + '<div style="font-size:12px;color:#8b7e79;">' + ms.quarter + ' ' + ms.year + '</div>'
+                            + '</div>';
+                    }).join(''),
+                  '</div>',
+                ].join('') : ''),
+
+                // Footer
+                '<div style="margin-top:auto;padding-top:20px;border-top:1px solid #d4cac8;display:flex;justify-content:space-between;font-size:10px;color:#8b7e79;">',
+                  '<span>Getinge AB — Accelerate Strategy</span>',
+                  '<span>' + new Date().toLocaleDateString('de-DE') + '</span>',
+                '</div>',
+            ].join('');
+
+            document.body.appendChild(container);
+
+            // Draw radars
+            var bSvg = container.querySelector('#export-radar-benefit');
+            var iSvg = container.querySelector('#export-radar-innovation');
+            if (bSvg) generateRadarPath(bSvg, 180, 180, 140, d.benefitValues||[0,0,0,0], 10, ["Revenue (+)","Cost savings","Convenience","Clinical benefit"], true);
+            if (iSvg) generateRadarPath(iSvg, 180, 180, 130, d.innovationValues||new Array(10).fill(0), 10, ["Profit Model","Network","Structure","Process","Product Perf.","Product System","Service","Channel","Brand","Cust. Engagement"], false);
+
+            setTimeout(function(){
+                html2canvas(container, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    useCORS: true,
+                    width: A4_W,
+                    height: Math.max(A4_H, container.scrollHeight)
+                }).then(function(canvas){
+                    document.body.removeChild(container);
+                    var link = document.createElement('a');
+                    link.download = (d.title||'project').replace(/[^a-z0-9]/gi,'-').toLowerCase() + '-card.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(function(err){
+                    document.body.removeChild(container);
+                    showAlert('Card PNG export failed: ' + err.message);
+                });
+            }, 200);
+        }
+
     // Kompletten Board-Zustand als JSON-Datei herunterladen
         function exportStrategyBoard(){
             var cp={};
@@ -2398,9 +2581,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         </div><!-- end modal-body -->
 
         <!-- FOOTER: always visible -->
-        <div style="border-top:2px solid var(--border);padding:12px 24px;display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-shrink:0;background:rgba(73,90,107,0.08);width:100%;box-sizing:border-box;">
-            <button onclick="saveActiveProjectDetails()">Save &amp; Close</button>
-            <button class="secondary" onclick="closeProjectModal()">Cancel</button>
+        <div style="border-top:2px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;background:rgba(73,90,107,0.08);width:100%;box-sizing:border-box;">
+            <button class="secondary" onclick="exportCardPNG(activeProjectId)" title="Export this card as A4 PNG" style="border-color:#6a8040;color:#6a8040;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#6a8040" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><rect x="1" y="1" width="14" height="14" rx="2"/><circle cx="5" cy="5" r="1.5"/><path d="M1 11l4-4 3 3 2-2 5 5"/></svg> Export PNG</button>
+            <div style="display:flex;gap:10px;">
+                <button onclick="saveActiveProjectDetails()">Save &amp; Close</button>
+                <button class="secondary" onclick="closeProjectModal()">Cancel</button>
+            </div>
         </div>
 
     </div>
