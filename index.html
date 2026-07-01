@@ -305,6 +305,43 @@
         .ci-status { font-size:10px; color:#6a9a4e; }
         .ci-remove { background:none; border:none; cursor:pointer; color:#c85060; font-size:16px; padding:0 4px; line-height:1; }
 
+        
+        /* ═══ STRATEGIC GOAL CARD ═════════════════════════════════════════════ */
+        .strategic-goal-card { position:relative; background:#16223f; border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:18px 22px 18px 38px; min-height:74px; margin-left:28px; width:230px; min-width:0; box-sizing:border-box; cursor:pointer; flex-shrink:0; user-select:none; }
+        .strategic-goal-card.sg-expanded { padding:20px 22px 22px 38px; cursor:default; }
+        .sg-avatar { position:absolute; left:-28px; top:50%; transform:translateY(-50%); width:56px; height:56px; border-radius:50%; background:#31b7bc; border:3px solid #16223f; display:flex; align-items:center; justify-content:center; }
+        .strategic-goal-card.sg-expanded .sg-avatar { top:32px; transform:none; }
+        .sg-dep-dot { position:absolute; left:-4px; bottom:-4px; width:14px; height:14px; border-radius:50%; background:#16223f; border:2px solid #31b7bc; cursor:pointer; }
+        .sg-headline { font-size:14px; font-weight:500; color:#ffffff; margin-bottom:6px; line-height:1.3; }
+        .sg-desc-preview { font-size:12px; color:#a9b4c4; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .sg-eyebrow { font-size:11px; font-weight:500; color:#31b7bc; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
+        .sg-field-label { font-size:11px; font-weight:500; color:#7e8aa0; text-transform:uppercase; letter-spacing:0.06em; margin:12px 0 6px 0; }
+        .sg-title-input { width:100%; background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.15); font-size:16px; font-weight:500; color:#ffffff; padding:2px 0 6px 0; margin-bottom:4px; font-family:inherit; outline:none; }
+        .sg-title-input:focus { border-bottom-color:#31b7bc; }
+        .sg-desc-textarea { width:100%; background:transparent; border:1px solid rgba(255,255,255,0.15); border-radius:6px; font-size:13px; color:#c5cbd6; line-height:1.6; padding:8px 10px; font-family:inherit; resize:vertical; min-height:70px; outline:none; box-sizing:border-box; }
+        .sg-desc-textarea:focus { border-color:#31b7bc; }
+        .sg-delete-btn { position:absolute; top:10px; right:10px; background:none; border:none; color:#7e8aa0; cursor:pointer; font-size:16px; padding:2px 4px; line-height:1; }
+        .sg-delete-btn:hover { color:#e56b78; }
+        .sg-collapse-hint { position:absolute; top:12px; right:36px; color:#7e8aa0; font-size:13px; }
+
+        
+        
+        /* ═══ SUB-BOARD RIGHT TAB (mirrors pre-study on left) ══════════════════ */
+        .subboard-tab { width:22px; background:#e9e4e3; border-radius:0 8px 8px 0; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; padding:8px 0; gap:5px; transition:background 0.15s; border:1px solid #d4cac8; border-left:none; }
+        .subboard-tab.sb-active { background:#18274a; border-color:#0f1a33; }
+        .subboard-tab:hover { background:#495a6b; border-color:#3a4a5c; }
+        .subboard-tab.sb-active:hover { background:#0f1a33; }
+        .sb-tab-label { font-size:9px; font-weight:400; color:white; writing-mode:vertical-rl; text-orientation:mixed; transform:rotate(180deg); letter-spacing:0.06em; text-transform:uppercase; line-height:1; }
+        .subboard-tab:not(.sb-active) .sb-tab-label { color:#8b7e79; }
+        .subboard-tab:not(.sb-active) svg { stroke:#8b7e79; }
+        .subboard-panel { width:155px; background:#eef2f8; border:1px solid #18274a; border-left:none; border-radius:0 8px 8px 0; padding:10px 11px; flex-shrink:0; display:none; box-sizing:border-box; }
+        .subboard-panel.sb-open { display:flex; flex-direction:column; gap:6px; }
+        .sb-panel-title { font-size:10px; font-weight:600; color:#18274a; text-transform:uppercase; letter-spacing:0.06em; }
+        .sb-panel-meta { font-size:11px; color:#495a6b; line-height:1.5; }
+        .sb-panel-open-btn { width:100%; background:#18274a; color:white; border:none; border-radius:3px; padding:6px 0; font-size:11px; font-weight:600; cursor:pointer; margin-top:4px; }
+        .sb-panel-open-btn:hover { background:#0f1a33; }
+        .sb-attach-banner { display:none; align-items:center; gap:10px; padding:7px 20px; background:#dce3f0; border-bottom:1px solid #b8cce8; font-size:12px; color:#18274a; }
+
         </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -454,11 +491,26 @@
     <div class="header-panel">
         <div class="header-title">
             <h1><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#18274a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:10px;"><path d="M12 2s6 3 6 10-6 10-6 10S6 19 6 12 12 2 12 2z"/><circle cx="12" cy="12" r="2.5" fill="#18274a" stroke="none"/><path d="M10 21l-1.5 3h7L14 21"/></svg> Accelerate Strategy &#x2013; 10-Year Product Board</h1>
-            
+            <input type="text" id="board-name-input" value="Untitled board" placeholder="Untitled board" title="Click to rename this board" oninput="boardName=this.value" onblur="updateBoardName(this.value)" onkeydown="if(event.key==='Enter')this.blur();" style="background:transparent;border:none;border-bottom:1px dashed transparent;font-size:13px;color:#8b7e79;font-weight:500;margin:2px 0 0 38px;padding:2px 4px;outline:none;width:300px;font-family:inherit;" onfocus="this.style.borderBottomColor='#18274a';this.style.color='#18274a';">
         </div>
         <div id="board-kpi-strip"></div>
     </div>
 
+    <div id="board-breadcrumb" style="display:none;align-items:center;gap:8px;padding:6px 20px;background:#eef3e9;border-bottom:1px solid #c8d9b8;font-size:12px;">
+        <button onclick="exitToParentBoard()" style="background:none;border:none;color:#4a7c2f;font-weight:600;cursor:pointer;padding:2px 4px;display:flex;align-items:center;gap:4px;font-size:12px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#4a7c2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>
+            <span id="breadcrumb-parent-name">Main board</span>
+        </button>
+        <span style="color:#9fb88a;">/</span>
+        <span id="breadcrumb-current-name" style="color:#2d4a1c;font-weight:600;">Sub-board</span>
+        <span style="margin-left:6px;color:#6a9a4e;font-size:11px;">(viewing as its own board)</span>
+    </div>
+
+    <div id="sb-attach-banner" class="sb-attach-banner">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><path d="M10.5 13.5h4.5M15 13.5v-4.5"/></svg>
+        <span>Click any project card to attach a sub-board to it</span>
+        <button onclick="toggleSubboardAttachMode()" style="margin-left:auto;background:none;border:1px solid #18274a;border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;color:#18274a;">Cancel</button>
+    </div>
     <div class="filter-bar">
 
         <!-- Gruppe: Suche -->
@@ -538,6 +590,7 @@
             <div class="cb-group-content">
                 <button class="action-green" onclick="promptAddNewProductLine()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 8h12M8 3v5M3 13h10"/></svg> Add product line</button>
                 <button class="secondary" onclick="createContainer()" style="border-color:#4a7c2f;color:#4a7c2f;" title="Create a new bundle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#4a7c2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M2 5l6-3 6 3v6l-6 3-6-3V5z"/><path d="M8 2v12M2 5l6 3 6-3"/></svg> Add bundle</button>
+                <button class="secondary" onclick="createStrategicGoal()" style="border-color:#31b7bc;color:#1a8a8f;" title="Create a new strategic goal card"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a8a8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><circle cx="8" cy="6" r="3"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg> Add strategic goal</button>
             </div>
         </div>
 
@@ -582,6 +635,127 @@
 </div>
 
     <script>
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // BOARD-IN-BOARD: navigation between master board and one sub-board level
+    // ═══════════════════════════════════════════════════════════════════════
+    var boardNavStack = [];   // holds the parent snapshot while inside a sub-board (max length 1)
+
+    // Rebuild the entire #strategy-board DOM from the currently active state
+    // (productLines / projectsData / containersData / goalsData / connectionsList).
+    // Used when entering or leaving a sub-board.
+    function rebuildBoardDOM() {
+        var board = document.getElementById('strategy-board');
+        if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+        var svg = document.getElementById('connections-svg');
+        if (svg) svg.innerHTML = '';
+
+        productLines.forEach(function(l){ addNewProductLineVisual(l.id, l.title); });
+
+        Object.keys(projectsData).forEach(function(id){
+            var p = projectsData[id];
+            createProjectCard(p.prodLineId, p.horizonId, p.title, p, id);
+            if (p.preStudy) {
+                var tab = document.getElementById('pstab-'+id);
+                if (tab) tab.classList.remove('ps-empty');
+            }
+        });
+
+        Object.keys(containersData).forEach(function(cid){
+            var c = containersData[cid]; if (!c) return;
+            renderContainerCard(c.prodLineId, c.horizonId, cid);
+            c.cardIds.forEach(function(id){
+                var w = document.getElementById('wrap-'+id) || document.getElementById(id);
+                if (w) w.style.display = 'none';
+            });
+        });
+
+        Object.keys(goalsData).forEach(function(gid){
+            var g = goalsData[gid]; if (!g) return;
+            renderStrategicGoalCard(g.prodLineId, g.horizonId, gid);
+        });
+
+        syncProductDropdown();
+        updateKpiStrip();
+        updateEffortSummaries();
+        updateLaneCellLayout();
+        setTimeout(function(){ redrawAllConnections(); }, 100);
+
+        var nameEl = document.getElementById('board-name-input');
+        if (nameEl) nameEl.value = boardName;
+    }
+
+    // Navigate into a bundle's sub-board (only valid one level deep from the master board)
+    function enterSubBoard(cardId) {
+        if (boardNavStack.length > 0) return; // one level only
+        var d = projectsData[cardId];
+        if (!d || !d.subBoard) return;
+        var b = d.subBoard;
+        boardNavStack.push({
+            boardName: boardName, productLines: productLines, projectsData: projectsData,
+            connectionsList: connectionsList, containersData: containersData, goalsData: goalsData,
+            enteredSid: cardId, enteredTitle: d.title
+        });
+        boardName = b.boardName;
+        productLines = b.productLines;
+        projectsData = b.projectsData;
+        connectionsList = b.connectionsList;
+        containersData = b.containersData;
+        goalsData = b.goalsData;
+        rebuildBoardDOM();
+        updateBreadcrumb();
+    }
+
+    // Leave the current sub-board and return to the parent (master) board
+    function exitToParentBoard() {
+        if (!boardNavStack.length) return;
+        var entry = boardNavStack.pop();
+        // Write live sub-board state back into the parent card's .subBoard field
+        entry.projectsData[entry.enteredSid].subBoard = {
+            boardName: boardName, productLines: productLines, projectsData: projectsData,
+            connectionsList: connectionsList, containersData: containersData, goalsData: goalsData
+        };
+        boardName = entry.boardName;
+        productLines = entry.productLines;
+        projectsData = entry.projectsData;
+        connectionsList = entry.connectionsList;
+        containersData = entry.containersData;
+        goalsData = entry.goalsData;
+        rebuildBoardDOM();
+        updateBreadcrumb();
+    }
+
+    function updateBreadcrumb() {
+        var bar = document.getElementById('board-breadcrumb');
+        if (!bar) return;
+        if (boardNavStack.length === 0) {
+            bar.style.display = 'none';
+            return;
+        }
+        var entry = boardNavStack[boardNavStack.length-1];
+        bar.style.display = 'flex';
+        document.getElementById('breadcrumb-parent-name').textContent = entry.boardName;
+        document.getElementById('breadcrumb-current-name').textContent = entry.enteredTitle;
+    }
+
+    // Always returns the FULL master-board export tree, even while currently
+    // viewing a sub-board (syncs the live sub-board state back in first).
+    function getTopLevelExportData() {
+        if (boardNavStack.length === 0) {
+            return { boardName:boardName, productLines:productLines, projectsData:projectsData,
+                      connectionsList:connectionsList, containersData:containersData, goalsData:goalsData };
+        }
+        // Inside a sub-board: sync live state into the parent card's .subBoard field
+        var top = boardNavStack[0];
+        var topProjectsData = JSON.parse(JSON.stringify(top.projectsData));
+        topProjectsData[top.enteredSid].subBoard = {
+            boardName: boardName, productLines: productLines, projectsData: projectsData,
+            connectionsList: connectionsList, containersData: containersData, goalsData: goalsData
+        };
+        return { boardName: top.boardName, productLines: top.productLines, projectsData: topProjectsData,
+                 connectionsList: top.connectionsList, containersData: top.containersData, goalsData: top.goalsData };
+    }
+
     // ═══════════════════════════════════════════════════════════════════════
     // CONTAINER FEATURE
     // ═══════════════════════════════════════════════════════════════════════
@@ -711,6 +885,12 @@
         if(sum) cell.insertBefore(div, sum); else cell.appendChild(div);
     }
 
+    function bundleAggregatedScore(c) {
+        var scores = c.cardIds.map(function(id){ var d=projectsData[id]; return d ? calcScore(d) : null; }).filter(function(s){ return s!==null; });
+        if(!scores.length) return null;
+        return Math.round(scores.reduce(function(a,b){return a+b;},0) / scores.length);
+    }
+
     function refreshContainerCard(cid, div) {
         if(!div) div = document.getElementById(cid); if(!div) return;
         var c = containersData[cid]; if(!c) return;
@@ -720,9 +900,14 @@
             return '<div class="container-item"><div class="container-status-dot" style="background:'+(sc[d.status||'idea']||'#bfb1ac')+'"></div>'
                 +'<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px;">'+(d.title||'?')+'</span></div>';
         }).join('');
+        var aggScore = bundleAggregatedScore(c);
+        var scoreCls = aggScore!==null ? scoreClass(aggScore) : '';
         div.innerHTML = '<div class="container-header">'
             +'<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;">&#x1F4E6;</span><span class="container-label">Bundle</span></div>'
+            +'<div style="display:flex;align-items:center;gap:6px;">'
+            +(aggScore!==null ? '<span class="card-badge badge-score '+scoreCls+'" style="font-size:9px;padding:1px 6px;" title="Average score across contained cards">'+aggScore+'</span>' : '')
             +'<span class="container-count">'+c.cardIds.length+' card'+(c.cardIds.length!==1?'s':'')+'</span>'
+            +'</div>'
             +'</div>'
             +'<div class="container-title">'+c.title+'</div>'
             +(c.cardIds.length ? '<div class="container-items">'+items+'</div>' : '<div class="container-empty">no cards yet — drag cards here</div>')
@@ -740,6 +925,8 @@
         }
     }
 
+
+
     function openContainerModal(cid) {
         activeContainerId = cid;
         var c = containersData[cid]; if(!c) return;
@@ -747,6 +934,16 @@
         refreshContainerModal();
         document.getElementById('container-modal-overlay').style.display = 'flex';
     }
+
+    var _returnToBundleId = null;
+
+    function containerOpenCard(cardId) {
+        _returnToBundleId = activeContainerId;
+        closeContainerModal();
+        openProjectModal(cardId);
+    }
+
+    var gripSvg = '<svg width="12" height="16" viewBox="0 0 12 16" fill="#9fb88a" style="flex-shrink:0;"><circle cx="3" cy="3" r="1.3"/><circle cx="9" cy="3" r="1.3"/><circle cx="3" cy="8" r="1.3"/><circle cx="9" cy="8" r="1.3"/><circle cx="3" cy="13" r="1.3"/><circle cx="9" cy="13" r="1.3"/></svg>';
 
     function refreshContainerModal() {
         var c = containersData[activeContainerId]; if(!c) return;
@@ -756,15 +953,44 @@
         listEl.innerHTML = c.cardIds.length
             ? c.cardIds.map(function(id){
                 var d = projectsData[id]||{};
-                return '<div class="container-card-list-item">'
+                return '<div class="container-card-list-item" draggable="true" data-cardid="'+id+'" style="cursor:grab;">'
+                    +gripSvg
                     +'<div class="ci-dot" style="background:'+(sc[d.status||'idea']||'#bfb1ac')+'"></div>'
                     +'<span class="ci-title">'+(d.title||'?')+'</span>'
                     +'<span class="ci-status">'+(sl[d.status||'idea']||'')+'</span>'
-                    +'<button class="ci-open" data-cardid="'+id+'" onclick="closeContainerModal();openProjectModal(this.dataset.cardid)" title="Open card" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:3px 8px;font-size:11px;cursor:pointer;font-weight:600;flex-shrink:0;">Open ↗</button>'
+                    +'<button class="ci-open" data-cardid="'+id+'" onclick="containerOpenCard(this.dataset.cardid)" title="Open card" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:3px 8px;font-size:11px;cursor:pointer;font-weight:600;flex-shrink:0;">Open ↗</button>'
                     +'<button class="ci-remove" data-cardid="'+id+'" onclick="containerRemoveCard(this.dataset.cardid)" title="Remove from container">&times;</button>'
                     +'</div>';
               }).join('')
             : '<div style="font-size:12px;color:#6a9a4e;font-style:italic;padding:8px 0;">No cards added yet.</div>';
+
+        // Wire up drag-to-reorder
+        var rowItems = listEl.querySelectorAll('.container-card-list-item');
+        rowItems.forEach(function(item){
+            item.addEventListener('dragstart', function(e){
+                e.dataTransfer.setData('text/plain', item.dataset.cardid);
+                item.style.opacity = '0.4';
+            });
+            item.addEventListener('dragend', function(){ item.style.opacity = '1'; });
+            item.addEventListener('dragover', function(e){ e.preventDefault(); item.style.borderTop = '2px solid #4a7c2f'; });
+            item.addEventListener('dragleave', function(){ item.style.borderTop = ''; });
+            item.addEventListener('drop', function(e){
+                e.preventDefault();
+                item.style.borderTop = '';
+                var draggedId = e.dataTransfer.getData('text/plain');
+                var targetId = item.dataset.cardid;
+                if(!draggedId || draggedId === targetId) return;
+                var cc = containersData[activeContainerId]; if(!cc) return;
+                var fromIdx = cc.cardIds.indexOf(draggedId);
+                var toIdx = cc.cardIds.indexOf(targetId);
+                if(fromIdx===-1||toIdx===-1) return;
+                cc.cardIds.splice(fromIdx,1);
+                cc.cardIds.splice(toIdx,0,draggedId);
+                refreshContainerModal();
+                refreshContainerCard(activeContainerId);
+            });
+        });
+
         var sel = document.getElementById('container-add-select');
         sel.innerHTML = '<option value="">-- select a card --</option>';
         Object.keys(projectsData).forEach(function(id){
@@ -969,6 +1195,17 @@
                 });
                 bundleEl.style.display = (titleMatch || cardMatch) ? '' : 'none';
             });
+
+            // Show/hide strategic goal cards by search text only (no status/score)
+            Object.keys(goalsData).forEach(function(gid){
+                var goalEl = document.getElementById(gid); if(!goalEl) return;
+                var g = goalsData[gid]; if(!g) return;
+                if(!search) { goalEl.style.display = ''; return; }
+                var match = (g.title||'').toLowerCase().indexOf(search) >= 0 ||
+                            (g.description||'').toLowerCase().indexOf(search) >= 0;
+                goalEl.style.display = match ? '' : 'none';
+            });
+
 
             updateKpiStrip(); updateEffortSummaries(); updateLaneCellLayout(); redrawAllConnections();
         }
@@ -1180,6 +1417,7 @@
                         if(projectsData[cardId]){projectsData[cardId].horizonId=horiz;projectsData[cardId].prodLineId=prod;}
                         // Also update bundle position if a bundle was dragged
                         if(containersData[cardId]){containersData[cardId].horizonId=horiz;containersData[cardId].prodLineId=prod;}
+                        if(goalsData[cardId]){goalsData[cardId].horizonId=horiz;goalsData[cardId].prodLineId=prod;}
                         setTimeout(function(){redrawAllConnections();updateEffortSummaries();},50);
                     }
                 });
@@ -1215,6 +1453,13 @@
                         });
                         refreshContainerCard(cid);
                     }
+                });
+                // Delete any strategic goal cards belonging to this line (and their connections)
+                Object.keys(goalsData).forEach(function(gid){
+                    var g=goalsData[gid]; if(!g || g.prodLineId!==id) return;
+                    var el=document.getElementById(gid); if(el) el.remove();
+                    delete goalsData[gid];
+                    connectionsList = connectionsList.filter(function(c){ return c.from!==gid && c.to!==gid; });
                 });
                 productLines=productLines.filter(function(l){return l.id!==id;}); syncProductDropdown();
                 setTimeout(function(){redrawAllConnections();},50);
@@ -1294,6 +1539,21 @@
             wrapper.appendChild(psPanel);
             wrapper.appendChild(psTab);
             wrapper.appendChild(card);
+
+            // ── Sub-board right tab (mirrors pre-study on left) ──
+            var sbTab = document.createElement('div');
+            sbTab.className = 'subboard-tab'; sbTab.id = 'sbtab-'+id;
+            sbTab.title = 'Sub-board';
+            sbTab.innerHTML = '<svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="0.5" y="0.5" width="4.5" height="4.5" rx="0.5"/><rect x="7" y="0.5" width="4.5" height="4.5" rx="0.5"/><rect x="0.5" y="7" width="4.5" height="4.5" rx="0.5"/><line x1="9.25" y1="7" x2="9.25" y2="11"/><line x1="7" y1="9.25" x2="11" y2="9.25"/></svg><span class="sb-tab-label">Sub-board</span>';
+            sbTab.addEventListener('click', function(e){ e.stopPropagation(); handleSbTabClick(id); });
+            if (d && d.subBoard) sbTab.classList.add('sb-active');
+
+            var sbPanel = document.createElement('div');
+            sbPanel.className = 'subboard-panel'; sbPanel.id = 'sbpanel-'+id;
+            refreshSubboardPanel(id, sbPanel);
+
+            wrapper.appendChild(sbTab);
+            wrapper.appendChild(sbPanel);
     
             card.addEventListener('dragstart',function(e){card.classList.add('dragging');e.dataTransfer.setData('text/plain',id);});
             card.addEventListener('dragend',function(){card.classList.remove('dragging');document.querySelectorAll('.drag-insert-before').forEach(function(c){c.classList.remove('drag-insert-before');});});
@@ -1532,6 +1792,237 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             updateKpiStrip();
         }
 
+
+    var boardName = 'Untitled board';
+    function updateBoardName(val) {
+        boardName = (val && val.trim()) ? val.trim() : 'Untitled board';
+        var el = document.getElementById('board-name-input');
+        if (el) { el.value = boardName; el.style.borderBottomColor = 'transparent'; el.style.color = '#8b7e79'; }
+    }
+    function sanitizeFilename(name) {
+        return (name || 'untitled-board')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .substring(0, 60) || 'untitled-board';
+    }
+
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // STRATEGIC GOAL CARD FEATURE
+    // ═══════════════════════════════════════════════════════════════════════
+    var goalsData = {};
+
+    function createStrategicGoal() {
+        if (!productLines.length) { showAlert('Add a product line first.'); return; }
+        var o = document.getElementById('goal-create-overlay');
+        if (!o) {
+            o = document.createElement('div');
+            o.id = 'goal-create-overlay';
+            o.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2001;';
+            var inner = document.createElement('div');
+            inner.style.cssText = 'background:white;border-radius:4px;padding:24px;width:420px;box-shadow:0 25px 50px rgba(0,0,0,0.25);';
+            inner.innerHTML = '<div style="font-size:15px;font-weight:600;color:#18274a;margin-bottom:16px;">New strategic goal</div>'
+                + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Goal title</label>'
+                + '<input id="gc-title" type="text" placeholder="e.g. Reduce checkout friction" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;box-sizing:border-box;"></div>'
+                + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Product line</label>'
+                + '<select id="gc-line" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;"></select></div>'
+                + '<div style="margin-bottom:20px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Year column</label>'
+                + '<select id="gc-horiz" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;">'
+                + '<option value="y2026" selected>2026 - Short Term</option>'
+                + '<option value="y2027">2027 - Short Term</option>'
+                + '<option value="y2028">2028 - Mid Term</option>'
+                + '<option value="y2029">2029 - Mid Term</option>'
+                + '<option value="y2030">2030 - Mid Term</option>'
+                + '<option value="y2031_33">2031-33 - Long Term</option>'
+                + '<option value="y2034_35">2034-35 - Long Term</option>'
+                + '<option value="vision" selected>2036+ - BU Vision</option>'
+                + '</select></div>'
+                + '<div style="display:flex;gap:8px;justify-content:flex-end;">'
+                + '<button onclick="strategicGoalCreateConfirm()" style="background:#1a8a8f;color:white;border:none;border-radius:3px;padding:8px 18px;font-size:13px;cursor:pointer;">Create</button>'
+                + '<button onclick="strategicGoalCreateCancel()" style="background:white;color:#595857;border:1px solid #d4cac8;border-radius:3px;padding:8px 14px;font-size:13px;cursor:pointer;">Cancel</button>'
+                + '</div>';
+            o.appendChild(inner);
+            document.body.appendChild(o);
+        }
+        var sel = document.getElementById('gc-line');
+        sel.innerHTML = productLines.map(function(l){ return '<option value="'+l.id+'">'+l.title+'</option>'; }).join('');
+        o.style.display = 'flex';
+        setTimeout(function(){ var t=document.getElementById('gc-title'); if(t){t.value='';t.focus();} }, 60);
+    }
+
+    function strategicGoalCreateCancel() {
+        var o=document.getElementById('goal-create-overlay'); if(o) o.style.display='none';
+    }
+
+    function strategicGoalCreateConfirm() {
+        var title = (document.getElementById('gc-title')||{}).value||'';
+        title = title.trim();
+        if (!title) { var t=document.getElementById('gc-title'); if(t) t.focus(); return; }
+        var lineId = document.getElementById('gc-line').value;
+        var horiz  = document.getElementById('gc-horiz').value;
+        strategicGoalCreateCancel();
+        var gid = 'goal-' + Date.now();
+        goalsData[gid] = { title:title, description:'', prodLineId:lineId, horizonId:horiz, expanded:false };
+        renderStrategicGoalCard(lineId, horiz, gid);
+        updateEffortSummaries();
+    }
+
+    function renderStrategicGoalCard(lineId, horizId, gid) {
+        var cell = document.getElementById(lineId+'-'+horizId);
+        if (!cell) return;
+        var ex = document.getElementById(gid); if(ex) ex.remove();
+        var g = goalsData[gid]; if(!g) return;
+        var div = document.createElement('div');
+        div.className = 'strategic-goal-card';
+        div.id = gid;
+        div.setAttribute('draggable', 'true');
+        div.addEventListener('dragstart', function(e){ div.style.opacity='0.5'; e.dataTransfer.setData('text/plain',gid); });
+        div.addEventListener('dragend',   function(){ div.style.opacity='1'; });
+        refreshStrategicGoalCard(gid, div);
+        var sum = cell.querySelector('.lane-col-summary');
+        if(sum) cell.insertBefore(div, sum); else cell.appendChild(div);
+    }
+
+    function refreshStrategicGoalCard(gid, div) {
+        if(!div) div = document.getElementById(gid); if(!div) return;
+        var g = goalsData[gid]; if(!g) return;
+        div.classList.toggle('sg-expanded', !!g.expanded);
+        var userSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>';
+
+        if (!g.expanded) {
+            div.innerHTML = '<div class="sg-avatar">'+userSvg+'<div class="sg-dep-dot" title="Link dependency"></div></div>'
+                + '<div class="sg-headline">'+(g.title||'Untitled goal')+'</div>'
+                + '<div class="sg-desc-preview">'+(g.description||'No description yet — click to add one.')+'</div>';
+            div.onclick = function(e){
+                if(e.target && (e.target.classList.contains('sg-dep-dot'))) return;
+                g.expanded = true;
+                refreshStrategicGoalCard(gid, div);
+            };
+        } else {
+            var chevronSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7e8aa0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+            div.innerHTML = '<button class="sg-delete-btn" title="Delete this goal">&times;</button>'
+                + '<span class="sg-collapse-hint" title="Collapse">'+chevronSvg+'</span>'
+                + '<div class="sg-avatar">'+userSvg+'<div class="sg-dep-dot" title="Link dependency"></div></div>'
+                + '<div class="sg-eyebrow">Strategic goal</div>'
+                + '<input class="sg-title-input" type="text" value="'+(g.title||'').replace(/"/g,'&quot;')+'" placeholder="Goal title">'
+                + '<div class="sg-field-label">Value proposition / description</div>'
+                + '<textarea class="sg-desc-textarea" placeholder="Describe the customer pain point and value...">'+(g.description||'')+'</textarea>';
+            div.onclick = null;
+
+            var titleInput = div.querySelector('.sg-title-input');
+            titleInput.addEventListener('click', function(e){ e.stopPropagation(); });
+            titleInput.addEventListener('blur', function(){ g.title = titleInput.value.trim() || 'Untitled goal'; });
+
+            var descArea = div.querySelector('.sg-desc-textarea');
+            descArea.addEventListener('click', function(e){ e.stopPropagation(); });
+            descArea.addEventListener('blur', function(){ g.description = descArea.value; });
+
+            var collapseHint = div.querySelector('.sg-collapse-hint');
+            collapseHint.addEventListener('click', function(e){
+                e.stopPropagation();
+                g.title = titleInput.value.trim() || 'Untitled goal';
+                g.description = descArea.value;
+                g.expanded = false;
+                refreshStrategicGoalCard(gid, div);
+            });
+
+            var delBtn = div.querySelector('.sg-delete-btn');
+            delBtn.addEventListener('click', function(e){
+                e.stopPropagation();
+                showConfirm('Delete strategic goal', 'Delete "'+(g.title||'this goal')+'"? This cannot be undone.', function(){
+                    connectionsList = connectionsList.filter(function(c){ return c.from!==gid && c.to!==gid; });
+                    delete goalsData[gid];
+                    var el = document.getElementById(gid); if(el) el.remove();
+                    updateEffortSummaries();
+                    setTimeout(function(){ redrawAllConnections(); }, 50);
+                });
+            });
+        }
+
+        var dot = div.querySelector('.sg-dep-dot');
+        if (dot) dot.addEventListener('click', function(e){ e.stopPropagation(); handleDepClick(e, gid); });
+    }
+
+
+
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // SUB-BOARD: stored as projectsData[cardId].subBoard
+    // Right-side tab on every project card, mirrors pre-study pattern.
+    // ═══════════════════════════════════════════════════════════════════════
+    var subboardAttachMode = false;
+
+    function toggleSubboardAttachMode() {
+        if (boardNavStack.length > 0) { showAlert('Cannot add sub-boards inside a sub-board.'); return; }
+        subboardAttachMode = !subboardAttachMode;
+        var btn = document.getElementById('add-subboard-btn');
+        var banner = document.getElementById('sb-attach-banner');
+        if (btn) { btn.style.background = subboardAttachMode ? '#18274a' : ''; btn.style.color = subboardAttachMode ? 'white' : '#18274a'; }
+        if (banner) banner.style.display = subboardAttachMode ? 'flex' : 'none';
+    }
+
+    function handleSbTabClick(cardId) {
+        var d = projectsData[cardId];
+        if (!d) return;
+        if (!d.subBoard) {
+            // No sub-board yet — create one if in attach mode, or prompt directly
+            if (subboardAttachMode || true) {
+                showConfirm(
+                    'Create sub-board?',
+                    'Attach an independent sub-board to "' + (d.title||'this card') + '"? You can open it to plan in detail.',
+                    function() {
+                        d.subBoard = {
+                            boardName: d.title || 'Sub-board',
+                            productLines: [{ id:'line-'+Date.now(), title:'Product line 1' }],
+                            projectsData: {}, connectionsList: [], containersData: {}, goalsData: {}
+                        };
+                        var tab = document.getElementById('sbtab-'+cardId);
+                        if (tab) tab.classList.add('sb-active');
+                        var panel = document.getElementById('sbpanel-'+cardId);
+                        refreshSubboardPanel(cardId, panel);
+                        if (panel) panel.classList.add('sb-open');
+                        if (subboardAttachMode) toggleSubboardAttachMode();
+                    }
+                );
+            }
+        } else {
+            // Toggle panel open/close
+            var panel = document.getElementById('sbpanel-'+cardId);
+            if (panel) {
+                if (panel.classList.contains('sb-open')) {
+                    panel.classList.remove('sb-open');
+                } else {
+                    refreshSubboardPanel(cardId, panel);
+                    panel.classList.add('sb-open');
+                }
+            }
+        }
+    }
+
+    function refreshSubboardPanel(cardId, panel) {
+        if (!panel) panel = document.getElementById('sbpanel-'+cardId);
+        if (!panel) return;
+        var d = projectsData[cardId];
+        if (!d || !d.subBoard) { panel.innerHTML = ''; return; }
+        var b = d.subBoard;
+        var lineCount = (b.productLines||[]).length;
+        var cardCount = Object.keys(b.projectsData||{}).length;
+        panel.innerHTML = '<div class="sb-panel-title">Sub-board</div>'
+            + '<div class="sb-panel-meta"><strong>'+lineCount+'</strong> line'+(lineCount!==1?'s':'')
+            + ' &mdash; <strong>'+cardCount+'</strong> card'+(cardCount!==1?'s':'')+'</div>'
+            + '<button class="sb-panel-open-btn" data-cardid="'+cardId+'" onclick="enterSubBoard(this.dataset.cardid)">Open board &rarr;</button>';
+    }
+
+    function syncSbTabState(cardId) {
+        var d = projectsData[cardId]; if (!d) return;
+        var tab = document.getElementById('sbtab-'+cardId);
+        if (tab) tab.classList.toggle('sb-active', !!(d.subBoard));
+        var panel = document.getElementById('sbpanel-'+cardId);
+        if (panel && !d.subBoard) { panel.classList.remove('sb-open'); panel.innerHTML = ''; }
+        else if (panel && d.subBoard) refreshSubboardPanel(cardId, panel);
+    }
+
     // ── Find which container holds a given card ──
         function findContainerForCard(cardId) {
             var found = null;
@@ -1585,6 +2076,8 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 if(containersData[cid] && containersData[cid].cardIds.indexOf(activeProjectId)!==-1)
                     refreshContainerCard(cid);
             });
+            // Sync sub-board tab state
+            syncSbTabState(activeProjectId);
             // Snapshot aktualisieren damit closeProjectModal keine Änderungen mehr erkennt
             _modalOpenSnapshot = JSON.stringify(projectsData[activeProjectId]);
             closeProjectModal(true);
@@ -1634,6 +2127,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                         function() {
                             document.getElementById('modal-overlay').style.display='none';
                             activeProjectId=null; _modalOpenSnapshot=null;
+                            _checkReturnToBundle();
                         }
                     );
                     return;
@@ -1641,6 +2135,16 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             }
             document.getElementById('modal-overlay').style.display='none';
             activeProjectId=null; _modalOpenSnapshot=null;
+            _checkReturnToBundle();
+        }
+
+    // ── Backlog item: return to the bundle modal after editing a card opened from it ──
+        function _checkReturnToBundle() {
+            if (_returnToBundleId) {
+                var bid = _returnToBundleId;
+                _returnToBundleId = null;
+                if (containersData[bid]) openContainerModal(bid);
+            }
         }
 
     // ── Aktive Projektkarte duplizieren (in gleicher Zelle) ──
@@ -1674,8 +2178,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     // Aktive Projektkarte löschen (inkl. Wrapper, Pre-Study und Verbindungen)
         function deleteActiveProjectCard() {
             if(!activeProjectId) return;
-            var title=(projectsData[activeProjectId]||{}).title||'this card';
-            showConfirm('Delete card?','Delete "'+title+'"? This cannot be undone.',function(){
+            var _dc = projectsData[activeProjectId]||{};
+            var _dcTitle = _dc.title||'this card';
+            var _dcMsg = _dc.subBoard
+                ? 'Delete "'+_dcTitle+'"? It has an attached sub-board with '+Object.keys(_dc.subBoard.projectsData||{}).length+' card(s) inside. Everything will be permanently deleted.'
+                : 'Delete "'+_dcTitle+'"? This cannot be undone.';
+            showConfirm('Delete card?', _dcMsg, function(){
                 var _delId = activeProjectId;
                 // Remove from any containers first
                 Object.keys(containersData).forEach(function(cid){
@@ -2227,12 +2735,29 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                         addedBundles++;
                     });
 
+                    // Transfer strategic goal cards that belong to new product lines
+                    var importedGoals = data.goalsData || {};
+                    var addedGoals = 0;
+                    Object.keys(importedGoals).forEach(function(gid){
+                        var g = importedGoals[gid]; if(!g) return;
+                        if(!newLineIds[g.prodLineId]) return;
+                        goalsData[gid] = {
+                            title: g.title,
+                            description: g.description,
+                            prodLineId: g.prodLineId,
+                            horizonId: g.horizonId,
+                            expanded: false
+                        };
+                        renderStrategicGoalCard(g.prodLineId, g.horizonId, gid);
+                        addedGoals++;
+                    });
+
                     syncProductDropdown();
                     updateKpiStrip();
                     updateEffortSummaries();
                     setTimeout(function() { redrawAllConnections(); }, 100);
 
-                    showAlert('Chase Merge complete: ' + addedLines + ' line(s), ' + addedCards + ' card(s), ' + addedBundles + ' bundle(s) added. ' + mergeConnections.length + ' connection(s) transferred.');
+                    showAlert('Chase Merge complete: ' + addedLines + ' line(s), ' + addedCards + ' card(s), ' + addedBundles + ' bundle(s), ' + addedGoals + ' goal(s), ' + mergeConnections.length + ' connection(s) transferred.');
 
                 } catch(err) {
                     showAlert('Chase Merge failed: ' + err.message);
@@ -2278,7 +2803,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 }).then(function(canvas){
                     toHide.forEach(function(el){ if(el) el.style.visibility=''; });
                     var link = document.createElement('a');
-                    link.download = 'accelerate-strategy-board.png';
+                    link.download = sanitizeFilename(boardName)+'-board.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                 }).catch(function(err){
@@ -2286,6 +2811,81 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     showAlert('PNG export failed: ' + err.message);
                 });
             }, 100);
+        }
+
+
+    // ── PNG Export: Bundle (A4 list of contained cards) ────────────────────
+        function exportBundlePNG() {
+            if (!activeContainerId) return;
+            var c = containersData[activeContainerId]; if(!c) return;
+
+            var A4_W = 1240, A4_H = 1754;
+            var container = document.createElement('div');
+            container.style.cssText = [
+                'position:fixed','left:-9999px','top:0',
+                'width:'+A4_W+'px','min-height:'+A4_H+'px',
+                'background:#ffffff','font-family:Adelle Sans, Source Sans 3, Segoe UI, sans-serif',
+                'padding:60px','box-sizing:border-box','color:#18274a',
+            ].join(';');
+
+            var statusColors = {idea:'#ede9e8',planned:'#dce3f0',active:'#fff4ce',done:'#e8f0d8',blocked:'#fae0e3'};
+            var statusText   = {idea:'#595857',planned:'#18274a',active:'#835600',done:'#4a6020',blocked:'#8a2030'};
+            var aggScore = bundleAggregatedScore(c);
+            var scoreColor = aggScore===null ? '#8b7e79' : (aggScore>=45?'#4a6020':aggScore>=25?'#835600':'#8a2030');
+            var scoreBg    = aggScore===null ? '#f5f2f1' : (aggScore>=45?'#e8f0d8':aggScore>=25?'#fff4ce':'#fae0e3');
+
+            var rows = c.cardIds.map(function(id){
+                var d = projectsData[id]; if(!d) return '';
+                var st = d.status||'idea';
+                var s = calcScore(d);
+                var sCol = s>=45?'#4a6020':s>=25?'#835600':'#8a2030';
+                var sBg  = s>=45?'#e8f0d8':s>=25?'#fff4ce':'#fae0e3';
+                return '<div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:#f5f2f1;border-radius:6px;margin-bottom:10px;">'
+                    + '<div style="background:'+sBg+';color:'+sCol+';border-radius:6px;padding:6px 12px;text-align:center;min-width:44px;">'
+                    +   '<div style="font-size:18px;font-weight:700;line-height:1;">'+s+'</div>'
+                    + '</div>'
+                    + '<div style="flex:1;">'
+                    +   '<div style="font-size:15px;font-weight:700;color:#18274a;">'+(d.title||'Untitled')+'</div>'
+                    +   (d.description ? '<div style="font-size:12px;color:#8b7e79;margin-top:3px;line-height:1.4;">'+d.description+'</div>' : '')
+                    + '</div>'
+                    + '<div style="background:'+(statusColors[st]||'#ede9e8')+';color:'+(statusText[st]||'#595857')+';font-size:11px;font-weight:600;padding:5px 12px;border-radius:14px;flex-shrink:0;">'+st.charAt(0).toUpperCase()+st.slice(1)+'</div>'
+                    + '</div>';
+            }).join('');
+
+            container.innerHTML = [
+                '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;padding-bottom:20px;border-bottom:3px solid #18274a;">',
+                  '<div>',
+                    '<div style="font-size:11px;font-weight:600;color:#8b7e79;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;">Getinge — Accelerate Strategy — Bundle</div>',
+                    '<div style="font-size:32px;font-weight:700;color:#18274a;line-height:1.1;">'+c.title+'</div>',
+                  '</div>',
+                  '<div style="background:'+scoreBg+';color:'+scoreColor+';border-radius:8px;padding:8px 16px;text-align:center;">',
+                    '<div style="font-size:28px;font-weight:700;line-height:1;">'+(aggScore===null?'—':aggScore)+'</div>',
+                    '<div style="font-size:10px;font-weight:600;">AVG SCORE</div>',
+                  '</div>',
+                '</div>',
+                '<div style="font-size:11px;font-weight:700;color:#8b7e79;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">'+c.cardIds.length+' included card'+(c.cardIds.length!==1?'s':'')+'</div>',
+                rows || '<div style="font-size:13px;color:#8b7e79;font-style:italic;">No cards in this bundle.</div>',
+                '<div style="margin-top:32px;padding-top:20px;border-top:1px solid #d4cac8;display:flex;justify-content:space-between;font-size:10px;color:#8b7e79;">',
+                  '<span>Getinge AB — Accelerate Strategy</span>',
+                  '<span>'+new Date().toLocaleDateString('de-DE')+'</span>',
+                '</div>',
+            ].join('');
+
+            document.body.appendChild(container);
+            setTimeout(function(){
+                html2canvas(container, { scale:2, backgroundColor:'#ffffff', useCORS:true, width:A4_W, height:Math.max(A4_H, container.scrollHeight) })
+                    .then(function(canvas){
+                        document.body.removeChild(container);
+                        var link = document.createElement('a');
+                        link.download = sanitizeFilename(c.title)+'-bundle.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    })
+                    .catch(function(err){
+                        document.body.removeChild(container);
+                        showAlert('Bundle PNG export failed: '+err.message);
+                    });
+            }, 150);
         }
 
     // ── PNG Export: einzelne Projektkarte ──────────────────────────────────
@@ -2436,10 +3036,11 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     if(projectsData[card.id]){projectsData[card.id].horizonId=horizId||cid;projectsData[card.id].prodLineId=prodId;}
                 });
             });
-            var data={version:3,projectsData:projectsData,productLines:productLines,connectionsList:connectionsList,containersData:containersData,cardPositions:cp};
+            var topData = getTopLevelExportData();
+            var data={version:3,boardName:topData.boardName,projectsData:topData.projectsData,productLines:topData.productLines,connectionsList:topData.connectionsList,containersData:topData.containersData,goalsData:topData.goalsData,cardPositions:cp};
             var a=document.createElement('a');
             a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
-            a.download="accelerate_strategy_export.json";a.click();
+            a.download=sanitizeFilename(topData.boardName)+".json";a.click();
         }
 
     // JSON-Datei importieren und Board vollständig neu aufbauen
@@ -2450,7 +3051,8 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     var data=JSON.parse(e.target.result);
                     var board=document.getElementById('strategy-board');
                     board.innerHTML='<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
-                    productLines=[];projectsData={};containersData=data.containersData||{};connectionsList=data.connectionsList||[];
+                    productLines=[];projectsData={};containersData=data.containersData||{};goalsData=data.goalsData||{};connectionsList=data.connectionsList||[];
+                    updateBoardName(data.boardName||'Untitled board');
                     data.productLines.forEach(function(l){addNewProductLineVisual(l.id,l.title);});
                     var cp=data.cardPositions||{};
                     var sorted=Object.keys(data.projectsData).sort(function(a,b){return (cp[a]?cp[a].order:0)-(cp[b]?cp[b].order:0);});
@@ -2479,7 +3081,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                             var w=document.getElementById('wrap-'+id)||document.getElementById(id);
                             if(w) w.style.display='none';
                         });
-                    }); showAlert("Import successful!");
+                    });
+                    Object.keys(goalsData).forEach(function(gid){
+                        var g=goalsData[gid]; if(!g) return;
+                        renderStrategicGoalCard(g.prodLineId,g.horizonId,gid);
+                    });
+                    showAlert("Import successful!");
                 }catch(err){showAlert("Import failed: "+err.message);}
             };
             reader.readAsText(file);
@@ -2573,11 +3180,15 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                         });
                     });
                     containersData = {};
+                    goalsData = {};
                     projectsData = {};
                     productLines = [];
                     connectionsList = [];
                     activeProjectId = null;
                     _modalOpenSnapshot = null;
+                    boardNavStack = [];
+                    updateBoardName('Untitled board');
+                    var _bc=document.getElementById('board-breadcrumb'); if(_bc) _bc.style.display='none';
                     // Board-HTML zurücksetzen
                     var board = document.getElementById('strategy-board');
                     board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
@@ -2598,11 +3209,15 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             c.cardIds.forEach(function(id){var w=document.getElementById('wrap-'+id)||document.getElementById(id); if(w) w.style.display='';});
         });
         containersData={};
+        goalsData={};
         projectsData = {};
         productLines = [];
         connectionsList = [];
         activeProjectId = null;
         _modalOpenSnapshot = null;
+        boardNavStack = [];
+        updateBoardName('Untitled board');
+        var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         // Board-HTML zurücksetzen
         var board = document.getElementById('strategy-board');
         if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
@@ -2631,11 +3246,15 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             c.cardIds.forEach(function(id){var w=document.getElementById('wrap-'+id)||document.getElementById(id); if(w) w.style.display='';});
         });
         containersData={};
+        goalsData={};
         projectsData = {};
         productLines = [];
         connectionsList = [];
         activeProjectId = null;
         _modalOpenSnapshot = null;
+        boardNavStack = [];
+        updateBoardName('Untitled board');
+        var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         var board = document.getElementById('strategy-board');
         if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
         importStrategyBoard(file);
@@ -2649,11 +3268,15 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             c.cardIds.forEach(function(id){var w=document.getElementById('wrap-'+id)||document.getElementById(id); if(w) w.style.display='';});
         });
         containersData={};
+        goalsData={};
         projectsData = {};
         productLines = [];
         connectionsList = [];
         activeProjectId = null;
         _modalOpenSnapshot = null;
+        boardNavStack = [];
+        updateBoardName('Untitled board');
+        var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         var board = document.getElementById('strategy-board');
         if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
         var svg = document.getElementById('connections-svg');
@@ -2665,6 +3288,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
 
     // ── Demo-Board mit Beispieldaten initialisieren ──
     function loadDemoBoard() {
+        updateBoardName('Demo board');
 
         // ── Produktlinie 1: Closed Loop Patient Monitoring ──
         addNewProductLineVisual("clpm","Closed Loop Monitoring");
@@ -2709,15 +3333,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             preStudy:null
         },"card-clpm-2029");
 
-        createProjectCard("clpm","vision","Autonomous Closed Loop ICU Platform",{
-            title:"Autonomous Closed Loop ICU Platform",prodLineId:"clpm",horizonId:"vision",
-            description:"Fully autonomous, self-learning monitoring and response system for the ICU of the future.",
-            persona:"ICU Medical Director — wants a fully autonomous, learning monitoring system",
-            effort:"M",cost:"S",status:"idea",competition:"gold",
-            benefitValues:[7,8,6,9],innovationValues:[0,7,0,8,9,8,7,0,0,0],
-            milestones:[{label:"Vision paper published",quarter:"Q2",year:"2027"},{label:"Technology roadmap fixed",quarter:"Q1",year:"2030"}],
-            preStudy:null
-        },"card-clpm-vision");
+        goalsData["goal-clpm-vision"] = {
+            title:"Autonomous Closed Loop ICU",
+            description:"ICU clinicians are overwhelmed by fragmented monitoring, slow escalation paths and alarm fatigue. A fully autonomous, self-learning closed-loop platform that senses, predicts and intervenes closes this gap — our north-star vision for critical care.",
+            prodLineId:"clpm",horizonId:"vision",expanded:false
+        };
+        renderStrategicGoalCard("clpm","vision","goal-clpm-vision");
 
         // ── Produktlinie 2: Surgical Workflows ──
         addNewProductLineVisual("surg","Surgical Workflows");
@@ -2784,10 +3405,23 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         // Verbindungen
         connectionsList.push({from:"card-clpm-2026",  to:"card-clpm-2027a", type:"blocking"});
         connectionsList.push({from:"card-clpm-2027a", to:"card-clpm-2029",  type:"blocking"});
-        connectionsList.push({from:"card-clpm-2029",  to:"card-clpm-vision",type:"blocking"});
+        connectionsList.push({from:"card-clpm-2029",  to:"goal-clpm-vision", type:"blocking"});
         connectionsList.push({from:"card-clpm-2027a", to:"card-clpm-2027b", type:"informal"});
         connectionsList.push({from:"card-digi-2026",  to:"card-clpm-2027a", type:"informal"});
-        connectionsList.push({from:"card-digi-2026",  to:"card-surg-2027",  type:"informal"});
+        // connection digi-2026 → surg-2027 removed: surg-2027 now lives inside the Surgical Innovation bundle
+
+        // ── Bundle demo: Surgical Innovation Release 1.0 (3 cards consolidated) ──
+        containersData["bundle-surg-release1"] = {
+            title: "Surgical Innovation Release 1.0",
+            prodLineId: "surg",
+            horizonId: "y2029",
+            cardIds: ["card-surg-2027","card-surg-2029","card-surg-2033"]
+        };
+        renderContainerCard("surg","y2029","bundle-surg-release1");
+        ["card-surg-2027","card-surg-2029","card-surg-2033"].forEach(function(id){
+            var w = document.getElementById('wrap-'+id) || document.getElementById(id);
+            if(w) w.style.display = 'none';
+        });
 
         setTimeout(function(){ redrawAllConnections(); updateEffortSummaries(); updateLaneCellLayout(); }, 150);
     }
@@ -3091,9 +3725,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 <button onclick="containerAddCard()" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:7px 16px;font-size:13px;cursor:pointer;">+ Add to container</button>
             </div>
         </div>
-        <div class="container-modal-footer">
-            <button onclick="closeContainerModal()" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:7px 18px;font-size:13px;cursor:pointer;">Done</button>
-            <button onclick="deleteContainer()" style="background:#a80000;color:white;border:none;border-radius:3px;padding:7px 14px;font-size:13px;cursor:pointer;">Delete container</button>
+        <div class="container-modal-footer" style="justify-content:space-between;">
+            <button onclick="exportBundlePNG()" style="background:white;color:#4a7c2f;border:1px solid #4a7c2f;border-radius:3px;padding:7px 14px;font-size:13px;cursor:pointer;">Export PNG</button>
+            <div style="display:flex;gap:8px;">
+                <button onclick="closeContainerModal()" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:7px 18px;font-size:13px;cursor:pointer;">Done</button>
+                <button onclick="deleteContainer()" style="background:#a80000;color:white;border:none;border-radius:3px;padding:7px 14px;font-size:13px;cursor:pointer;">Delete bundle</button>
+            </div>
         </div>
     </div>
 </div>
