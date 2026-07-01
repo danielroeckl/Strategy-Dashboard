@@ -341,6 +341,13 @@
         .sb-panel-open-btn { width:100%; background:#18274a; color:white; border:none; border-radius:3px; padding:6px 0; font-size:11px; font-weight:600; cursor:pointer; margin-top:4px; }
         .sb-panel-open-btn:hover { background:#0f1a33; }
         .sb-attach-banner { display:none; align-items:center; gap:10px; padding:7px 20px; background:#dce3f0; border-bottom:1px solid #b8cce8; font-size:12px; color:#18274a; }
+        /* Hide sub-board tabs and panels when already inside a sub-board (one level only) */
+        .in-subboard .subboard-tab,
+        body.in-subboard .subboard-tab { display:none !important; }
+        .in-subboard .subboard-panel,
+        body.in-subboard .subboard-panel { display:none !important; }
+        /* Board name not editable inside a sub-board */
+        body.in-subboard #board-name-input { pointer-events:none; opacity:0.55; cursor:default; border-bottom-color:transparent !important; }
 
         </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -702,6 +709,10 @@
         connectionsList = b.connectionsList;
         containersData = b.containersData;
         goalsData = b.goalsData;
+        // Set class BEFORE rebuild so sbTabs are hidden from the moment cards are created
+        var _boardEl = document.getElementById('strategy-board');
+        if (_boardEl) _boardEl.classList.add('in-subboard');
+        document.body.classList.add('in-subboard');
         rebuildBoardDOM();
         updateBreadcrumb();
     }
@@ -727,15 +738,20 @@
 
     function updateBreadcrumb() {
         var bar = document.getElementById('board-breadcrumb');
+        var board = document.getElementById('strategy-board');
         if (!bar) return;
         if (boardNavStack.length === 0) {
             bar.style.display = 'none';
+            if (board) board.classList.remove('in-subboard');
+            document.body.classList.remove('in-subboard');
             return;
         }
         var entry = boardNavStack[boardNavStack.length-1];
         bar.style.display = 'flex';
         document.getElementById('breadcrumb-parent-name').textContent = entry.boardName;
         document.getElementById('breadcrumb-current-name').textContent = entry.enteredTitle;
+        if (board) board.classList.add('in-subboard');
+        document.body.classList.add('in-subboard');
     }
 
     // Always returns the FULL master-board export tree, even while currently
@@ -820,6 +836,8 @@
         var sel = document.getElementById('cc-line');
         sel.innerHTML = productLines.map(function(l){ return '<option value="'+l.id+'">'+l.title+'</option>'; }).join('');
         o.style.display = 'flex';
+        var ccHoriz = document.getElementById('cc-horiz');
+        if (ccHoriz) ccHoriz.value = 'y2026';
         setTimeout(function(){ var t=document.getElementById('cc-title'); if(t){t.value='';t.focus();} }, 60);
     }
 
@@ -1848,6 +1866,9 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         var sel = document.getElementById('gc-line');
         sel.innerHTML = productLines.map(function(l){ return '<option value="'+l.id+'">'+l.title+'</option>'; }).join('');
         o.style.display = 'flex';
+        // Reset year to 2026 every time dialog opens (dialog is reused, select remembers last value)
+        var gcHoriz = document.getElementById('gc-horiz');
+        if (gcHoriz) gcHoriz.value = 'y2026';
         setTimeout(function(){ var t=document.getElementById('gc-title'); if(t){t.value='';t.focus();} }, 60);
     }
 
@@ -2076,7 +2097,14 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 if(containersData[cid] && containersData[cid].cardIds.indexOf(activeProjectId)!==-1)
                     refreshContainerCard(cid);
             });
-            // Sync sub-board tab state
+            // Keep boardNavStack enteredTitle in sync if this card IS an open sub-board
+            if (boardNavStack.length > 0 && boardNavStack[boardNavStack.length-1].enteredSid === activeProjectId) {
+                boardNavStack[boardNavStack.length-1].enteredTitle = projectsData[activeProjectId].title || 'Sub-board';
+            }
+            // Sync sub-board tab state + keep boardName in sync with card title
+            if (projectsData[activeProjectId] && projectsData[activeProjectId].subBoard) {
+                projectsData[activeProjectId].subBoard.boardName = projectsData[activeProjectId].title || 'Sub-board';
+            }
             syncSbTabState(activeProjectId);
             // Snapshot aktualisieren damit closeProjectModal keine Änderungen mehr erkennt
             _modalOpenSnapshot = JSON.stringify(projectsData[activeProjectId]);
@@ -3187,6 +3215,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     activeProjectId = null;
                     _modalOpenSnapshot = null;
                     boardNavStack = [];
+                    document.body.classList.remove('in-subboard');
                     updateBoardName('Untitled board');
                     var _bc=document.getElementById('board-breadcrumb'); if(_bc) _bc.style.display='none';
                     // Board-HTML zurücksetzen
@@ -3216,6 +3245,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         activeProjectId = null;
         _modalOpenSnapshot = null;
         boardNavStack = [];
+        document.body.classList.remove('in-subboard');
         updateBoardName('Untitled board');
         var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         // Board-HTML zurücksetzen
@@ -3253,6 +3283,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         activeProjectId = null;
         _modalOpenSnapshot = null;
         boardNavStack = [];
+        document.body.classList.remove('in-subboard');
         updateBoardName('Untitled board');
         var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         var board = document.getElementById('strategy-board');
@@ -3275,6 +3306,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         activeProjectId = null;
         _modalOpenSnapshot = null;
         boardNavStack = [];
+        document.body.classList.remove('in-subboard');
         updateBoardName('Untitled board');
         var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         var board = document.getElementById('strategy-board');
