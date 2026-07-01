@@ -311,7 +311,7 @@
         .strategic-goal-card.sg-expanded { padding:20px 22px 22px 38px; cursor:default; }
         .sg-avatar { position:absolute; left:-28px; top:50%; transform:translateY(-50%); width:56px; height:56px; border-radius:50%; background:#31b7bc; border:3px solid #16223f; display:flex; align-items:center; justify-content:center; }
         .strategic-goal-card.sg-expanded .sg-avatar { top:32px; transform:none; }
-        .sg-dep-dot { position:absolute; left:-4px; bottom:-4px; width:14px; height:14px; border-radius:50%; background:#16223f; border:2px solid #31b7bc; cursor:pointer; }
+        .sg-dep-dot { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; border-radius:50%; background:rgba(22,34,63,0.7); border:2px solid #31b7bc; cursor:pointer; z-index:3; }
         .sg-headline { font-size:14px; font-weight:500; color:#ffffff; margin-bottom:6px; line-height:1.3; }
         .sg-desc-preview { font-size:12px; color:#a9b4c4; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
         .sg-eyebrow { font-size:11px; font-weight:500; color:#31b7bc; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
@@ -340,7 +340,6 @@
         .sb-panel-meta { font-size:11px; color:#495a6b; line-height:1.5; }
         .sb-panel-open-btn { width:100%; background:#18274a; color:white; border:none; border-radius:3px; padding:6px 0; font-size:11px; font-weight:600; cursor:pointer; margin-top:4px; }
         .sb-panel-open-btn:hover { background:#0f1a33; }
-        .sb-attach-banner { display:none; align-items:center; gap:10px; padding:7px 20px; background:#dce3f0; border-bottom:1px solid #b8cce8; font-size:12px; color:#18274a; }
         /* Hide sub-board tabs and panels when already inside a sub-board (one level only) */
         .in-subboard .subboard-tab,
         body.in-subboard .subboard-tab { display:none !important; }
@@ -348,6 +347,10 @@
         body.in-subboard .subboard-panel { display:none !important; }
         /* Board name not editable inside a sub-board */
         body.in-subboard #board-name-input { pointer-events:none; opacity:0.55; cursor:default; border-bottom-color:transparent !important; }
+        /* JSON export/import hidden in sub-board (sub-board data travels with parent card) */
+        body.in-subboard #btn-export-json,
+        body.in-subboard #btn-import-json,
+        body.in-subboard #import-file { display:none !important; }
 
         </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -513,11 +516,6 @@
         <span style="margin-left:6px;color:#6a9a4e;font-size:11px;">(viewing as its own board)</span>
     </div>
 
-    <div id="sb-attach-banner" class="sb-attach-banner">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><path d="M10.5 13.5h4.5M15 13.5v-4.5"/></svg>
-        <span>Click any project card to attach a sub-board to it</span>
-        <button onclick="toggleSubboardAttachMode()" style="margin-left:auto;background:none;border:1px solid #18274a;border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;color:#18274a;">Cancel</button>
-    </div>
     <div class="filter-bar">
 
         <!-- Gruppe: Suche -->
@@ -613,9 +611,9 @@
         <div class="cb-group">
             <div class="cb-group-label">Save &amp; Load</div>
             <div class="cb-group-content">
-                <button onclick="exportStrategyBoard()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 2h8l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M5 2v4h6V2M5 11h6"/></svg> Export JSON</button>
+                <button id="btn-export-json" onclick="exportStrategyBoard()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 2h8l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M5 2v4h6V2M5 11h6"/></svg> Export JSON</button>
                 <input type="file" id="import-file" style="display:none" onchange="importStrategyBoard(this.files[0])">
-                <button class="secondary" onclick="document.getElementById('import-file').click()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 4a1 1 0 0 1 1-1h3l2 2h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/></svg> Import JSON</button>
+                <button class="secondary" id="btn-import-json" onclick="document.getElementById('import-file').click()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 4a1 1 0 0 1 1-1h3l2 2h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/></svg> Import JSON</button>
                 <input type="file" id="chase-merge-file" style="display:none" accept=".json" onchange="chaseMergePromptPassword(this.files[0])">
                 <button class="secondary" onclick="document.getElementById('chase-merge-file').click()" style="border-color:#c07000;color:#c07000;" title="Merge a colleague&#39;s JSON into this board (password protected)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c07000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:4px;"><circle cx="5" cy="5" r="2"/><circle cx="11" cy="5" r="2"/><circle cx="8" cy="11" r="2"/><path d="M7 5h-1M10 5h-1M6.5 8.5l1 1.5M9.5 8.5l-1 1.5"/></svg> Chase Merge</button>
                 <button class="secondary" onclick="exportBoardPNG()" title="Export board as high-resolution PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:4px;"><rect x="1" y="1" width="14" height="14" rx="2"/><circle cx="5" cy="5" r="1.5"/><path d="M1 11l4-4 3 3 2-2 5 5"/></svg> Export PNG</button>
@@ -904,16 +902,29 @@
     }
 
     function bundleAggregatedScore(c) {
-        // Effort-weighted average: larger cards count proportionally more
+        // Effort-weighted strategic QUALITY score.
+        // Uses the benefit+innovation value BEFORE the effort/cost divisor,
+        // so XL projects are not double-penalised (once in their own score,
+        // once as the heaviest weight in the average).
         var effortW = {XS:1, S:2, M:3, L:4, XL:5};
-        var weightedSum = 0, totalWeight = 0;
+        var weightedQuality = 0, totalWeight = 0;
         c.cardIds.forEach(function(id){
             var d = projectsData[id]; if(!d) return;
+            // Benefit: top-2 double
+            var bVals = (d.benefitValues||[0,0,0,0]).slice().sort(function(a,b){return b-a;});
+            var bAvg = (bVals[0]*2 + bVals[1]*2 + bVals[2] + bVals[3]) / 6.0;
+            // Innovation: top-4 double
+            var iVals = (d.innovationValues||[0,0,0,0,0,0,0,0,0,0]).slice().sort(function(a,b){return b-a;});
+            var iAvg = (iVals[0]*2+iVals[1]*2+iVals[2]*2+iVals[3]*2
+                       +iVals[4]+iVals[5]+iVals[6]+iVals[7]+iVals[8]+iVals[9]) / 14.0;
+            var quality = bAvg*0.5 + iAvg*0.5; // 0–10, no effort penalty
             var w = effortW[d.effort||'M'] || 3;
-            weightedSum += calcScore(d) * w;
+            weightedQuality += quality * w;
             totalWeight += w;
         });
-        return totalWeight ? Math.round(weightedSum / totalWeight) : null;
+        if (!totalWeight) return null;
+        // Scale 0–10 → 0–100
+        return Math.min(100, Math.round((weightedQuality / totalWeight) * 10));
     }
 
     function refreshContainerCard(cid, div) {
@@ -930,7 +941,7 @@
         div.innerHTML = '<div class="container-header">'
             +'<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;">&#x1F4E6;</span><span class="container-label">Bundle</span></div>'
             +'<div style="display:flex;align-items:center;gap:6px;">'
-            +(aggScore!==null ? '<span class="card-badge badge-score '+scoreCls+'" style="font-size:9px;padding:1px 6px;" title="Effort-weighted average score across contained cards">'+aggScore+'</span>' : '')
+            +(aggScore!==null ? '<span class="card-badge badge-score '+scoreCls+'" style="font-size:9px;padding:1px 6px;" title="Effort-weighted strategic quality (benefit + innovation, before effort penalty)">'+aggScore+'</span>' : '')
             +'<span class="container-count">'+c.cardIds.length+' card'+(c.cardIds.length!==1?'s':'')+'</span>'
             +'</div>'
             +'</div>'
@@ -978,11 +989,12 @@
         listEl.innerHTML = c.cardIds.length
             ? c.cardIds.map(function(id){
                 var d = projectsData[id]||{};
+                var _pline = productLines.find(function(l){return l.id===d.prodLineId;})||{};
                 return '<div class="container-card-list-item" draggable="true" data-cardid="'+id+'" style="cursor:grab;">'
                     +gripSvg
                     +'<div class="ci-dot" style="background:'+(sc[d.status||'idea']||'#bfb1ac')+'"></div>'
                     +'<span class="ci-title">'+(d.title||'?')+'</span>'
-                    +'<span class="ci-status">'+(sl[d.status||'idea']||'')+'</span>'
+                    +'<div style="flex:1;min-width:0;">'+'<span class="ci-title">'+(d.title||'?')+'</span>'+(_pline.title ? '<div style="font-size:10px;color:#6a9a4e;margin-top:1px;">'+_pline.title+'</div>' : '')+'</div>'
                     +'<button class="ci-open" data-cardid="'+id+'" onclick="containerOpenCard(this.dataset.cardid)" title="Open card" style="background:#4a7c2f;color:white;border:none;border-radius:3px;padding:3px 8px;font-size:11px;cursor:pointer;font-weight:600;flex-shrink:0;">Open ↗</button>'
                     +'<button class="ci-remove" data-cardid="'+id+'" onclick="containerRemoveCard(this.dataset.cardid)" title="Remove from container">&times;</button>'
                     +'</div>';
@@ -1363,12 +1375,13 @@
     
             var inner = document.createElement('div');
             inner.className = 'swimlane-title-inner';
-            var span = document.createElement('input');
-            span.type = 'text';
+            var span = document.createElement('div');
+            span.contentEditable = 'true';
             span.id = 'text-title-' + id;
             span.dataset.lineid = id;
-            span.value = titleText;
-            span.style.cssText = 'background:transparent;border:none;outline:none;font-weight:700;font-size:20px;color:#495a6b;width:100%;font-family:inherit;cursor:text;padding:0;';
+            span.innerText = titleText;
+            span.setAttribute('spellcheck','false');
+            span.style.cssText = 'background:transparent;border:none;outline:none;font-weight:700;font-size:14px;color:#495a6b;width:100%;font-family:inherit;cursor:text;padding:0;word-break:break-word;white-space:pre-wrap;line-height:1.4;';
             span.addEventListener('input', function(){ updateProductLineTitle(this.dataset.lineid); });
             var effortDiv = document.createElement('div');
             effortDiv.className = 'lane-effort-summary';
@@ -1456,7 +1469,7 @@
 
     // Produktlinien-Titel nach Texteingabe speichern
         function updateProductLineTitle(id) {
-            var el=document.getElementById('text-title-'+id); var txt=(el.value!==undefined?el.value:el.innerText||'').trim();
+            var el=document.getElementById('text-title-'+id); var txt=(el.innerText||el.value||'').trim();
             var line=productLines.find(function(l){return l.id===id;}); if(line) line.title=txt; syncProductDropdown();
         }
 
@@ -1979,41 +1992,26 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     // SUB-BOARD: stored as projectsData[cardId].subBoard
     // Right-side tab on every project card, mirrors pre-study pattern.
     // ═══════════════════════════════════════════════════════════════════════
-    var subboardAttachMode = false;
-
-    function toggleSubboardAttachMode() {
-        if (boardNavStack.length > 0) { showAlert('Cannot add sub-boards inside a sub-board.'); return; }
-        subboardAttachMode = !subboardAttachMode;
-        var btn = document.getElementById('add-subboard-btn');
-        var banner = document.getElementById('sb-attach-banner');
-        if (btn) { btn.style.background = subboardAttachMode ? '#18274a' : ''; btn.style.color = subboardAttachMode ? 'white' : '#18274a'; }
-        if (banner) banner.style.display = subboardAttachMode ? 'flex' : 'none';
-    }
 
     function handleSbTabClick(cardId) {
-        var d = projectsData[cardId];
-        if (!d) return;
+        var d = projectsData[cardId]; if (!d) return;
         if (!d.subBoard) {
-            // No sub-board yet — create one if in attach mode, or prompt directly
-            if (subboardAttachMode || true) {
-                showConfirm(
-                    'Create sub-board?',
-                    'Attach an independent sub-board to "' + (d.title||'this card') + '"? You can open it to plan in detail.',
-                    function() {
-                        d.subBoard = {
-                            boardName: d.title || 'Sub-board',
-                            productLines: [{ id:'line-'+Date.now(), title:'Product line 1' }],
-                            projectsData: {}, connectionsList: [], containersData: {}, goalsData: {}
-                        };
-                        var tab = document.getElementById('sbtab-'+cardId);
-                        if (tab) tab.classList.add('sb-active');
-                        var panel = document.getElementById('sbpanel-'+cardId);
-                        refreshSubboardPanel(cardId, panel);
-                        if (panel) panel.classList.add('sb-open');
-                        if (subboardAttachMode) toggleSubboardAttachMode();
-                    }
-                );
-            }
+            // No sub-board yet: ask to create one
+            showConfirm('Create sub-board?',
+                'Attach a sub-board to "' + (d.title||'this card') + '"? You can open it and plan independently.',
+                function() {
+                    d.subBoard = {
+                        boardName: d.title || 'Sub-board',
+                        productLines: [{ id:'line-'+Date.now(), title:'Product line 1' }],
+                        projectsData: {}, connectionsList: [], containersData: {}, goalsData: {}
+                    };
+                    var tab = document.getElementById('sbtab-'+cardId);
+                    if (tab) tab.classList.add('sb-active');
+                    var panel = document.getElementById('sbpanel-'+cardId);
+                    refreshSubboardPanel(cardId, panel);
+                    if (panel) panel.classList.add('sb-open');
+                }
+            );
         } else {
             // Toggle panel open/close
             var panel = document.getElementById('sbpanel-'+cardId);
@@ -2838,7 +2836,9 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 }).then(function(canvas){
                     toHide.forEach(function(el){ if(el) el.style.visibility=''; });
                     var link = document.createElement('a');
-                    link.download = sanitizeFilename(boardName)+'-board.png';
+                    link.download = (boardNavStack.length > 0
+                        ? sanitizeFilename(boardNavStack[0].projectsData[boardNavStack[0].enteredSid].title || 'subboard') + '-subboard.png'
+                        : sanitizeFilename(boardName) + '-board.png');
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                 }).catch(function(err){
@@ -3364,12 +3364,28 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
 
         createProjectCard("clpm","y2029","Predictive Deterioration AI",{
             title:"Predictive Deterioration AI",prodLineId:"clpm",horizonId:"y2029",
-            description:"AI model to predict critical patient events 6 hours in advance using longitudinal vital data.",
-            persona:"Intensivist — wants to be warned 6h before a critical event",
-            effort:"M",cost:"S",status:"idea",competition:"gold",
-            benefitValues:[6,7,5,9],innovationValues:[0,0,0,8,9,8,0,0,0,0],
-            milestones:[{label:"AI model training complete",quarter:"Q2",year:"2029"},{label:"Prospective validation study",quarter:"Q4",year:"2029"}],
-            preStudy:null
+            description:"Early warning system using multi-parameter vital sign trends to predict deterioration 2-4 hours before clinical signs.",
+            persona:"ICU Nurse — wants earlier warning to prepare interventions without alarm fatigue",
+            effort:"L",cost:"M",status:"planned",competition:"gold",
+            benefitValues:[9,7,8,6],innovationValues:[0,9,0,8,7,0,0,8,0,0],
+            milestones:[{label:"Algorithm validated",quarter:"Q3",year:"2027"},{label:"Pilot live in 3 ICUs",quarter:"Q1",year:"2029"}],
+            preStudy:null,
+            subBoard:{
+                boardName:"Predictive Deterioration AI",
+                productLines:[
+                    {id:"sb-line-algo",title:"Algorithm & Data"},
+                    {id:"sb-line-int",title:"Clinical Integration"}
+                ],
+                projectsData:{
+                    "sb-card-1":{title:"Training Data Pipeline",prodLineId:"sb-line-algo",horizonId:"y2026",description:"Build and validate the multi-parameter training dataset from 3 partner hospitals.",persona:"Data Scientist",effort:"M",cost:"M",status:"active",competition:"gold",benefitValues:[7,6,5,4],innovationValues:[0,6,0,5,4,0,0,0,0,0],milestones:[],preStudy:null},
+                    "sb-card-2":{title:"Detection Model v1",prodLineId:"sb-line-algo",horizonId:"y2027",description:"Train and benchmark the deterioration prediction model to achieve >92% sensitivity.",persona:"AI Engineer",effort:"L",cost:"M",status:"planned",competition:"gold",benefitValues:[9,8,7,5],innovationValues:[0,9,0,8,6,0,0,7,0,0],milestones:[{label:"Model accuracy >92%",quarter:"Q3",year:"2027"}],preStudy:null},
+                    "sb-card-3":{title:"EMR Integration",prodLineId:"sb-line-int",horizonId:"y2027",description:"Connect the model to existing EMR systems for real-time patient data ingestion.",persona:"Clinical IT Lead",effort:"M",cost:"S",status:"idea",competition:"silver",benefitValues:[6,7,5,4],innovationValues:[0,0,0,6,4,0,0,0,0,0],milestones:[],preStudy:null},
+                    "sb-card-4":{title:"Nurse Alert Dashboard",prodLineId:"sb-line-int",horizonId:"y2028",description:"Alert interface and patient risk overview for ICU nursing staff.",persona:"ICU Nurse",effort:"S",cost:"S",status:"idea",competition:"silver",benefitValues:[8,9,6,5],innovationValues:[0,0,0,0,0,0,7,8,0,0],milestones:[],preStudy:null}
+                },
+                connectionsList:[{from:"sb-card-1",to:"sb-card-2",type:"blocking"},{from:"sb-card-2",to:"sb-card-3",type:"informal"},{from:"sb-card-3",to:"sb-card-4",type:"blocking"}],
+                containersData:{},
+                goalsData:{}
+            }
         },"card-clpm-2029");
 
         goalsData["goal-clpm-vision"] = {
