@@ -904,9 +904,16 @@
     }
 
     function bundleAggregatedScore(c) {
-        var scores = c.cardIds.map(function(id){ var d=projectsData[id]; return d ? calcScore(d) : null; }).filter(function(s){ return s!==null; });
-        if(!scores.length) return null;
-        return Math.round(scores.reduce(function(a,b){return a+b;},0) / scores.length);
+        // Effort-weighted average: larger cards count proportionally more
+        var effortW = {XS:1, S:2, M:3, L:4, XL:5};
+        var weightedSum = 0, totalWeight = 0;
+        c.cardIds.forEach(function(id){
+            var d = projectsData[id]; if(!d) return;
+            var w = effortW[d.effort||'M'] || 3;
+            weightedSum += calcScore(d) * w;
+            totalWeight += w;
+        });
+        return totalWeight ? Math.round(weightedSum / totalWeight) : null;
     }
 
     function refreshContainerCard(cid, div) {
@@ -923,7 +930,7 @@
         div.innerHTML = '<div class="container-header">'
             +'<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:13px;">&#x1F4E6;</span><span class="container-label">Bundle</span></div>'
             +'<div style="display:flex;align-items:center;gap:6px;">'
-            +(aggScore!==null ? '<span class="card-badge badge-score '+scoreCls+'" style="font-size:9px;padding:1px 6px;" title="Average score across contained cards">'+aggScore+'</span>' : '')
+            +(aggScore!==null ? '<span class="card-badge badge-score '+scoreCls+'" style="font-size:9px;padding:1px 6px;" title="Effort-weighted average score across contained cards">'+aggScore+'</span>' : '')
             +'<span class="container-count">'+c.cardIds.length+' card'+(c.cardIds.length!==1?'s':'')+'</span>'
             +'</div>'
             +'</div>'
