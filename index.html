@@ -688,7 +688,7 @@
                 <button class="secondary" onclick="clearConnections()" style="border-color:#f1707b;color:#a80000;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a80000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete all</button>
                 <button id="btn-toggle-connections" onclick="toggleConnections()" title="Show / hide all connections" style="background:white;color:#18274a;border:1px solid #d4cac8;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg> Hide connections</button>
                 <button id="focus-mode-btn" onclick="toggleFocusMode()" title="Click a card to see only its direct dependencies" style="background:white;color:#2F6F6B;border:1px solid #2F6F6B;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" opacity="0.4"/></svg> Focus mode</button>
-                <button id="critical-path-btn" onclick="toggleCriticalPathMode()" title="Click a card to trace the longest blocking chain leading to it" style="background:white;color:#C4522F;border:1px solid #C4522F;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 L9 9 L14 14 L20 4"/></svg> Critical path</button>
+                <button id="critical-path-btn" onclick="toggleCriticalPathMode()" title="Click a card to trace the longest dependency chain (blocking & related) leading to it" style="background:white;color:#C4522F;border:1px solid #C4522F;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 L9 9 L14 14 L20 4"/></svg> Critical path</button>
                 <span id="conn-mode-hint"></span>
             </div>
         </div>
@@ -2761,7 +2761,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     var connModeHintText = {
         none:     'Click a card to open it.',
         focus:    'Click a card to highlight only its direct dependencies.',
-        critical: 'Click a card to trace the longest blocking chain leading to it.'
+        critical: 'Click a card to trace its longest dependency chain (blocking & related).'
     };
 
     function setConnModeHint(text){
@@ -2818,15 +2818,15 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         return {nodes:nodes, edges:edges};
     }
 
-    // Longest chain of *blocking* connections that leads into `id` (the critical path to deliver it)
+    // Longest chain of *any* connection (blocking or informal/related) that leads into `id`
     function criticalPathTo(id){
-        var blocking = connectionsList.filter(function(c){ return (c.type||'blocking')==='blocking'; });
+        var allConns = connectionsList; // v22.3: include informal/related connections too, not just blocking
         var memo = {};
         function longest(nodeId, stack){
             if(memo[nodeId]) return memo[nodeId];
             if(stack.indexOf(nodeId)!==-1) return {len:0, path:[nodeId]}; // cycle guard
             stack.push(nodeId);
-            var preds = blocking.filter(function(e){ return e.to===nodeId; }).map(function(e){ return e.from; });
+            var preds = allConns.filter(function(e){ return e.to===nodeId; }).map(function(e){ return e.from; });
             var best = {len:0, path:[nodeId]};
             preds.forEach(function(p){
                 var r = longest(p, stack);
@@ -2839,7 +2839,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         var result = longest(id, []);
         var nodes = new Set(result.path);
         var edges = [];
-        for(var i=0;i<result.path.length-1;i++) edges.push({from:result.path[i], to:result.path[i+1], type:'blocking'});
+        for(var i=0;i<result.path.length-1;i++) edges.push({from:result.path[i], to:result.path[i+1]});
         return {nodes:nodes, edges:edges, length:result.len};
     }
 
@@ -2856,8 +2856,8 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             nodesSet = r2.nodes; edgesList = r2.edges; styleClass = 'card-critical-highlight';
             var rootTitle = (projectsData[connSelectedRootId]||goalsData[connSelectedRootId]||{}).title||connSelectedRootId;
             setConnModeHint(r2.length > 0
-                ? 'Critical path to "'+rootTitle+'": '+r2.length+' blocking step'+(r2.length>1?'s':'')+'.'
-                : '"'+rootTitle+'" has no upstream blocking dependencies.');
+                ? 'Critical path to "'+rootTitle+'": '+r2.length+' step'+(r2.length>1?'s':'')+' (blocking & related).'
+                : '"'+rootTitle+'" has no upstream dependencies.');
         } else {
             return;
         }
