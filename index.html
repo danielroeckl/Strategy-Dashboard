@@ -311,7 +311,7 @@
         .strategic-goal-card.sg-expanded { padding:20px 22px 22px 38px; cursor:default; }
         .sg-avatar { position:absolute; left:-28px; top:50%; transform:translateY(-50%); width:56px; height:56px; border-radius:50%; background:#31b7bc; border:3px solid #16223f; display:flex; align-items:center; justify-content:center; }
         .strategic-goal-card.sg-expanded .sg-avatar { top:32px; transform:none; }
-        .sg-dep-dot { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:14px; height:14px; border-radius:50%; background:rgba(22,34,63,0.7); border:2px solid #31b7bc; cursor:pointer; z-index:3; }
+        .sg-dep-dot { position:absolute; top:8px; right:8px; width:11px; height:11px; border-radius:50%; background:#bfb1ac; cursor:crosshair; z-index:3; }
         .sg-headline { font-size:14px; font-weight:500; color:#ffffff; margin-bottom:6px; line-height:1.3; }
         .sg-desc-preview { font-size:12px; color:#a9b4c4; line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
         .sg-eyebrow { font-size:11px; font-weight:500; color:#31b7bc; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
@@ -367,8 +367,8 @@
         .score-formula-label { font-size:13px; font-weight:500; color:#18274a; white-space:nowrap; }
         .score-fraction { display:inline-flex; flex-direction:column; align-items:center; gap:0; font-size:11.5px; }
         .score-numerator { color:#18274a; white-space:nowrap; padding-bottom:4px; }
-        .score-frac-line { width:100%; border-top:1.5px solid #8b7e79; }
-        .score-denominator { color:#595857; white-space:nowrap; padding-top:4px; }
+        .score-frac-line { width:100%; border-top:1.5px solid #18274a; }
+        .score-denominator { color:#18274a; white-space:nowrap; padding-top:4px; }
         .score-dim-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px; }
         .score-dim-card { background:#f5f2f1; border:0.5px solid #d4cac8; border-radius:8px; padding:10px 12px; }
         .score-dim-name { font-size:11px; font-weight:500; color:#18274a; margin-bottom:3px; }
@@ -378,6 +378,31 @@
         .score-level-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
         .score-level-text { font-size:12px; color:#595857; }
         .score-level-text strong { color:#18274a; }
+
+        
+        /* ═══ INNOVATION TYPES INFO OVERLAY ═════════════════════════════════════ */
+        #inno-info-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:3000; display:none; align-items:center; justify-content:center; padding:20px; }
+        #inno-info-overlay.visible { display:flex; }
+        .inno-info-panel { background:#ffffff; border:0.5px solid #d4cac8; border-radius:12px; padding:18px 20px; width:860px; max-width:95vw; max-height:90vh; overflow-y:auto; text-align:left !important; }
+        .inno-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+        .inno-title { font-size:14px; font-weight:500; color:#18274a; }
+        .inno-close { font-size:18px; color:#8b7e79; cursor:pointer; padding:2px 5px; line-height:1; background:none; border:none; }
+        .inno-close:hover { color:#18274a; }
+        .inno-scroll { overflow-x:auto; padding-bottom:4px; }
+        .inno-cols { display:grid; grid-template-columns:repeat(10,1fr); gap:2px; min-width:760px; }
+        .inno-cat-4 { grid-column:span 4; }
+        .inno-cat-2 { grid-column:span 2; }
+        .inno-cat-label { font-size:8px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; text-align:center; padding:4px 0; margin-bottom:2px; border-radius:3px; color:white; }
+        .inno-cat-config { background:#1a8a8f; }
+        .inno-cat-offer  { background:#f39200; }
+        .inno-cat-exp    { background:#c07000; }
+        .inno-col { display:flex; flex-direction:column; text-align:left !important; }
+        .inno-col-head { padding:7px 6px 6px; border-radius:3px 3px 0 0; color:white; font-size:9.5px; font-weight:500; text-align:center; line-height:1.2; min-height:34px; display:flex; align-items:center; justify-content:center; }
+        .inno-col-body { background:#f5f2f1; border:0.5px solid #e9e4e3; border-top:none; border-radius:0 0 3px 3px; padding:7px; flex:1; text-align:left !important; }
+        .inno-col-desc { font-size:9px; color:#595857; line-height:1.4; margin-bottom:6px; font-style:italic; padding-bottom:5px; border-bottom:0.5px solid #d4cac8; text-align:left !important; }
+        .inno-list { list-style:disc; padding-left:13px; text-align:left !important; }
+        .inno-list li { font-size:9px; color:#18274a; line-height:1.5; text-align:left !important; }
+        .inno-footer { margin-top:10px; font-size:9px; color:#bfb1ac; text-align:right; }
 
         </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -632,6 +657,7 @@
                 <button class="secondary" onclick="toggleDependencyMode()" id="dep-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add</button>
                 <button class="secondary" onclick="deleteSingleConnectionMode()" id="dep-del-btn" style="border-color:#f39200;color:#8a4500;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><path d="M5.5 4.5l7-1.5M5.5 11.5l7 1.5M12 8h2"/></svg> Delete one</button>
                 <button class="secondary" onclick="clearConnections()" style="border-color:#f1707b;color:#a80000;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a80000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete all</button>
+                <button id="btn-toggle-connections" onclick="toggleConnections()" title="Show / hide all connections" style="background:white;color:#18274a;border:1px solid #d4cac8;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg> Hide connections</button>
             </div>
         </div>
 
@@ -1959,7 +1985,8 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         var userSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>';
 
         if (!g.expanded) {
-            div.innerHTML = '<div class="sg-avatar">'+userSvg+'<div class="sg-dep-dot" title="Link dependency"></div></div>'
+            div.innerHTML = '<div class="sg-dep-dot" title="Link dependency"></div>'
+                + '<div class="sg-avatar">'+userSvg+'</div>'
                 + '<div class="sg-headline">'+(g.title||'Untitled goal')+'</div>'
                 + '<div class="sg-desc-preview">'+(g.description||'No description yet — click to add one.')+'</div>';
             div.onclick = function(e){
@@ -1971,7 +1998,8 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             var chevronSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7e8aa0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
             div.innerHTML = '<button class="sg-delete-btn" title="Delete this goal">&times;</button>'
                 + '<span class="sg-collapse-hint" title="Collapse">'+chevronSvg+'</span>'
-                + '<div class="sg-avatar">'+userSvg+'<div class="sg-dep-dot" title="Link dependency"></div></div>'
+                + '<div class="sg-dep-dot" title="Link dependency"></div>'
+                + '<div class="sg-avatar">'+userSvg+'</div>'
                 + '<div class="sg-eyebrow">Strategic goal</div>'
                 + '<input class="sg-title-input" type="text" value="'+(g.title||'').replace(/"/g,'&quot;')+'" placeholder="Goal title">'
                 + '<div class="sg-field-label">Value proposition / description</div>'
@@ -2085,6 +2113,29 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             return found;
         }
 
+
+
+    // ── Innovation Types Info Overlay ─────────────────────────────────────────
+        function openInnoInfo() {
+            document.getElementById('inno-info-overlay').classList.add('visible');
+        }
+        function closeInnoInfo() {
+            document.getElementById('inno-info-overlay').classList.remove('visible');
+        }
+
+    // ── Toggle connections visibility ──────────────────────────────────────────
+        var connectionsVisible = true;
+        function toggleConnections() {
+            connectionsVisible = !connectionsVisible;
+            var svg = document.getElementById('connections-svg');
+            if (svg) svg.style.display = connectionsVisible ? '' : 'none';
+            var btn = document.getElementById('btn-toggle-connections');
+            if (btn) {
+                btn.querySelector('svg').style.opacity = connectionsVisible ? '1' : '0.4';
+                btn.lastChild.textContent = connectionsVisible ? ' Hide connections' : ' Show connections';
+                btn.style.color = connectionsVisible ? '#18274a' : '#8b7e79';
+            }
+        }
 
     // ── Score Info Overlay ────────────────────────────────────────────────────
         function openScoreInfo() {
@@ -2514,8 +2565,8 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     // Verbindungs-Modus ein/ausschalten (Klick auf Abhängigkeits-Punkt)
         function toggleDependencyMode(){
             dependencyMode=!dependencyMode;var btn=document.getElementById('dep-btn');
-            if(dependencyMode){btn.style.background='#e81123';btn.style.color='#fff';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Click source…';}
-            else{btn.style.background='';btn.style.color='';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add connection';dependencySourceId=null;}
+            if(dependencyMode){document.getElementById('strategy-board').parentElement.classList.add('dep-connection-mode');btn.style.background='#e81123';btn.style.color='#fff';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Click source…';}
+            else{document.getElementById('strategy-board').parentElement.classList.remove('dep-connection-mode');btn.style.background='';btn.style.color='';btn.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add connection';dependencySourceId=null;}
         }
 
     // Klick auf Abhängigkeits-Punkt verarbeiten (Quelle oder Ziel setzen)
@@ -3756,7 +3807,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
 
             <!-- Full width: 10 Types of Innovation -->
             <div class="form-section full-width" style="grid-column:span 2;">
-                <div class="form-section-title">10 Types of Innovation</div>
+                <div class="form-section-title" style="display:flex;align-items:center;gap:6px;">10 Types of Innovation <button class="score-info-btn" onclick="openInnoInfo()" title="What do these types mean?"><i>i</i></button></div>
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) 1fr;gap:16px;align-items:center;">
                     <div class="radar-sliders" style="display:grid;grid-template-columns:1fr;gap:4px;">
                         <div class="slider-row"><label>Profit Model</label><input type="range" id="i-val1" min="0" max="10" step="1" value="5" oninput="document.getElementById('i-lbl1').textContent=this.value;renderInnovationRadar();updateScoreDisplay();"><span id="i-lbl1" class="slider-val">5</span></div>
@@ -3864,6 +3915,34 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             <div class="score-level-row"><div class="score-level-dot" style="background:#a19f9d"></div><span class="score-level-text"><strong>Low &lt; 25</strong> &mdash; low impact or high cost, reconsider</span></div>
         </div>
     </div>
+</div>
+
+
+<div id="inno-info-overlay" onclick="if(event.target===this)closeInnoInfo()">
+  <div class="inno-info-panel">
+    <div class="inno-header">
+      <span class="inno-title">10 Types of Innovation</span>
+      <button class="inno-close" onclick="closeInnoInfo()" aria-label="Close">&times;</button>
+    </div>
+    <div class="inno-scroll" style="text-align:left;">
+      <div class="inno-cols">
+        <div class="inno-cat-4"><div class="inno-cat-label inno-cat-config">Configuration</div></div>
+        <div class="inno-cat-2"><div class="inno-cat-label inno-cat-offer">Offering</div></div>
+        <div class="inno-cat-4"><div class="inno-cat-label inno-cat-exp">Experience</div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#1a8a8f">Profit Model</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">Novel ways to convert value into revenue</p><ul class="inno-list"><li>Premium</li><li>Subscription</li><li>Freemium</li><li>Membership</li><li>Licensing</li><li>Flexible Pricing</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#1a8a8f">Network</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">Connections with partners to create shared value</p><ul class="inno-list"><li>Open Innovation</li><li>Alliances</li><li>Franchising</li><li>Collaboration</li><li>Complementary Partnering</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#1a8a8f">Structure</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">How talent and assets are organised</p><ul class="inno-list"><li>Org. Design</li><li>IT Integration</li><li>Outsourcing</li><li>Knowledge Mgmt.</li><li>Asset Standardisation</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#1a8a8f">Process</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">Proprietary methods competitors can't easily copy</p><ul class="inno-list"><li>Standardisation</li><li>Process Efficiency</li><li>Lean Production</li><li>Automation</li><li>Predictive Analytics</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#f39200">Product Performance</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">Distinguishing features of the core product</p><ul class="inno-list"><li>Superior Product</li><li>Ease of Use</li><li>Safety</li><li>Feature Aggregation</li><li>Environmental Sensitivity</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#f39200">Product System</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">Complementary products that amplify the core</p><ul class="inno-list"><li>Complements</li><li>Extensions / Plug-ins</li><li>Product Bundling</li><li>Modular Systems</li><li>Integrated Offering</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#c07000">Service</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">Support and services that surround the product</p><ul class="inno-list"><li>Guarantee</li><li>Loyalty Programs</li><li>Added Value</li><li>Concierge</li><li>Self-Service</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#c07000">Channel</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">How offerings reach customers</p><ul class="inno-list"><li>Flagship Store</li><li>Go Direct</li><li>Cross-selling</li><li>Multi-Level Marketing</li><li>Experience Center</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#c07000">Brand</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">Identity and perception of your company</p><ul class="inno-list"><li>Co-Branding</li><li>Brand Leverage</li><li>Private Label</li><li>Transparency</li><li>Certification</li></ul></div></div>
+        <div class="inno-col"><div class="inno-col-head" style="background:#c07000">Customer Engagement</div><div class="inno-col-body" style="text-align:left;"><p class="inno-col-desc">Interactions that build lasting relationships</p><ul class="inno-list"><li>Personalisation</li><li>Community</li><li>Simplification</li><li>Mastery</li><li>Curation</li></ul></div></div>
+      </div>
+    </div>
+    <p class="inno-footer">Framework: 10 Types of Innovation &mdash; Doblin / Deloitte</p>
+  </div>
 </div>
 
 </body>
