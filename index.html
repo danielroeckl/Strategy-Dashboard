@@ -9,8 +9,10 @@
     <!--
     ╔══════════════════════════════════════════════════════════════╗
     ║  ACCELERATE STRATEGY – 10-Year Product Board                 ║
-    ║  Version: v16  |  Erstellt: 2026  |  Autor: Daniel Röckl     ║
+    ║  Version: v22  |  Erstellt: 2026  |  Autor: Daniel Röckl     ║
     ║  Getinge AB – Internal Strategy Tool                         ║
+    ║  v22 additions: Focus Mode, Critical Path, Strategic Goal    ║
+    ║  read/edit popup (Connections toolbar)                       ║
     ╠══════════════════════════════════════════════════════════════╣
     ║  AUFBAU DER DATEI:                                           ║
     ║  1. CSS-Variablen (Getinge Brandfarben)                      ║
@@ -320,9 +322,36 @@
         .sg-title-input:focus { border-bottom-color:#31b7bc; }
         .sg-desc-textarea { width:100%; background:transparent; border:1px solid rgba(255,255,255,0.15); border-radius:6px; font-size:13px; color:#c5cbd6; line-height:1.6; padding:8px 10px; font-family:inherit; resize:vertical; min-height:70px; outline:none; box-sizing:border-box; }
         .sg-desc-textarea:focus { border-color:#31b7bc; }
-        .sg-delete-btn { position:absolute; top:10px; right:10px; background:none; border:none; color:#7e8aa0; cursor:pointer; font-size:16px; padding:2px 4px; line-height:1; }
-        .sg-delete-btn:hover { color:#e56b78; }
         .sg-collapse-hint { position:absolute; top:12px; right:36px; color:#7e8aa0; font-size:13px; }
+
+        /* ── v22: Focus Mode / Critical Path highlighting ── */
+        .project-card.card-dimmed, .strategic-goal-card.card-dimmed { opacity:0.2; }
+        .project-card.card-focus-highlight, .strategic-goal-card.card-focus-highlight { box-shadow:0 0 0 2px #2F6F6B, 0 4px 14px rgba(20,25,40,.18); }
+        .project-card.card-critical-highlight, .strategic-goal-card.card-critical-highlight { box-shadow:0 0 0 2px #C4522F, 0 4px 14px rgba(20,25,40,.18); }
+        .project-card.card-selected-root, .strategic-goal-card.card-selected-root { box-shadow:0 0 0 3px #18274a, 0 4px 14px rgba(20,25,40,.18); }
+        .conn-pick-cursor .project-card, .conn-pick-cursor .strategic-goal-card { cursor:pointer; }
+        #conn-mode-hint { font-size:11px; color:#8b7e79; margin-left:8px; max-width:260px; line-height:1.3; }
+
+        /* ── v22: Strategic Goal read/edit popup ── */
+        .goal-modal-window { background:#16223f; width:560px; max-width:92vw; max-height:85vh; border-radius:14px; box-shadow:0 25px 60px -12px rgba(0,0,0,0.45); display:flex; flex-direction:column; overflow:hidden; border:1px solid rgba(255,255,255,0.08); }
+        .goal-modal-head { display:flex; align-items:flex-start; gap:14px; padding:24px 26px 16px 26px; }
+        .goal-modal-avatar { width:52px; height:52px; border-radius:50%; background:#31b7bc; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .goal-modal-eyebrow { font-size:11px; font-weight:600; color:#31b7bc; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
+        .goal-modal-title { font-size:20px; font-weight:600; color:#ffffff; margin:0; line-height:1.3; }
+        .goal-modal-close { background:none; border:none; color:#7e8aa0; cursor:pointer; font-size:22px; line-height:1; padding:2px 6px; flex-shrink:0; }
+        .goal-modal-close:hover { color:#fff; }
+        .goal-modal-body { padding:4px 26px 22px 26px; overflow-y:auto; flex:1; }
+        .goal-modal-field-label { font-size:11px; font-weight:600; color:#7e8aa0; text-transform:uppercase; letter-spacing:0.06em; margin:14px 0 8px 0; }
+        .goal-modal-desc-read { font-size:14.5px; color:#dfe4ee; line-height:1.7; white-space:pre-wrap; }
+        .goal-modal-title-input { width:100%; background:rgba(255,255,255,0.06); border:1.5px solid #31b7bc; border-radius:8px; font-size:18px; font-weight:600; color:#fff; padding:8px 10px; font-family:inherit; outline:none; box-sizing:border-box; }
+        .goal-modal-desc-textarea { width:100%; min-height:220px; background:rgba(255,255,255,0.06); border:1.5px solid #31b7bc; border-radius:8px; font-size:14px; color:#eef1f6; line-height:1.65; padding:12px; font-family:inherit; resize:vertical; outline:none; box-sizing:border-box; }
+        .goal-modal-foot { display:flex; align-items:center; justify-content:flex-end; gap:9px; padding:16px 26px; border-top:1px solid rgba(255,255,255,0.08); }
+        .goal-modal-btn { font-size:12.5px; font-weight:600; padding:8px 16px; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:transparent; color:#dfe4ee; cursor:pointer; }
+        .goal-modal-btn:hover { background:rgba(255,255,255,0.08); }
+        .goal-modal-btn-primary { background:#31b7bc; border-color:#31b7bc; color:#0c1526; }
+        .goal-modal-btn-primary:hover { background:#3fcdd2; }
+        .goal-modal-btn-danger { color:#e56b78; border-color:rgba(229,107,120,0.4); margin-right:auto; }
+        .goal-modal-btn-danger:hover { background:rgba(229,107,120,0.12); }
 
         
         
@@ -658,6 +687,9 @@
                 <button class="secondary" onclick="deleteSingleConnectionMode()" id="dep-del-btn" style="border-color:#f39200;color:#8a4500;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><path d="M5.5 4.5l7-1.5M5.5 11.5l7 1.5M12 8h2"/></svg> Delete one</button>
                 <button class="secondary" onclick="clearConnections()" style="border-color:#f1707b;color:#a80000;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a80000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete all</button>
                 <button id="btn-toggle-connections" onclick="toggleConnections()" title="Show / hide all connections" style="background:white;color:#18274a;border:1px solid #d4cac8;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg> Hide connections</button>
+                <button id="focus-mode-btn" onclick="toggleFocusMode()" title="Click a card to see only its direct dependencies" style="background:white;color:#2F6F6B;border:1px solid #2F6F6B;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" opacity="0.4"/></svg> Focus mode</button>
+                <button id="critical-path-btn" onclick="toggleCriticalPathMode()" title="Click a card to trace the longest blocking chain leading to it" style="background:white;color:#C4522F;border:1px solid #C4522F;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 L9 9 L14 14 L20 4"/></svg> Critical path</button>
+                <span id="conn-mode-hint"></span>
             </div>
         </div>
 
@@ -1164,6 +1196,9 @@
         var dependencySourceId = null;
         var connectionsList = [];
         var deleteConnectionMode = false;
+        var focusModeActive = false;         // v22: Focus Mode
+        var criticalPathModeActive = false;  // v22: Critical Path Mode
+        var connSelectedRootId = null;       // v22: card currently picked in Focus/Critical Path mode
         var activePsId = null;
         var currentView = 'full';
         var activeStatusFilters = new Set(['idea','planned','active','done','blocked']);
@@ -1652,7 +1687,7 @@
             card.addEventListener('dragleave',function(){card.classList.remove('drag-insert-before');});
             card.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();card.classList.remove('drag-insert-before');var did=e.dataTransfer.getData('text/plain');var dc=document.getElementById(did);if(dc&&dc!==card){var dw=document.getElementById('wrap-'+did)||dc;var tw=card.closest('.card-with-prestudy')||card;// SWAP: exchange positions of dragged and target card
 var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.nextSibling===dw?dw.nextSibling:tw.nextSibling;var dwNext=dw.nextSibling===tw?tw.nextSibling:dw.nextSibling;par.insertBefore(dw,twNext);dpar.insertBefore(tw,dwNext);}setTimeout(function(){redrawAllConnections();updateEffortSummaries();},50);}});
-            card.addEventListener('click',function(e){if(e.target.classList.contains('dependency-dot'))return;openProjectModal(id);});
+            card.addEventListener('click',function(e){if(e.target.classList.contains('dependency-dot'))return;if(focusModeActive||criticalPathModeActive){handleConnPickClick(id);return;}openProjectModal(id);});
     
             var summary=container.querySelector('.lane-col-summary');
             if(summary) container.insertBefore(wrapper,summary); else container.appendChild(wrapper);
@@ -1981,63 +2016,82 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     function refreshStrategicGoalCard(gid, div) {
         if(!div) div = document.getElementById(gid); if(!div) return;
         var g = goalsData[gid]; if(!g) return;
-        div.classList.toggle('sg-expanded', !!g.expanded);
+        div.classList.remove('sg-expanded'); // v22: inline expand/edit retired in favour of the read/edit popup
         var userSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg>';
 
-        if (!g.expanded) {
-            div.innerHTML = '<div class="sg-dep-dot" title="Link dependency"></div>'
-                + '<div class="sg-avatar">'+userSvg+'</div>'
-                + '<div class="sg-headline">'+(g.title||'Untitled goal')+'</div>'
-                + '<div class="sg-desc-preview">'+(g.description||'No description yet — click to add one.')+'</div>';
-            div.onclick = function(e){
-                if(e.target && (e.target.classList.contains('sg-dep-dot'))) return;
-                g.expanded = true;
-                refreshStrategicGoalCard(gid, div);
-            };
-        } else {
-            var chevronSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7e8aa0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
-            div.innerHTML = '<button class="sg-delete-btn" title="Delete this goal">&times;</button>'
-                + '<span class="sg-collapse-hint" title="Collapse">'+chevronSvg+'</span>'
-                + '<div class="sg-dep-dot" title="Link dependency"></div>'
-                + '<div class="sg-avatar">'+userSvg+'</div>'
-                + '<div class="sg-eyebrow">Strategic goal</div>'
-                + '<input class="sg-title-input" type="text" value="'+(g.title||'').replace(/"/g,'&quot;')+'" placeholder="Goal title">'
-                + '<div class="sg-field-label">Value proposition / description</div>'
-                + '<textarea class="sg-desc-textarea" placeholder="Describe the customer pain point and value...">'+(g.description||'')+'</textarea>';
-            div.onclick = null;
+        // v22.1: no delete (×) affordance on the card itself anymore —
+        // deleting a strategic goal is only possible from inside the popup (openGoalModal -> Delete goal).
+        div.innerHTML = '<div class="sg-dep-dot" title="Link dependency"></div>'
+            + '<div class="sg-avatar">'+userSvg+'</div>'
+            + '<div class="sg-headline">'+(g.title||'Untitled goal')+'</div>'
+            + '<div class="sg-desc-preview">'+(g.description||'No description yet — click to add one.')+'</div>';
 
-            var titleInput = div.querySelector('.sg-title-input');
-            titleInput.addEventListener('click', function(e){ e.stopPropagation(); });
-            titleInput.addEventListener('blur', function(){ g.title = titleInput.value.trim() || 'Untitled goal'; });
-
-            var descArea = div.querySelector('.sg-desc-textarea');
-            descArea.addEventListener('click', function(e){ e.stopPropagation(); });
-            descArea.addEventListener('blur', function(){ g.description = descArea.value; });
-
-            var collapseHint = div.querySelector('.sg-collapse-hint');
-            collapseHint.addEventListener('click', function(e){
-                e.stopPropagation();
-                g.title = titleInput.value.trim() || 'Untitled goal';
-                g.description = descArea.value;
-                g.expanded = false;
-                refreshStrategicGoalCard(gid, div);
-            });
-
-            var delBtn = div.querySelector('.sg-delete-btn');
-            delBtn.addEventListener('click', function(e){
-                e.stopPropagation();
-                showConfirm('Delete strategic goal', 'Delete "'+(g.title||'this goal')+'"? This cannot be undone.', function(){
-                    connectionsList = connectionsList.filter(function(c){ return c.from!==gid && c.to!==gid; });
-                    delete goalsData[gid];
-                    var el = document.getElementById(gid); if(el) el.remove();
-                    updateEffortSummaries();
-                    setTimeout(function(){ redrawAllConnections(); }, 50);
-                });
-            });
-        }
+        div.onclick = function(e){
+            if(e.target && e.target.classList.contains('sg-dep-dot')) return;
+            if(focusModeActive || criticalPathModeActive){ handleConnPickClick(gid); return; }
+            openGoalModal(gid);
+        };
 
         var dot = div.querySelector('.sg-dep-dot');
         if (dot) dot.addEventListener('click', function(e){ e.stopPropagation(); handleDepClick(e, gid); });
+    }
+
+    // ── v22: Strategic Goal read/edit popup ──
+    // Clicking a goal card now opens a large, readable popup in view mode.
+    // Editing only happens after explicitly pressing "Edit".
+    var activeGoalModalId = null;
+    function openGoalModal(gid) {
+        var g = goalsData[gid]; if(!g) return;
+        activeGoalModalId = gid;
+        setGoalModalMode('read');
+        document.getElementById('goal-modal-title-read').textContent = g.title || 'Untitled goal';
+        document.getElementById('goal-modal-desc-read').textContent = g.description && g.description.trim() ? g.description : 'No description yet — click Edit to add one.';
+        document.getElementById('goal-modal-title-input').value = g.title || '';
+        document.getElementById('goal-modal-desc-textarea').value = g.description || '';
+        document.getElementById('goal-modal-overlay').style.display = 'flex';
+    }
+    function closeGoalModal() {
+        document.getElementById('goal-modal-overlay').style.display = 'none';
+        activeGoalModalId = null;
+    }
+    function setGoalModalMode(mode) {
+        var isEdit = mode === 'edit';
+        document.getElementById('goal-modal-title-read').style.display = isEdit ? 'none' : 'block';
+        document.getElementById('goal-modal-desc-read').style.display = isEdit ? 'none' : 'block';
+        document.getElementById('goal-modal-title-input').style.display = isEdit ? 'block' : 'none';
+        document.getElementById('goal-modal-desc-textarea').style.display = isEdit ? 'block' : 'none';
+        document.getElementById('goal-modal-edit-btn').style.display = isEdit ? 'none' : 'inline-block';
+        document.getElementById('goal-modal-save-btn').style.display = isEdit ? 'inline-block' : 'none';
+        document.getElementById('goal-modal-cancel-btn').style.display = isEdit ? 'inline-block' : 'none';
+    }
+    function goalModalEnableEdit() { setGoalModalMode('edit'); }
+    function goalModalCancelEdit() {
+        var g = goalsData[activeGoalModalId]; if(!g) return;
+        document.getElementById('goal-modal-title-input').value = g.title || '';
+        document.getElementById('goal-modal-desc-textarea').value = g.description || '';
+        setGoalModalMode('read');
+    }
+    function goalModalSave() {
+        var g = goalsData[activeGoalModalId]; if(!g) return;
+        var newTitle = document.getElementById('goal-modal-title-input').value.trim() || 'Untitled goal';
+        var newDesc = document.getElementById('goal-modal-desc-textarea').value;
+        g.title = newTitle;
+        g.description = newDesc;
+        document.getElementById('goal-modal-title-read').textContent = newTitle;
+        document.getElementById('goal-modal-desc-read').textContent = newDesc.trim() ? newDesc : 'No description yet — click Edit to add one.';
+        refreshStrategicGoalCard(activeGoalModalId);
+        setGoalModalMode('read');
+    }
+    function goalModalDelete() {
+        var gid = activeGoalModalId; var g = goalsData[gid]; if(!g) return;
+        showConfirm('Delete strategic goal', 'Delete "'+(g.title||'this goal')+'"? This cannot be undone.', function(){
+            connectionsList = connectionsList.filter(function(c){ return c.from!==gid && c.to!==gid; });
+            delete goalsData[gid];
+            var el = document.getElementById(gid); if(el) el.remove();
+            updateEffortSummaries();
+            closeGoalModal();
+            setTimeout(function(){ redrawAllConnections(); }, 50);
+        });
     }
 
 
@@ -2602,7 +2656,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         function clearConnections(){showConfirm('Delete all connections?','Remove all dependency connections? Cannot be undone.',function(){connectionsList=[];redrawAllConnections();});}
 
     // Alle Verbindungslinien im SVG neu zeichnen (mit Pill-Labels)
-        function redrawAllConnections(){
+        function redrawAllConnections(highlightEdgeSet, highlightType){
             var svg=document.getElementById('connections-svg');svg.innerHTML='';
             connectionsList.forEach(function(conn,index){
                 var eF=document.getElementById(conn.from),eT=document.getElementById(conn.to);
@@ -2614,19 +2668,35 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 var x1=rF.left+rF.width-rB.left,y1=rF.top+rF.height/2-rB.top,x2=rT.left-rB.left,y2=rT.top+rT.height/2-rB.top;
                 var mx=(x1+x2)/2, my=(y1+y2)/2;
                 var isBlocking=(conn.type||'blocking')==='blocking';
+
+                // v22: Focus Mode / Critical Path — dim everything except the picked chain
+                var isHighlightMode = !!highlightEdgeSet;
+                var isHighlighted = isHighlightMode && highlightEdgeSet.has(conn.from+'|'+conn.to);
                 var lineColor = isBlocking ? '#e56b78' : '#bfb1ac';
+                var lineOpacity = 1;
+                var lineWidth = isBlocking?'3':'2';
+                var dashArr = isBlocking?'5 3':'2 5';
+                if(isHighlightMode){
+                    if(isHighlighted){
+                        lineColor = highlightType==='critical' ? '#C4522F' : '#2F6F6B';
+                        lineWidth = '3.5'; dashArr = 'none'; lineOpacity = 1;
+                    } else {
+                        lineOpacity = 0.08;
+                    }
+                }
                 var d = "M "+x1+" "+y1+" C "+(x1+60)+" "+y1+", "+(x2-60)+" "+y2+", "+x2+" "+y2;
     
                 var g=document.createElementNS("http://www.w3.org/2000/svg","g");
                 g.setAttribute("class","connection-line-group");
+                g.setAttribute("opacity", lineOpacity);
     
                 // Main visible path
                 var path=document.createElementNS("http://www.w3.org/2000/svg","path");
                 path.setAttribute("d",d);
                 path.setAttribute("stroke",lineColor);
-                path.setAttribute("stroke-width",isBlocking?'3':'2');
+                path.setAttribute("stroke-width",lineWidth);
                 path.setAttribute("fill","none");
-                path.setAttribute("stroke-dasharray",isBlocking?'5 3':'2 5');
+                path.setAttribute("stroke-dasharray",dashArr);
                 g.appendChild(path);
     
                 // Wide invisible hit area for clicking
@@ -2681,14 +2751,153 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             });
         }
 
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  v22: FOCUS MODE & CRITICAL PATH                                  ║
+    // ║  Two picker modes for the Connections toolbar. Only one active   ║
+    // ║  at a time. Clicking a card while a mode is active highlights    ║
+    // ║  its dependency subgraph and dims everything else.               ║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    var connModeHintText = {
+        none:     'Click a card to open it.',
+        focus:    'Click a card to highlight only its direct dependencies.',
+        critical: 'Click a card to trace the longest blocking chain leading to it.'
+    };
+
+    function setConnModeHint(text){
+        var el = document.getElementById('conn-mode-hint');
+        if(el) el.textContent = text || '';
+    }
+
+    function toggleFocusMode(){
+        var turningOn = !focusModeActive;
+        focusModeActive = turningOn;
+        criticalPathModeActive = false;
+        connSelectedRootId = null;
+        updateConnModeButtons();
+        clearConnHighlighting();
+        setConnModeHint(turningOn ? connModeHintText.focus : '');
+    }
+
+    function toggleCriticalPathMode(){
+        var turningOn = !criticalPathModeActive;
+        criticalPathModeActive = turningOn;
+        focusModeActive = false;
+        connSelectedRootId = null;
+        updateConnModeButtons();
+        clearConnHighlighting();
+        setConnModeHint(turningOn ? connModeHintText.critical : '');
+    }
+
+    function updateConnModeButtons(){
+        var fBtn = document.getElementById('focus-mode-btn');
+        var cBtn = document.getElementById('critical-path-btn');
+        if(fBtn){ fBtn.style.background = focusModeActive ? '#2F6F6B' : 'white'; fBtn.style.color = focusModeActive ? '#fff' : '#2F6F6B'; }
+        if(cBtn){ cBtn.style.background = criticalPathModeActive ? '#C4522F' : 'white'; cBtn.style.color = criticalPathModeActive ? '#fff' : '#C4522F'; }
+        var boardArea = document.getElementById('board-scroll-area');
+        if(boardArea) boardArea.classList.toggle('conn-pick-cursor', focusModeActive || criticalPathModeActive);
+    }
+
+    function handleConnPickClick(id){
+        connSelectedRootId = (connSelectedRootId === id) ? null : id;
+        applyConnHighlighting();
+    }
+
+    function clearConnHighlighting(){
+        document.querySelectorAll('.project-card,.strategic-goal-card').forEach(function(el){
+            el.classList.remove('card-dimmed','card-focus-highlight','card-critical-highlight','card-selected-root');
+        });
+        redrawAllConnections();
+    }
+
+    function focusNeighbors(id){
+        var nodes = new Set([id]); var edges = [];
+        connectionsList.forEach(function(c){
+            if(c.from===id || c.to===id){ nodes.add(c.from); nodes.add(c.to); edges.push(c); }
+        });
+        return {nodes:nodes, edges:edges};
+    }
+
+    // Longest chain of *blocking* connections that leads into `id` (the critical path to deliver it)
+    function criticalPathTo(id){
+        var blocking = connectionsList.filter(function(c){ return (c.type||'blocking')==='blocking'; });
+        var memo = {};
+        function longest(nodeId, stack){
+            if(memo[nodeId]) return memo[nodeId];
+            if(stack.indexOf(nodeId)!==-1) return {len:0, path:[nodeId]}; // cycle guard
+            stack.push(nodeId);
+            var preds = blocking.filter(function(e){ return e.to===nodeId; }).map(function(e){ return e.from; });
+            var best = {len:0, path:[nodeId]};
+            preds.forEach(function(p){
+                var r = longest(p, stack);
+                if(r.len + 1 > best.len) best = {len:r.len+1, path:r.path.concat([nodeId])};
+            });
+            stack.pop();
+            memo[nodeId] = best;
+            return best;
+        }
+        var result = longest(id, []);
+        var nodes = new Set(result.path);
+        var edges = [];
+        for(var i=0;i<result.path.length-1;i++) edges.push({from:result.path[i], to:result.path[i+1], type:'blocking'});
+        return {nodes:nodes, edges:edges, length:result.len};
+    }
+
+    function applyConnHighlighting(){
+        if(!connSelectedRootId){ clearConnHighlighting(); setConnModeHint(focusModeActive?connModeHintText.focus:criticalPathModeActive?connModeHintText.critical:''); return; }
+
+        var nodesSet, edgesList, styleClass;
+        if(focusModeActive){
+            var r = focusNeighbors(connSelectedRootId);
+            nodesSet = r.nodes; edgesList = r.edges; styleClass = 'card-focus-highlight';
+            setConnModeHint('Showing dependencies of "'+((projectsData[connSelectedRootId]||goalsData[connSelectedRootId]||{}).title||connSelectedRootId)+'". Click it again to clear.');
+        } else if(criticalPathModeActive){
+            var r2 = criticalPathTo(connSelectedRootId);
+            nodesSet = r2.nodes; edgesList = r2.edges; styleClass = 'card-critical-highlight';
+            var rootTitle = (projectsData[connSelectedRootId]||goalsData[connSelectedRootId]||{}).title||connSelectedRootId;
+            setConnModeHint(r2.length > 0
+                ? 'Critical path to "'+rootTitle+'": '+r2.length+' blocking step'+(r2.length>1?'s':'')+'.'
+                : '"'+rootTitle+'" has no upstream blocking dependencies.');
+        } else {
+            return;
+        }
+
+        document.querySelectorAll('.project-card,.strategic-goal-card').forEach(function(el){
+            el.classList.remove('card-dimmed','card-focus-highlight','card-critical-highlight','card-selected-root');
+            if(nodesSet.has(el.id)){
+                el.classList.add(styleClass);
+                if(el.id === connSelectedRootId) el.classList.add('card-selected-root');
+            } else {
+                el.classList.add('card-dimmed');
+            }
+        });
+
+        var edgeKeySet = new Set(edgesList.map(function(e){ return e.from+'|'+e.to; }));
+        redrawAllConnections(edgeKeySet, focusModeActive ? 'focus' : 'critical');
+    }
+
+    // Clicking empty board background clears the current Focus/Critical Path selection
+    document.addEventListener('DOMContentLoaded', function(){
+        var boardArea = document.getElementById('board-scroll-area');
+        if(!boardArea) return;
+        boardArea.addEventListener('click', function(e){
+            if((focusModeActive || criticalPathModeActive) && connSelectedRootId){
+                if(!e.target.closest('.project-card') && !e.target.closest('.strategic-goal-card')){
+                    connSelectedRootId = null;
+                    applyConnHighlighting();
+                }
+            }
+        });
+    });
+
     // Verbindungs-Label-Editor öffnen (Klick auf Linie)
     var _connLabelIndex = null;
         function openConnLabelEditor(index) {
             var conn = connectionsList[index];
             if (!conn) return;
             _connLabelIndex = index;
-            var fromTitle = (projectsData[conn.from]||{}).title || conn.from;
-            var toTitle   = (projectsData[conn.to]||{}).title   || conn.to;
+            var fromTitle = (projectsData[conn.from]||goalsData[conn.from]||{}).title || conn.from;
+            var toTitle   = (projectsData[conn.to]||goalsData[conn.to]||{}).title   || conn.to;
             document.getElementById('conn-label-title').textContent = fromTitle + ' → ' + toTitle;
             document.getElementById('conn-label-field').value = conn.label || '';
             document.getElementById('conn-label-type-select').value = conn.type || 'blocking';
@@ -2709,6 +2918,18 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         function _connLabelCancel() {
             document.getElementById('conn-label-overlay').style.display = 'none';
             _connLabelIndex = null;
+        }
+        // v22.2: delete the connection directly from the label editor popup
+        function _connLabelDelete() {
+            if (_connLabelIndex === null) return;
+            var index = _connLabelIndex;
+            var conn = connectionsList[index];
+            var title = document.getElementById('conn-label-title').textContent || 'this connection';
+            document.getElementById('conn-label-overlay').style.display = 'none';
+            showConfirm('Delete connection', 'Delete the connection "'+title+'"? This cannot be undone.', function(){
+                deleteConnection(index);
+                _connLabelIndex = null;
+            });
         }
 
 
@@ -3626,6 +3847,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             <div class="confirm-popup-btns">
                 <button id="conn-label-ok" onclick="_connLabelSave()">Save</button>
                 <button class="secondary" id="conn-label-cancel" onclick="_connLabelCancel()">Cancel</button>
+                <button class="secondary" id="conn-label-delete" onclick="_connLabelDelete()" style="border-color:#f1707b;color:#a80000;margin-left:auto;" title="Delete this connection"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#a80000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:3px;"><polyline points="2 4 14 4"/><path d="M5 4V2h6v2"/><path d="M3 4l1 10h8l1-10"/><line x1="6" y1="7" x2="6" y2="11"/><line x1="10" y1="7" x2="10" y2="11"/></svg>Delete</button>
             </div>
         </div>
     </div>
@@ -3943,6 +4165,32 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     </div>
     <p class="inno-footer">Framework: 10 Types of Innovation &mdash; Doblin / Deloitte</p>
   </div>
+</div>
+
+<!-- v22: Strategic Goal read/edit popup -->
+<div class="modal-overlay" id="goal-modal-overlay">
+    <div class="goal-modal-window">
+        <div class="goal-modal-head">
+            <div class="goal-modal-avatar"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0 1 16 0v1"/></svg></div>
+            <div style="flex:1;min-width:0;">
+                <div class="goal-modal-eyebrow">Strategic goal</div>
+                <h2 class="goal-modal-title" id="goal-modal-title-read"></h2>
+                <input type="text" id="goal-modal-title-input" class="goal-modal-title-input" style="display:none;margin-top:2px;" placeholder="Goal title">
+            </div>
+            <button class="goal-modal-close" onclick="closeGoalModal()" title="Close" aria-label="Close">&times;</button>
+        </div>
+        <div class="goal-modal-body">
+            <div class="goal-modal-field-label">Value proposition / description</div>
+            <p class="goal-modal-desc-read" id="goal-modal-desc-read"></p>
+            <textarea id="goal-modal-desc-textarea" class="goal-modal-desc-textarea" style="display:none;" placeholder="Describe the customer pain point and value..."></textarea>
+        </div>
+        <div class="goal-modal-foot">
+            <button class="goal-modal-btn goal-modal-btn-danger" onclick="goalModalDelete()">Delete goal</button>
+            <button class="goal-modal-btn" id="goal-modal-cancel-btn" style="display:none;" onclick="goalModalCancelEdit()">Cancel</button>
+            <button class="goal-modal-btn goal-modal-btn-primary" id="goal-modal-save-btn" style="display:none;" onclick="goalModalSave()">Save changes</button>
+            <button class="goal-modal-btn goal-modal-btn-primary" id="goal-modal-edit-btn" onclick="goalModalEnableEdit()">Edit</button>
+        </div>
+    </div>
 </div>
 
 </body>
