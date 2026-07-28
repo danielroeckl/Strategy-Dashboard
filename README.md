@@ -1,12 +1,12 @@
 # 🚀 Accelerate Strategy – 10-Year Product Board
 
-A single-file, browser-based strategy dashboard for long-term product portfolio planning across multiple product lines and time horizons. Built for product managers who need to map, prioritise, and communicate a multi-year roadmap — without installing anything.
+A single-file, browser-based strategy dashboard for long-term product portfolio planning across multiple lanes and time horizons. Built for product managers who need to map, prioritise, and communicate a multi-year roadmap — without installing anything.
 
 ---
 
 ## Board structure
 
-Swimlane layout: product lines (rows) × time columns, with four planning horizons:
+Swimlane layout: **lanes** (rows) × time columns, with four planning horizons:
 
 | Horizon | Columns | Focus |
 |---|---|---|
@@ -15,9 +15,10 @@ Swimlane layout: product lines (rows) × time columns, with four planning horizo
 | Long Term | 2031–33, 2034–35 | Vision direction |
 | BU Vision | 2036+ | Moonshots |
 
-- Product lines are reorderable by drag & drop; titles wrap automatically for long names
-- Effort and cost summaries per column and product line, updated live
-- Editable board name in the header — used as the filename for all exports
+- A **lane** is one board row. It can represent a product line, a topic, or a theme — the neutral name keeps it open. New lanes are auto-named "Lane 1", "Lane 2", … and can be renamed inline.
+- Lanes are reorderable by drag & drop; titles wrap automatically for long names.
+- Effort and cost summaries per column and lane, updated live.
+- Editable board name in the header — used as the filename for all exports.
 
 ---
 
@@ -28,67 +29,100 @@ The board supports four distinct tile types, each serving a different purpose.
 ### 🃏 Project cards
 The standard unit of work. Each card carries:
 - Title, description, user persona
+- **User Needs** — why we are tackling it (see [User Needs](#user-needs))
 - Status: Idea / Planned / Active / Done / Blocked — colour-coded stripe on the card
 - Effort and cost sizing: XS · S · M · L · XL
-- Competition status: 🥇 Pioneer / 🥈 Fast Follower / 🥉 Me-Too (shown as medal next to radars in full view; in the badge row in compact view)
+- Competition status: 🥇 Pioneer / 🥈 Fast Follower / 🥉 Me-Too
 - Strategic Score (0–100) — see [Scoring](#strategic-score) below
 - Two mini spider-radars: Customer Benefit (4 dimensions) + 10 Types of Innovation
-- Full modal with description, persona, sizing, radars, roadmap, and connections
+- Full modal with description, persona, User Needs, sizing, radars, roadmap, and connections
 
-Cards can be dragged between cells and swapped with each other by dropping one on top of another. Cells with 4+ cards auto-switch to a two-column grid layout.
+Cards can be dragged between cells and swapped by dropping one on top of another. Cells with 4+ cards auto-switch to a two-column grid layout.
 
 ### 🎯 Strategic Goal cards
-A customer pain-point / north-star card. Visually distinct: dark background, circular avatar icon overlapping the left edge.
+A customer pain-point / north-star card. Visually distinct: dark background, circular avatar icon.
 - **Collapsed:** headline + 2-line description preview. No status or score.
-- **Expanded (click):** editable goal title and full description field with "Value Proposition / Description" label.
-- Has a connection point centred on the avatar for linking to project cards.
-- Excluded from status and score filters; included in text search.
+- **Expanded (click):** editable goal title and full description field.
+- Has a connection point for linking to project cards, bundles, and goals.
+- Excluded from status and score filters; included in title search.
 
 ### 📦 Bundles
 A named release scope that groups related project cards.
-- Drag any project card onto a bundle to add it — the card disappears from the board and is listed inside the bundle.
-- The bundle face shows an **effort-weighted strategic quality score** — see [Bundle Score](#bundle-score) below.
-- Click to open the management modal: add cards (dropdown with product line shown per card), remove (×), reorder (drag with grip handles).
-- Opening a card from the bundle modal returns you to the bundle modal after saving.
+- Drag any project card onto a bundle to add it — the card moves inside the bundle.
+- The bundle face shows an **effort-weighted strategic quality score** — see [Bundle Score](#bundle-score).
+- Click to open the management modal: add cards, remove (×), reorder (drag handles).
 - Export the full bundle as a print-ready **A4 PNG** directly from the modal.
+- Bundles respond to the User Needs filter: a bundle stays visible when at least one contained card matches the active filter.
 
 ### 🔲 Sub-boards
 A full nested planning board attached to any project card — one level deep.
-- Click the **grey tab on the right edge** of any project card to attach a sub-board (confirmation required).
-- The tab turns **Getinge Blue** once a sub-board is attached.
-- Clicking the active tab opens a side panel showing the sub-board's line count, card count, and an **"Open board →"** button.
-- Clicking "Open board →" swaps the entire board into the sub-board. A breadcrumb bar at the top shows the path back; clicking the parent name returns.
-- The sub-board's board name mirrors the parent card title and updates automatically when the card is renamed.
-- Leaving the sub-board auto-saves all changes back into the parent card.
-- Sub-board data lives inside the parent card — it exports, imports, duplicates, and merges through Chase Merge automatically.
-- JSON Export and Import are hidden while inside a sub-board; use them from the main board only. Chase Merge and PNG Export remain available at all levels.
+- Click the **grey tab on the right edge** of any project card to attach a sub-board.
+- The tab turns **Getinge Blue** once attached; the side panel offers an **"Open board →"** button.
+- A breadcrumb bar shows the path back to the parent.
+- Sub-board data lives inside the parent card — it exports, imports, duplicates, and merges automatically.
+
+---
+
+## User Needs
+
+User Needs answer **why** we tackle an initiative — the purpose it serves. This is deliberately separate from **Customer Benefit** (Revenue, Cost savings, Convenience, Clinical benefit), which measures **how strongly** it pays off and feeds the strategic score. Purpose vs. impact — two different lenses.
+
+Eight categories (short filter label in brackets):
+
+| Category | Covers |
+|---|---|
+| Clinical Value *(Clinical)* | Outcomes, clinical confidence, diagnostic accuracy, decision support, early detection |
+| Patient Safety *(Safety)* | Error prevention, alarming, guideline adherence, risk reduction, therapy safety |
+| Workflow & Usability *(Workflow)* | Workflow efficiency, ease of use, time savings, automation, documentation |
+| Connectivity *(Connectivity)* | EMR/PDMS/HIS integration, device connectivity, data exchange, remote access |
+| Economic Value *(Economic)* | Cost savings, total cost of ownership, resource utilisation, length-of-stay reduction |
+| Compliance & Trust *(Compliance)* | MDR/FDA compliance, cybersecurity, data privacy, reliability, auditability |
+| Operational Excellence *(Operations)* | Serviceability, installation, fleet management, remote service, scalability |
+| Evidence & Innovation *(Evidence)* | Clinical evidence, health economics, AI support, research, data analytics |
+
+- Assigned per card in the card modal (multi-select chips); shown as neutral tags on the card face in both Full and Compact view.
+- An info (i) button in the card modal explains each category's sub-topics.
+- Categories are neutral grey — no colour — so they don't clash with status and score signals.
 
 ---
 
 ## Pre-Study add-on
 
-Each project card can have an optional Pre-Study attached via the **orange left tab**:
-- Own status, effort, cost estimate, and a short note
-- Visible at a glance without opening the card modal
+Each project card can have an optional Pre-Study attached via the **orange left tab**: own status, effort, cost estimate, and a short note — visible without opening the card modal.
 
 ---
 
 ## Connections
 
-- **Blocking** (Berry red, dashed line): must finish before the target
-- **Informational / Related** (Clay grey, solid line)
+- **Blocking** (Berry red, dashed line): must finish before the target.
+- **Informational / Related** (Clay grey, solid line).
+- **Directional arrowheads** point toward the dependent card; arrow colour matches the line state (blocking, related, or the active Focus / Critical-path highlight).
 
-Activate Connection Mode from the toolbar, then click source → target. Click any line to edit its type or label. Delete individually or all at once via toolbar. Connections can be drawn to and from any card type including Strategic Goal cards, Bundles, and Sub-boards.
+Activate connection mode from the toolbar. A step banner guides you: click the **source** dot, then the **target** dot. Click any line to edit its type or label. Connections can be drawn to and from any card type.
+
+### Focus mode & Critical path
+- **Focus mode:** click a card to see only its direct dependencies; everything else dims.
+- **Critical path:** click a card to trace the longest dependency chain leading to it.
+- **Hover highlight:** hovering a card outlines its connected neighbours and dims the rest.
+- **Hide connections:** toggle all lines off for clean screenshots.
 
 ---
 
 ## Filters & views
 
-- **Search** by title, description, or user persona — also highlights bundles whose cards match; sub-board tiles match on title
-- **Score filter:** High / Medium / Low chips (applies to project cards only)
-- **Status filter:** multi-select per lifecycle state (applies to project cards only)
-- **Full view:** all card detail visible (radars, timeline, competition medal, pre-study and sub-board tabs)
-- **Compact view:** smaller cards, radars hidden, competition medal shown in badge row
+The filter bar follows a deliberate priority order: **Score → User Needs → Status**.
+
+- **Search** — matches card titles only.
+- **Score:** High / Medium / Low.
+- **User Needs:** the 8 categories, multi-select — combine several to see any card matching one of them.
+- **Status:** multi-select per lifecycle state.
+- **Master toggle (Filters):** *All on* resets everything to visible; *All off* hides everything so you can reveal the board layer by layer (e.g. first High score, then one User Need, then a status).
+- **View:** Full / Compact segmented toggle.
+
+All three filter groups share the same model — every chip active means everything is visible — so the master toggle behaves consistently across them.
+
+### Toolbar hierarchy
+The **Add to board** group leads with **New lane** (the entry point), followed by New project card, New bundle, and New strategic goal — all in one unified dark-navy button style. Connections and Save & Load use a quieter grey style so the primary "add" actions stand out.
 
 ---
 
@@ -96,18 +130,18 @@ Activate Connection Mode from the toolbar, then click source → target. Click a
 
 | Action | Result |
 |---|---|
-| **Export JSON** | Full board state including all sub-boards — filename uses the board name |
+| **Export JSON** | Full board state including all sub-boards and User Needs — filename uses the board name |
 | **Import JSON** | Restores any saved board including all sub-board data |
 | **Export PNG (board)** | High-resolution 2× PNG; in a sub-board the filename is `[card-name]-subboard.png` |
 | **Export PNG (card)** | A4-format PNG of a single project card |
 | **Export PNG (bundle)** | A4-format PNG listing all contained cards with scores |
-| **Chase Merge** | Password-protected merge of a colleague's JSON into the current board (works at any level) |
+| **Chase Merge** | Password-protected merge of a colleague's JSON into the current board |
 
 ### Chase Merge rules
-1. Existing product lines (same name) → ignored completely, including their cards
-2. New product lines → added, including all cards, bundles, goals, and sub-boards
-3. Connections within new product lines → transferred
-4. Cross-line connections → dropped (re-create manually)
+1. Existing lanes (same name) → ignored completely, including their cards.
+2. New lanes → added, including all cards, bundles, goals, and sub-boards.
+3. Connections within new lanes → transferred.
+4. Cross-line connections → dropped (re-create manually).
 
 ---
 
@@ -141,9 +175,6 @@ Score    =       Quality ^ 0.72  ×  15.81
 
 The bundle score (0–100) reflects the collective strategic quality of a release scope, weighted so that larger projects have more influence — without penalising them twice for their size.
 
-**Why not a simple average of card scores?**
-Card scores are already reduced by the effort/cost divisor. Using effort weights on top of those scores would double-penalise large projects: an XL card has a structurally lower score *and* the highest weight, always pulling the bundle down regardless of content quality.
-
 **Formula:**
 
 ```
@@ -156,21 +187,17 @@ BundleScore  =  Σ( Quality_i × Weight_i )  ×  10
                          Σ( Weight_i )
 ```
 
-This measures: *"How much strategic content does this bundle contain, weighted by the size of each project?"*
-
-- An XL project with strong benefit and innovation ratings contributes fully based on its content — not reduced by its size.
-- Larger projects (XL) count five times as much as the smallest (XS).
-- Score is 0–100 and colour-coded using the same High / Medium / Low thresholds as individual cards.
+Larger projects (XL) count five times as much as the smallest (XS); a strong XL contributes fully on content, not reduced by its size. Score is colour-coded using the same High / Medium / Low thresholds as individual cards.
 
 ---
 
 ## How to use
 
-Open the HTML file in any modern browser — no server, no install, no dependencies.
+Open the HTML file in any modern browser — no server, no install, no dependencies to set up.
 
-1. **New project** — start from the welcome screen, add product lines, create cards
-2. **Import** — load any previously exported JSON to restore a board including all sub-boards
-3. **Demo** — load the built-in demo board to explore all four card types and the sub-board feature
+1. **New project** — start from the welcome screen, add lanes, create cards.
+2. **Import** — load any previously exported JSON to restore a board including all sub-boards.
+3. **Demo** — load the built-in demo board to explore all four card types and the sub-board feature.
 4. **Share** — export as JSON and send it alongside the HTML. Recipients import with one click.
 5. **Team collaboration** — each person works on their own copy; the Board Owner merges JSONs via Chase Merge.
 
@@ -182,7 +209,7 @@ Pure HTML, CSS, and vanilla JavaScript. No framework, no build step, no external
 - **Google Fonts** (Source Sans 3, loaded from CDN)
 - **html2canvas** (loaded from cdnjs, used only for PNG export)
 
-Everything else runs client-side. One file, ~250 KB.
+Everything else runs client-side. One file.
 
 ---
 
