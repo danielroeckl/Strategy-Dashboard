@@ -7,20 +7,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accelerate Strategy – 10-Year Product Board</title>
     <!--
-    ╔══════════════════════════════════════════════════════════════╗
-    ║  ACCELERATE STRATEGY – 10-Year Product Board                 ║
-    ║  Version: v22  |  Erstellt: 2026  |  Autor: Daniel Röckl     ║
-    ║  Getinge AB – Internal Strategy Tool                         ║
-    ║  v22 additions: Focus Mode, Critical Path, Strategic Goal    ║
-    ║  read/edit popup (Connections toolbar)                       ║
-    ╠══════════════════════════════════════════════════════════════╣
-    ║  AUFBAU DER DATEI:                                           ║
-    ║  1. CSS-Variablen (Getinge Brandfarben)                      ║
-    ║  2. Layout & Komponenten CSS                                 ║
-    ║  3. HTML-Struktur (Header, Board, Modals, Popups)            ║
-    ║  4. JavaScript (Daten, Funktionen, Event-Handler)            ║
-    ║  5. window.onload (Beispieldaten CLPM)                       ║
-    ╚══════════════════════════════════════════════════════════════╝
+    ╔═══════════════════════════════════════════════════════════════════════╗
+    ║  ACCELERATE STRATEGY BOARD — 10-Year Product Portfolio Planning        ║
+    ║  Version: v25   |   Strategy Tool                ║
+    ║  Author: Daniel Röckl                                                  ║
+    ╠═══════════════════════════════════════════════════════════════════════╣
+    ║  SINGLE-FILE APP — no build step, deploy as-is to GitHub Pages.        ║
+    ║                                                                        ║
+    ║  FILE STRUCTURE                                                        ║
+    ║   1. STYLE     — CSS: brand variables, layout, cards, toolbar,         ║
+    ║                  filters, overlays, connections                        ║
+    ║   2. BODY      — Top bar, filter bar, board grid, modals, overlays     ║
+    ║   3. SCRIPT    — see the JS TABLE OF CONTENTS block at the top of      ║
+    ║                  the main script for section map                       ║
+    ║                                                                        ║
+    ║  KEY CONCEPTS                                                          ║
+    ║   • Lane          — a board row (product line / topic / theme)         ║
+    ║   • Project card  — scored initiative (Benefit + Innovation → Score)   ║
+    ║   • Bundle        — a release grouping of cards                        ║
+    ║   • Strategic goal— a north-star card, linkable via connections        ║
+    ║   • User Needs    — WHY we tackle it (8 categories, tags + filter)     ║
+    ║   • Customer Benefit — HOW strongly it pays off (feeds the score)      ║
+    ║                                                                        ║
+    ║  FILTER MODEL (all use "full set = everything visible")                ║
+    ║   Score · User Needs · Status  +  master All-on/off toggle             ║
+    ║                                                                        ║
+    ║  CONNECTIONS                                                           ║
+    ║   Add / Delete one / Delete all / Hide · Focus mode · Critical path.   ║
+    ║   Directional arrowheads; colour reflects blocking vs. informal.       ║
+    ╚═══════════════════════════════════════════════════════════════════════╝
     -->
     <style>
 
@@ -86,16 +101,16 @@
         .filter-bar { background: #edf2f0; padding: 0; border-radius: 4px; box-shadow: 0 1.6px 3.6px rgba(0,0,0,0.132); margin-bottom: 10px; display: flex; align-items: stretch; flex-wrap: wrap; overflow: hidden; }
         .filter-bar label { font-size: 12px; font-weight: 600; color: var(--text-main); }
         .filter-bar select, .filter-bar input[type="text"] { padding: 5px 9px; border: 1px solid var(--border); border-radius: 2px; background: #fff; color: var(--text-main); font-size: 12px; }
-        .filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; opacity: 0.45; }
-        .filter-chip.active { border-color: var(--primary); opacity: 1; }
-        .chip-score-high   { background: #e8f0d8; color: #4a6020; border-color: #94b654; }
-        .chip-score-medium { background: #fff4ce; color: #835600; border-color: #f39200; }
-        .chip-score-low    { background: #ede9e8; color: #595857; border-color: #bfb1ac; }
-        .chip-idea    { background: #ede9e8; color: #595857; }
-        .chip-planned { background: #d0d5e0; color: #18274a; }
-        .chip-active  { background: #fff4ce; color: #835600; }
-        .chip-done    { background: #e8f0d8; color: #4a6020; }
-        .chip-blocked { background: #fae0e3; color: #8a2030; }
+        .filter-chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 10px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; background:#ede9e8; color:#495a6b; }
+        .filter-chip.active { background:#495a6b; color:white; border-color:#495a6b; }
+        .chip-score-high { background:#ede9e8; color:#495a6b; }
+        .chip-score-medium { background:#ede9e8; color:#495a6b; }
+        .chip-score-low { background:#ede9e8; color:#495a6b; }
+        .chip-idea { background:#ede9e8; color:#495a6b; }
+        .chip-planned { background:#ede9e8; color:#495a6b; }
+        .chip-active { background:#ede9e8; color:#495a6b; }
+        .chip-done { background:#ede9e8; color:#495a6b; }
+        .chip-blocked { background:#ede9e8; color:#495a6b; }
         .view-toggle { margin-left: auto; display: flex; gap: 6px; }
         .view-btn { padding: 4px 12px; font-size: 12px; border: 1px solid var(--border-hover); background: #fff; color: var(--text-main); border-radius: 2px; cursor: pointer; font-weight: 600; }
         .view-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
@@ -433,7 +448,50 @@
         .inno-list li { font-size:9px; color:#18274a; line-height:1.5; text-align:left !important; }
         .inno-footer { margin-top:10px; font-size:9px; color:#bfb1ac; text-align:right; }
 
-        </style>
+        
+        /* ═══ UNIFIED TOOLBAR BUTTONS ═══════════════════════════════════════════ */
+        /* Add-to-board actions: filled dark navy */
+        .add-btn { background:#18274a; color:#fff; border:1px solid #18274a; padding:6px 12px; border-radius:4px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+        .add-btn:hover { background:#22345e; border-color:#22345e; }
+        .add-btn svg { flex-shrink:0; }
+        /* Utility actions (connections, save/load): sleek grey bg, blue text + border */
+        .util-btn { background:#f5f2f1; color:#18274a; border:1px solid #d4cac8; padding:6px 12px; border-radius:4px; font-size:12px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+        .util-btn:hover { background:#ece7e5; border-color:#bfb1ac; }
+        .util-btn svg { flex-shrink:0; stroke:#18274a; }
+        .util-btn.util-active { background:#18274a; color:#fff; border-color:#18274a; }
+        .util-btn.util-active svg { stroke:#fff; }
+
+
+        /* ═══ USER NEEDS ════════════════════════════════════════════════════════ */
+        .un-tag { display:inline-flex; align-items:center; font-size:10px; font-weight:500; padding:2px 7px; border-radius:10px; white-space:nowrap; background:#ede9e8; color:#495a6b; border:0.5px solid #d4cac8; }
+        .un-tag-row { display:flex; flex-wrap:wrap; gap:4px; padding-top:6px; margin-top:4px; border-top:0.5px solid #e9e4e3; }
+        .un-tag-compact { display:inline-flex; align-items:center; font-size:9px; font-weight:500; padding:1px 5px; border-radius:8px; background:#ede9e8; color:#495a6b; margin:2px 2px 0 0; }
+        .un-chip-modal { display:inline-flex; align-items:center; font-size:11px; font-weight:500; padding:4px 10px; border-radius:10px; cursor:pointer; background:#ede9e8; color:#495a6b; border:1.5px solid transparent; user-select:none; }
+        .un-chip-modal.selected { border-color:#495a6b; }
+        .un-filter-chip { font-size:11px; font-weight:500; padding:4px 10px; border-radius:10px; cursor:pointer; background:#ede9e8; color:#495a6b; border:1.5px solid transparent; }
+        .un-filter-chip.active { background:#495a6b; color:white; }
+        .un-info-btn { width:15px; height:15px; border-radius:50%; border:1.5px solid #bfb1ac; background:white; color:#8b7e79; font-size:9px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; line-height:1; padding:0; font-style:italic; font-family:Georgia,serif; }
+        /* User Needs info overlay */
+        #un-info-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.45); z-index:3000; display:none; align-items:center; justify-content:center; padding:20px; }
+        #un-info-overlay.visible { display:flex; }
+        .un-info-panel { background:#fff; border:0.5px solid #d4cac8; border-radius:12px; padding:20px 24px; width:560px; max-width:95vw; max-height:90vh; overflow-y:auto; text-align:left; }
+        .un-info-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #18274a; }
+        .un-info-title { font-size:16px; font-weight:600; color:#18274a; }
+        .un-info-close { background:none; border:none; font-size:22px; color:#8b7e79; cursor:pointer; line-height:1; padding:0 4px; }
+        .un-info-row { margin-bottom:16px; }
+        .un-info-cat { display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:10px; background:#ede9e8; color:#495a6b; border:0.5px solid #d4cac8; margin-bottom:6px; }
+        .un-info-sub { font-size:12px; color:#595857; line-height:1.6; }
+
+
+        /* ═══ SEGMENTED TOGGLES (Filters master + View) ════════════════════════ */
+        .seg-toggle { display:inline-flex; border:1px solid #d4cac8; border-radius:6px; overflow:hidden; }
+        .seg-toggle button { padding:5px 12px; font-size:11px; font-weight:500; cursor:pointer; color:#495a6b; background:#f5f2f1; border:none; border-right:1px solid #d4cac8; display:inline-flex; align-items:center; gap:5px; }
+        .seg-toggle button:last-child { border-right:none; }
+        .seg-toggle button.seg-active { background:#495a6b; color:#fff; }
+        .seg-toggle button.seg-active svg { stroke:#fff; }
+        .seg-toggle button svg { stroke:#495a6b; }
+
+</style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
@@ -617,6 +675,21 @@
             </div>
         </div>
 
+        <!-- Gruppe: User Needs -->
+        <div class="cb-group">
+            <div class="cb-group-label">User Needs</div>
+            <div class="cb-group-content" id="un-filter-group" style="flex-wrap:wrap;gap:4px;">
+                <div class="un-filter-chip active" data-need="Clinical Value" onclick="setUnFilter(this)">Clinical</div>
+                <div class="un-filter-chip active" data-need="Patient Safety" onclick="setUnFilter(this)">Safety</div>
+                <div class="un-filter-chip active" data-need="Workflow & Usability" onclick="setUnFilter(this)">Workflow</div>
+                <div class="un-filter-chip active" data-need="Connectivity" onclick="setUnFilter(this)">Connectivity</div>
+                <div class="un-filter-chip active" data-need="Economic Value" onclick="setUnFilter(this)">Economic</div>
+                <div class="un-filter-chip active" data-need="Compliance & Trust" onclick="setUnFilter(this)">Compliance</div>
+                <div class="un-filter-chip active" data-need="Operational Excellence" onclick="setUnFilter(this)">Operations</div>
+                <div class="un-filter-chip active" data-need="Evidence & Innovation" onclick="setUnFilter(this)">Evidence</div>
+            </div>
+        </div>
+
         <!-- Gruppe: Status -->
         <div class="cb-group">
             <div class="cb-group-label">Status</div>
@@ -629,12 +702,25 @@
             </div>
         </div>
 
+        <!-- Gruppe: Filters master toggle -->
+        <div class="cb-group">
+            <div class="cb-group-label">Filters</div>
+            <div class="cb-group-content">
+                <div class="seg-toggle">
+                    <button id="filters-all-on" class="seg-active" onclick="setAllFilters(true)" title="Show everything — reset all filters"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/><circle cx="8" cy="8" r="2"/></svg> All on</button>
+                    <button id="filters-all-off" onclick="setAllFilters(false)" title="Hide everything — then reveal step by step"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 2l12 12M6.5 6.6A2 2 0 0 0 8 10a2 2 0 0 0 1.4-.6M4 4.5C2.3 5.6 1 8 1 8s2.5 5 7 5c1.2 0 2.3-.3 3.2-.8M7 3.1A7 7 0 0 1 8 3c4.5 0 7 5 7 5a13 13 0 0 1-1.7 2.3"/></svg> All off</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Gruppe: Ansicht -->
         <div class="cb-group">
             <div class="cb-group-label">View</div>
             <div class="cb-group-content">
-                <button class="view-btn active" id="view-full-btn"    onclick="setView('full')">Full</button>
-                <button class="view-btn"        id="view-compact-btn" onclick="setView('compact')">Compact</button>
+                <div class="seg-toggle">
+                    <button id="view-full-btn" class="seg-active" onclick="setView('full')">Full</button>
+                    <button id="view-compact-btn" onclick="setView('compact')">Compact</button>
+                </div>
             </div>
         </div>
 
@@ -653,42 +739,24 @@
     <div class="control-bar">
 
         <div class="cb-group">
-            <div class="cb-group-label">New Project</div>
+            <div class="cb-group-label">Add to board</div>
             <div class="cb-group-content">
-                <input type="text" id="new-title" placeholder="Project name..." style="width:150px;">
-                <select id="select-product"></select>
-                <select id="select-horizon">
-                    <option value="y2026">2026 — Short Term</option>
-                    <option value="y2027">2027 — Short Term</option>
-                    <option value="y2028">2028 — Mid Term</option>
-                    <option value="y2029">2029 — Mid Term</option>
-                    <option value="y2030">2030 — Mid Term</option>
-                    <option value="y2031_33">2031–2033 — Long Term</option>
-                    <option value="y2034_35">2034–2035 — Long Term</option>
-                    <option value="vision">2036+ — BU Vision</option>
-                </select>
-                <button onclick="addNewProjectCard()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M8 2v12M2 8h12"/></svg> Add card</button>
-            </div>
-        </div>
-
-        <div class="cb-group">
-            <div class="cb-group-label">Product Lines</div>
-            <div class="cb-group-content">
-                <button class="action-green" onclick="promptAddNewProductLine()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 8h12M8 3v5M3 13h10"/></svg> Add product line</button>
-                <button class="secondary" onclick="createContainer()" style="border-color:#4a7c2f;color:#4a7c2f;" title="Create a new bundle"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#4a7c2f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M2 5l6-3 6 3v6l-6 3-6-3V5z"/><path d="M8 2v12M2 5l6 3 6-3"/></svg> Add bundle</button>
-                <button class="secondary" onclick="createStrategicGoal()" style="border-color:#31b7bc;color:#1a8a8f;" title="Create a new strategic goal card"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a8a8f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><circle cx="8" cy="6" r="3"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg> Add strategic goal</button>
+                <button class="add-btn" onclick="promptAddNewProductLine()" title="Start here — add a new lane (product line, topic or theme)"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12M2 8h12M2 12h7"/></svg> New lane</button>
+                <button class="add-btn" onclick="openNewCardDialog()" title="Add a new project card to a lane"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M8 5.5v5M5.5 8h5"/></svg> New project card</button>
+                <button class="add-btn" onclick="createContainer()" title="Add a release bundle"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5l6-3 6 3v6l-6 3-6-3V5z"/><path d="M8 2v12M2 5l6 3 6-3"/></svg> New bundle</button>
+                <button class="add-btn" onclick="createStrategicGoal()" title="Add a strategic goal card"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="6" r="3"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg> New strategic goal</button>
             </div>
         </div>
 
         <div class="cb-group">
             <div class="cb-group-label">Connections</div>
             <div class="cb-group-content">
-                <button class="secondary" onclick="toggleDependencyMode()" id="dep-btn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add</button>
-                <button class="secondary" onclick="deleteSingleConnectionMode()" id="dep-del-btn" style="border-color:#f39200;color:#8a4500;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#8a4500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><path d="M5.5 4.5l7-1.5M5.5 11.5l7 1.5M12 8h2"/></svg> Delete one</button>
-                <button class="secondary" onclick="clearConnections()" style="border-color:#f1707b;color:#a80000;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#a80000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete all</button>
-                <button id="btn-toggle-connections" onclick="toggleConnections()" title="Show / hide all connections" style="background:white;color:#18274a;border:1px solid #d4cac8;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg> Hide connections</button>
-                <button id="focus-mode-btn" onclick="toggleFocusMode()" title="Click a card to see only its direct dependencies" style="background:white;color:#2F6F6B;border:1px solid #2F6F6B;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" opacity="0.4"/></svg> Focus mode</button>
-                <button id="critical-path-btn" onclick="toggleCriticalPathMode()" title="Click a card to trace the longest dependency chain (blocking & related) leading to it" style="background:white;color:#C4522F;border:1px solid #C4522F;border-radius:3px;padding:4px 10px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:5px;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 L9 9 L14 14 L20 4"/></svg> Critical path</button>
+                <button class="util-btn" onclick="toggleDependencyMode()" id="dep-btn"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l2-2a2 2 0 0 1 2.8 2.8l-4 4a2 2 0 0 1-2.8 0"/><path d="M6 10l-2 2a2 2 0 0 1-2.8-2.8l4-4a2 2 0 0 1 2.8 0"/></svg> Add</button>
+                <button class="util-btn" onclick="deleteSingleConnectionMode()" id="dep-del-btn"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="4" r="1.5"/><circle cx="4" cy="12" r="1.5"/><path d="M5.5 4.5l7-1.5M5.5 11.5l7 1.5M12 8h2"/></svg> Delete one</button>
+                <button class="util-btn" onclick="clearConnections()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h10M5 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M6 8v5M8 8v5M10 8v5M4 5l1 9h6l1-9"/></svg> Delete all</button>
+                <button class="util-btn" id="btn-toggle-connections" onclick="toggleConnections()" title="Show / hide all connections"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round"><path d="M2 4h12M4 8h8M6 12h4"/></svg> Hide</button>
+                <button class="util-btn" id="focus-mode-btn" onclick="toggleFocusMode()" title="Click a card to see only its direct dependencies"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" opacity="0.4"/></svg> Focus mode</button>
+                <button class="util-btn" id="critical-path-btn" onclick="toggleCriticalPathMode()" title="Click a card to trace the longest dependency chain leading to it"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19 L9 9 L14 14 L20 4"/></svg> Critical path</button>
                 <span id="conn-mode-hint"></span>
             </div>
         </div>
@@ -696,22 +764,22 @@
         <div class="cb-group">
             <div class="cb-group-label">Save &amp; Load</div>
             <div class="cb-group-content">
-                <button id="btn-export-json" onclick="exportStrategyBoard()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M3 2h8l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M5 2v4h6V2M5 11h6"/></svg> Export JSON</button>
+                <button class="util-btn" id="btn-export-json" onclick="exportStrategyBoard()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2h8l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M5 2v4h6V2M5 11h6"/></svg> Export JSON</button>
                 <input type="file" id="import-file" style="display:none" onchange="importStrategyBoard(this.files[0])">
-                <button class="secondary" id="btn-import-json" onclick="document.getElementById('import-file').click()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;"><path d="M2 4a1 1 0 0 1 1-1h3l2 2h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/></svg> Import JSON</button>
+                <button class="util-btn" id="btn-import-json" onclick="document.getElementById('import-file').click()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4a1 1 0 0 1 1-1h3l2 2h5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/></svg> Import JSON</button>
                 <input type="file" id="chase-merge-file" style="display:none" accept=".json" onchange="chaseMergePromptPassword(this.files[0])">
-                <button class="secondary" onclick="document.getElementById('chase-merge-file').click()" style="border-color:#c07000;color:#c07000;" title="Merge a colleague&#39;s JSON into this board (password protected)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#c07000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:4px;"><circle cx="5" cy="5" r="2"/><circle cx="11" cy="5" r="2"/><circle cx="8" cy="11" r="2"/><path d="M7 5h-1M10 5h-1M6.5 8.5l1 1.5M9.5 8.5l-1 1.5"/></svg> Chase Merge</button>
-                <button class="secondary" onclick="exportBoardPNG()" title="Export board as high-resolution PNG"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;flex-shrink:0;margin-right:4px;"><rect x="1" y="1" width="14" height="14" rx="2"/><circle cx="5" cy="5" r="1.5"/><path d="M1 11l4-4 3 3 2-2 5 5"/></svg> Export PNG</button>
+                <button class="util-btn" onclick="document.getElementById('chase-merge-file').click()" title="Merge a colleague&#39;s JSON into this board (password protected)"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="2"/><circle cx="11" cy="5" r="2"/><circle cx="8" cy="11" r="2"/><path d="M7 5h-1M10 5h-1M6.5 8.5l1 1.5M9.5 8.5l-1 1.5"/></svg> Chase Merge</button>
+                <button class="util-btn" onclick="exportBoardPNG()" title="Export board as high-resolution PNG"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="14" height="14" rx="2"/><circle cx="5" cy="5" r="1.5"/><path d="M1 11l4-4 3 3 2-2 5 5"/></svg> Export PNG</button>
             </div>
         </div>
 
-    </div>
+        </div>
 
     </div><div class="board-scroll-area" id="board-scroll-area">
     <div style="position:relative; width:max-content; min-width:100%;">
         <svg id="connections-svg"></svg>
         <div class="strategy-board" id="strategy-board">
-            <div class="board-header">Product lines</div>
+            <div class="board-header">Lanes</div>
             <div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div>
             <div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div>
             <div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div>
@@ -726,6 +794,28 @@
 
     <script>
 
+    /* ═══════════════════════════════════════════════════════════════════════
+       JS TABLE OF CONTENTS  —  major sections in this script, in order
+       ───────────────────────────────────────────────────────────────────────
+       1.  BOARD-IN-BOARD        sub-board navigation, rebuildBoardDOM
+       2.  STATE                 productLines, projectsData, containersData,
+                                 goalsData, connectionsList
+       3.  SCORING               computeStrategicScore (Benefit + Innovation)
+       4.  RENDERING             createProjectCard, renderCardContent,
+                                 addNewProductLineVisual (lanes), bundles, goals
+       5.  MODALS                openProjectModal, save*, strategic-goal popup
+       6.  FILTERS               Score / User Needs / Status chips,
+                                 setAllFilters master toggle, applyFilters,
+                                 setView (Full / Compact)
+       7.  CONNECTIONS           dependency mode, redrawAllConnections (arrows),
+                                 Focus mode, Critical path, hover highlight
+       8.  INFO OVERLAYS         Score, Innovation Types, User Needs
+       9.  IMPORT / EXPORT       JSON export/import, Chase Merge, PNG export
+       10. WELCOME / DEMO        welcome screen, demo board seed data
+       ═══════════════════════════════════════════════════════════════════════ */
+
+
+
     // ═══════════════════════════════════════════════════════════════════════
     // BOARD-IN-BOARD: navigation between master board and one sub-board level
     // ═══════════════════════════════════════════════════════════════════════
@@ -736,7 +826,7 @@
     // Used when entering or leaving a sub-board.
     function rebuildBoardDOM() {
         var board = document.getElementById('strategy-board');
-        if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+        if (board) board.innerHTML = '<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
         var svg = document.getElementById('connections-svg');
         if (svg) svg.innerHTML = '';
 
@@ -885,7 +975,7 @@
     var activeContainerId = null;
 
     function createContainer() {
-        if (!productLines.length) { showAlert('Add a product line first.'); return; }
+        if (!productLines.length) { showAlert('Add a lane first.'); return; }
         var o = document.getElementById('container-create-overlay');
         if (!o) {
             o = document.createElement('div');
@@ -896,7 +986,7 @@
             inner.innerHTML = '<div style="font-size:15px;font-weight:600;color:#18274a;margin-bottom:16px;">New Bundle</div>'
                 + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Title</label>'
                 + '<input id="cc-title" type="text" placeholder="e.g. Software Release 2.0" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;box-sizing:border-box;"></div>'
-                + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Product Line</label>'
+                + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Lane</label>'
                 + '<select id="cc-line" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;"></select></div>'
                 + '<div style="margin-bottom:20px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Year Column</label>'
                 + '<select id="cc-horiz" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;">'
@@ -1265,13 +1355,66 @@
             if(activeScoreFilters.has(level)) activeScoreFilters.delete(level);
             else activeScoreFilters.add(level);
             el.classList.toggle('active', activeScoreFilters.has(level));
+            _syncMasterToggle();
             applyFilters();
         }
 
     // Status-Filter-Chip ein/ausschalten
         function toggleStatusFilter(status,el) {
             if(activeStatusFilters.has(status)) activeStatusFilters.delete(status); else activeStatusFilters.add(status);
-            el.classList.toggle('active'); applyFilters();
+            el.classList.toggle('active'); _syncMasterToggle(); applyFilters();
+        }
+
+    // ── User Needs multi-select filter ────────────────────────────────────────
+        var UN_ALL = ['Clinical Value','Patient Safety','Workflow & Usability','Connectivity','Economic Value','Compliance & Trust','Operational Excellence','Evidence & Innovation'];
+        var activeUnFilters = new Set(UN_ALL); // full = show all (same logic as score/status)
+        function setUnFilter(el) {
+            var need = el.dataset.need;
+            if (activeUnFilters.has(need)) activeUnFilters.delete(need);
+            else activeUnFilters.add(need);
+            el.classList.toggle('active', activeUnFilters.has(need));
+            _syncMasterToggle();
+            applyFilters();
+        }
+        // Reflect current filter state on the master All on/off toggle
+        function _syncMasterToggle() {
+            var allOn = activeScoreFilters.size===3 && activeStatusFilters.size===5 && activeUnFilters.size===UN_ALL.length;
+            var onBtn = document.getElementById('filters-all-on');
+            var offBtn = document.getElementById('filters-all-off');
+            if (onBtn) onBtn.classList.toggle('seg-active', allOn);
+            if (offBtn) offBtn.classList.toggle('seg-active', false);
+        }
+        function openUnInfo() { document.getElementById('un-info-overlay').classList.add('visible'); }
+        function closeUnInfo() { document.getElementById('un-info-overlay').classList.remove('visible'); }
+
+    // ── Master toggle: activate / deactivate ALL filters at once ──────────────
+        function setAllFilters(on) {
+            if (on) {
+                // Everything visible — all filter sets full
+                activeScoreFilters = new Set(['low','medium','high']);
+                activeStatusFilters = new Set(['idea','planned','active','done','blocked']);
+                activeUnFilters = new Set(UN_ALL);
+            } else {
+                // Nothing visible — exploration mode, reveal step by step
+                activeScoreFilters.clear();
+                activeStatusFilters.clear();
+                activeUnFilters.clear();
+            }
+            // Sync chip visual states
+            document.querySelectorAll('.filter-chip.chip-score-high,.filter-chip.chip-score-medium,.filter-chip.chip-score-low').forEach(function(c){
+                var lvl = c.classList.contains('chip-score-high')?'high':c.classList.contains('chip-score-medium')?'medium':'low';
+                c.classList.toggle('active', activeScoreFilters.has(lvl));
+            });
+            document.querySelectorAll('.filter-chip[data-status]').forEach(function(c){
+                c.classList.toggle('active', activeStatusFilters.has(c.dataset.status));
+            });
+            document.querySelectorAll('#un-filter-group .un-filter-chip').forEach(function(c){
+                c.classList.toggle('active', activeUnFilters.has(c.dataset.need));
+            });
+            // Sync the master toggle itself
+            document.getElementById('filters-all-on').classList.toggle('seg-active', on);
+            document.getElementById('filters-all-off').classList.toggle('seg-active', !on);
+            applyFilters();
         }
 
     // Filter anwenden (Suche, Status, Score)
@@ -1297,28 +1440,32 @@
                 }
                 var score = calcScore(d);
                 var scoreLvl = score>=45?'high':score>=25?'medium':'low';
-                var ok = (!search || d.title.toLowerCase().indexOf(search)>=0 ||
-                          (d.description||'').toLowerCase().indexOf(search)>=0 ||
-                          (d.persona||'').toLowerCase().indexOf(search)>=0) &&
+                var ok = (!search || d.title.toLowerCase().indexOf(search)>=0) &&
                          activeStatusFilters.has(d.status||'idea') &&
-                         activeScoreFilters.has(scoreLvl);
+                         activeScoreFilters.has(scoreLvl) &&
+                         ((d.userNeeds||[]).length===0 ? true : (d.userNeeds||[]).some(function(n){return activeUnFilters.has(n);}));
                 card.style.display = ok ? '' : 'none';
                 var wrap = document.getElementById('wrap-'+id);
                 if(wrap) wrap.style.display = ok ? '' : 'none';
             });
 
-            // Show/hide bundles: visible if search matches any contained card or bundle title
+            // Show/hide bundles: respect BOTH search and User Needs filter.
             Object.keys(containersData).forEach(function(cid){
                 var bundleEl = document.getElementById(cid); if(!bundleEl) return;
                 var c = containersData[cid]; if(!c) return;
-                if(!search) { bundleEl.style.display = ''; return; }
-                var titleMatch = c.title.toLowerCase().indexOf(search) >= 0;
-                var cardMatch = c.cardIds.some(function(id){
+                var titleMatch = search ? (c.title.toLowerCase().indexOf(search) >= 0) : false;
+                var anyCardPasses = c.cardIds.some(function(id){
                     var d = projectsData[id]; if(!d) return false;
-                    return d.title.toLowerCase().indexOf(search) >= 0 ||
-                           (d.description||'').toLowerCase().indexOf(search) >= 0;
+                    var sOk = !search || d.title.toLowerCase().indexOf(search) >= 0;
+                    var unOk = (d.userNeeds||[]).length===0 ||
+                               (d.userNeeds||[]).some(function(n){return activeUnFilters.has(n);});
+                    return sOk && unOk;
                 });
-                bundleEl.style.display = (titleMatch || cardMatch) ? '' : 'none';
+                var show;
+                var unFilterActive = activeUnFilters.size < UN_ALL.length; // some deselected
+                if (unFilterActive) show = anyCardPasses;
+                else show = titleMatch || anyCardPasses || !search;
+                bundleEl.style.display = show ? '' : 'none';
             });
 
             // Show/hide strategic goal cards by search text only (no status/score)
@@ -1338,8 +1485,8 @@
     // Ansicht wechseln: "full" (normal) oder "compact" (schmale Karten)
         function setView(mode) {
             currentView=mode;
-            document.getElementById('view-full-btn').classList.toggle('active',mode==='full');
-            document.getElementById('view-compact-btn').classList.toggle('active',mode==='compact');
+            document.getElementById('view-full-btn').classList.toggle('seg-active',mode==='full');
+            document.getElementById('view-compact-btn').classList.toggle('seg-active',mode==='compact');
             document.getElementById('strategy-board').classList.toggle('board-compact',mode==='compact');
             if(mode==='compact') document.querySelectorAll('.prestudy-panel.ps-open').forEach(function(p){p.classList.remove('ps-open');});
             Object.keys(projectsData).forEach(function(id){
@@ -1425,7 +1572,7 @@
     // Produktlinien-Dropdown im Control Bar synchronisieren
         function syncProductDropdown() {
             ['select-product'].forEach(function(sid) {
-                var s=document.getElementById(sid); var cur=s.value;
+                var s=document.getElementById(sid); if(!s) return; var cur=s.value;
                 s.innerHTML='';
                 productLines.forEach(function(line){var o=document.createElement('option');o.value=line.id;o.text=line.title||'Unnamed';s.appendChild(o);});
                 if(cur) s.value=cur;
@@ -1439,13 +1586,14 @@
 
     // Eingabe-Popup öffnen und neue Produktlinie anlegen
         function promptAddNewProductLine() {
-            showPrompt('Add product line', 'Product line name...', function(name) {
+            var suggested = 'Lane ' + (productLines.length + 1);
+            showPrompt('Add lane', 'Lane name...', function(name) {
                 try {
-                    addNewProductLineVisual("prod-"+Date.now(), name);
+                    addNewProductLineVisual("prod-"+Date.now(), (name && name.trim()) ? name.trim() : suggested);
                 } catch(err) {
-                    showAlert('Error adding product line: ' + err.message);
+                    showAlert('Error adding lane: ' + err.message);
                 }
-            });
+            }, false, suggested);
         }
 
     // Neue Produktlinie als Grid-Zeile mit 8 Jahres-Zellen einfügen
@@ -1479,7 +1627,7 @@
             var delBtn = document.createElement('span');
             delBtn.className = 'delete-lane-btn';
             delBtn.dataset.delid = id;
-            delBtn.title = 'Delete product line';
+            delBtn.title = 'Delete lane';
             delBtn.innerHTML = '&times;';
             // Click-Handler direkt auf Button — löscht diese Produktlinie
             delBtn.addEventListener('click', function(e) {
@@ -1563,7 +1711,7 @@
 
     // Produktlinie mit allen Karten löschen (nach Bestätigung)
         function deleteProductLine(id) {
-            showConfirm('Delete product line?','This will delete the product line and all its cards. Cannot be undone.',function() {
+            showConfirm('Delete lane?','This will delete the lane and all its cards. Cannot be undone.',function() {
                 ['title-box-'+id,id+'-y2026',id+'-y2027',id+'-y2028',id+'-y2029',id+'-y2030',id+'-y2031_33',id+'-y2034_35',id+'-vision'].forEach(function(sel){var el=document.getElementById(sel);if(el)el.remove();});
                 // Remove card wrappers belonging to this lane
     
@@ -1624,14 +1772,56 @@
     // ║  Karten erstellen, rendern, verschieben, löschen                 ║
     // ╚══════════════════════════════════════════════════════════════════╝
 
-    // Neue Karte aus Control Bar anlegen
-        function addNewProjectCard() {
-            var ti=document.getElementById('new-title');
-            var prod=document.getElementById('select-product').value;
-            var horiz=document.getElementById('select-horizon').value;
-            if(!prod){ showAlert('Please create a product line first!'); return; }
-            if(!ti.value.trim()){ showAlert('Please enter a project name!'); return; }
-            createProjectCard(prod,horiz,ti.value.trim()); ti.value='';
+    // Neue Projektkarte via Popup-Dialog (statt Toolbar-Eingabefeld)
+        function openNewCardDialog() {
+            if (!productLines.length) { showAlert('Add a lane first.'); return; }
+            var o = document.getElementById('newcard-create-overlay');
+            if (!o) {
+                o = document.createElement('div');
+                o.id = 'newcard-create-overlay';
+                o.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:2001;';
+                var inner = document.createElement('div');
+                inner.style.cssText = 'background:white;border-radius:4px;padding:24px;width:420px;box-shadow:0 25px 50px rgba(0,0,0,0.25);';
+                inner.innerHTML = '<div style="font-size:15px;font-weight:600;color:#18274a;margin-bottom:16px;">New project card</div>'
+                    + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Card title</label>'
+                    + '<input id="ncc-title" type="text" placeholder="e.g. Sensor Fusion Baseline" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;box-sizing:border-box;"></div>'
+                    + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Lane</label>'
+                    + '<select id="ncc-line" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;"></select></div>'
+                    + '<div style="margin-bottom:20px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Year column</label>'
+                    + '<select id="ncc-horiz" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;">'
+                    + '<option value="y2026">2026 - Short Term</option>'
+                    + '<option value="y2027">2027 - Short Term</option>'
+                    + '<option value="y2028">2028 - Mid Term</option>'
+                    + '<option value="y2029">2029 - Mid Term</option>'
+                    + '<option value="y2030">2030 - Mid Term</option>'
+                    + '<option value="y2031_33">2031-33 - Long Term</option>'
+                    + '<option value="y2034_35">2034-35 - Long Term</option>'
+                    + '<option value="vision">2036+ - BU Vision</option>'
+                    + '</select></div>'
+                    + '<div style="display:flex;gap:8px;justify-content:flex-end;">'
+                    + '<button onclick="newCardCreateConfirm()" style="background:#18274a;color:white;border:none;border-radius:3px;padding:8px 18px;font-size:13px;cursor:pointer;">Create</button>'
+                    + '<button onclick="newCardCreateCancel()" style="background:white;color:#595857;border:1px solid #d4cac8;border-radius:3px;padding:8px 14px;font-size:13px;cursor:pointer;">Cancel</button>'
+                    + '</div>';
+                o.appendChild(inner);
+                document.body.appendChild(o);
+            }
+            var sel = document.getElementById('ncc-line');
+            sel.innerHTML = productLines.map(function(l){ return '<option value="'+l.id+'">'+l.title+'</option>'; }).join('');
+            o.style.display = 'flex';
+            var h = document.getElementById('ncc-horiz'); if (h) h.value = 'y2026';
+            setTimeout(function(){ var t=document.getElementById('ncc-title'); if(t){t.value='';t.focus();} }, 60);
+        }
+        function newCardCreateCancel() {
+            var o=document.getElementById('newcard-create-overlay'); if(o) o.style.display='none';
+        }
+        function newCardCreateConfirm() {
+            var title=(document.getElementById('ncc-title')||{}).value||'';
+            title=title.trim();
+            if(!title){ var t=document.getElementById('ncc-title'); if(t) t.focus(); return; }
+            var lineId=document.getElementById('ncc-line').value;
+            var horiz=document.getElementById('ncc-horiz').value;
+            newCardCreateCancel();
+            createProjectCard(lineId, horiz, title);
         }
 
     // Projektkarte im DOM erzeugen (Wrapper + Pre-Study-Tab + Karte)
@@ -1825,6 +2015,24 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 tlDiv.appendChild(svg);
                 card.appendChild(tlDiv);
             }
+            // User needs tags (full view: pill row; compact: tiny pills)
+            var _uns = d.userNeeds || [];
+            if (_uns.length > 0) {
+                if (currentView === 'compact') {
+                    var _unC = document.createElement('div');
+                    _unC.style.cssText = 'display:flex;flex-wrap:wrap;margin-top:3px;';
+                    var _shortMapC = {'Clinical Value':'Clinical','Patient Safety':'Safety','Workflow & Usability':'Workflow','Connectivity':'Connectivity','Economic Value':'Economic','Compliance & Trust':'Compliance','Operational Excellence':'Operations','Evidence & Innovation':'Evidence'};
+                    _uns.forEach(function(n){ var t=document.createElement('span'); t.className='un-tag-compact';
+                        t.textContent = (_shortMapC[n]||n); t.title = n; _unC.appendChild(t); });
+                    card.appendChild(_unC);
+                } else {
+                    var _unRow = document.createElement('div');
+                    _unRow.className = 'un-tag-row';
+                    var _shortMap = {'Clinical Value':'Clinical','Patient Safety':'Safety','Workflow & Usability':'Workflow','Connectivity':'Connectivity','Economic Value':'Economic','Compliance & Trust':'Compliance','Operational Excellence':'Operations','Evidence & Innovation':'Evidence'};
+                    _uns.forEach(function(n){ var t=document.createElement('span'); t.className='un-tag'; t.textContent=(_shortMap[n]||n); t.title=n; _unRow.appendChild(t); });
+                    card.appendChild(_unRow);
+                }
+            }
         }
 
     // Kartenvorschau nach Modal-Speicherung aktualisieren
@@ -1911,7 +2119,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             activeProjectId = null;
             _modalOpenSnapshot = null;
             var board = document.getElementById('strategy-board');
-            if(board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+            if(board) board.innerHTML = '<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
             var svg = document.getElementById('connections-svg');
             if(svg) svg.innerHTML = '';
             document.getElementById('modal-overlay').style.display = 'none';
@@ -1940,7 +2148,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     var goalsData = {};
 
     function createStrategicGoal() {
-        if (!productLines.length) { showAlert('Add a product line first.'); return; }
+        if (!productLines.length) { showAlert('Add a lane first.'); return; }
         var o = document.getElementById('goal-create-overlay');
         if (!o) {
             o = document.createElement('div');
@@ -1951,7 +2159,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             inner.innerHTML = '<div style="font-size:15px;font-weight:600;color:#18274a;margin-bottom:16px;">New strategic goal</div>'
                 + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Goal title</label>'
                 + '<input id="gc-title" type="text" placeholder="e.g. Reduce checkout friction" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;box-sizing:border-box;"></div>'
-                + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Product line</label>'
+                + '<div style="margin-bottom:12px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Lane</label>'
                 + '<select id="gc-line" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;"></select></div>'
                 + '<div style="margin-bottom:20px;"><label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Year column</label>'
                 + '<select id="gc-horiz" style="width:100%;padding:7px 10px;border:1px solid #d4cac8;border-radius:3px;font-size:13px;">'
@@ -2111,7 +2319,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 function() {
                     d.subBoard = {
                         boardName: d.title || 'Sub-board',
-                        productLines: [{ id:'line-'+Date.now(), title:'Product line 1' }],
+                        productLines: [{ id:'line-'+Date.now(), title:'Lane 1' }],
                         projectsData: {}, connectionsList: [], containersData: {}, goalsData: {}
                     };
                     var tab = document.getElementById('sbtab-'+cardId);
@@ -2213,6 +2421,15 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             document.getElementById('modal-project-title').value=d.title;
             document.getElementById('modal-description').value=d.description||'';
             document.getElementById('modal-user-persona').value=d.persona||'';
+            (function(){
+                var unc=document.getElementById('modal-user-needs'); if(!unc) return;
+                unc.innerHTML=''; var sel=d.userNeeds||[];
+                ['Clinical Value','Patient Safety','Workflow & Usability','Connectivity','Economic Value','Compliance & Trust','Operational Excellence','Evidence & Innovation'].forEach(function(need){
+                    var ch=document.createElement('div'); ch.className='un-chip-modal'+(sel.indexOf(need)!==-1?' selected':'');
+                    ch.textContent=need; ch.addEventListener('click',function(){ch.classList.toggle('selected');});
+                    unc.appendChild(ch);
+                });
+            })();
             document.getElementById('modal-effort').value=d.effort||'M';
             document.getElementById('modal-cost').value=d.cost||'M';
             document.getElementById('modal-status').value=d.status||'idea'; updateStatusSelectColor(document.getElementById('modal-status'));
@@ -2233,6 +2450,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             d.cost=document.getElementById('modal-cost').value;
             d.status=document.getElementById('modal-status').value;
             d.competition=document.getElementById('modal-competition').value;
+            d.userNeeds=Array.from(document.querySelectorAll('#modal-user-needs .un-chip-modal.selected')).map(function(c){return c.textContent;});
             // connection type is managed per-connection
             for(var i=1;i<=4;i++) d.benefitValues[i-1]=parseInt(document.getElementById('b-val'+i).value);
             for(var i=1;i<=10;i++) d.innovationValues[i-1]=parseInt(document.getElementById('i-val'+i).value);
@@ -2658,6 +2876,20 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     // Alle Verbindungslinien im SVG neu zeichnen (mit Pill-Labels)
         function redrawAllConnections(highlightEdgeSet, highlightType){
             var svg=document.getElementById('connections-svg');svg.innerHTML='';
+            // Arrowhead markers (one per line colour used)
+            var _defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+            [['blocking','#e56b78'],['informal','#bfb1ac'],['critical','#C4522F'],['focus','#2F6F6B']].forEach(function(pair){
+                var m=document.createElementNS('http://www.w3.org/2000/svg','marker');
+                m.setAttribute('id','arrow-'+pair[0]);
+                m.setAttribute('viewBox','0 0 10 10');
+                m.setAttribute('refX','9'); m.setAttribute('refY','5');
+                m.setAttribute('markerWidth','5'); m.setAttribute('markerHeight','5');
+                m.setAttribute('orient','auto');
+                var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+                p.setAttribute('d','M 0 1 L 9 5 L 0 9 Z'); p.setAttribute('fill',pair[1]);
+                m.appendChild(p); _defs.appendChild(m);
+            });
+            svg.appendChild(_defs);
             connectionsList.forEach(function(conn,index){
                 var eF=document.getElementById(conn.from),eT=document.getElementById(conn.to);
                 if(!eF||!eT) return;
@@ -2697,6 +2929,10 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 path.setAttribute("stroke-width",lineWidth);
                 path.setAttribute("fill","none");
                 path.setAttribute("stroke-dasharray",dashArr);
+                // Direction arrow — marker colour matches the line state
+                var _mk = isBlocking ? 'blocking' : 'informal';
+                if (isHighlightMode && isHighlighted) _mk = (highlightType==='critical' ? 'critical' : 'focus');
+                path.setAttribute("marker-end","url(#arrow-"+_mk+")");
                 g.appendChild(path);
     
                 // Wide invisible hit area for clicking
@@ -2990,7 +3226,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     });
 
                     if (newLines.length === 0) {
-                        showAlert('Chase Merge: No new product lines found. All product lines already exist in this board.');
+                        showAlert('Chase Merge: No new lanes found. All lanes already exist in this board.');
                         return;
                     }
 
@@ -3392,7 +3628,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 try{
                     var data=JSON.parse(e.target.result);
                     var board=document.getElementById('strategy-board');
-                    board.innerHTML='<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+                    board.innerHTML='<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
                     productLines=[];projectsData={};containersData=data.containersData||{};goalsData=data.goalsData||{};connectionsList=data.connectionsList||[];
                     updateBoardName(data.boardName||'Untitled board');
                     data.productLines.forEach(function(l){addNewProductLineVisual(l.id,l.title);});
@@ -3440,16 +3676,16 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     // ╚══════════════════════════════════════════════════════════════════╝
 
     // Eingabe-Popup anzeigen (ersetzt nativen prompt())
-        function showPrompt(title, placeholder, onConfirm, isPassword) {
+        function showPrompt(title, placeholder, onConfirm, isPassword, defaultValue) {
             _promptCallback = onConfirm;
             var overlay = document.getElementById('input-popup-overlay');
             document.getElementById('input-popup-title').textContent = title;
             var field = document.getElementById('input-popup-field');
-            field.value = '';
+            field.value = defaultValue || '';
             field.placeholder = placeholder || '';
             field.type = isPassword ? 'password' : 'text';
             overlay.style.display = 'flex';
-            setTimeout(function(){ field.focus(); }, 60);
+            setTimeout(function(){ field.focus(); field.select(); }, 60);
         }
 
     // OK-Klick im Eingabe-Popup verarbeiten
@@ -3534,7 +3770,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     var _bc=document.getElementById('board-breadcrumb'); if(_bc) _bc.style.display='none';
                     // Board-HTML zurücksetzen
                     var board = document.getElementById('strategy-board');
-                    board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+                    board.innerHTML = '<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
                     document.getElementById('modal-overlay').style.display = 'none';
                     updateKpiStrip();
                     document.getElementById('welcome-overlay').style.display = 'flex';
@@ -3564,11 +3800,11 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         // Board-HTML zurücksetzen
         var board = document.getElementById('strategy-board');
-        if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+        if (board) board.innerHTML = '<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
         // Connections SVG leeren
         var svg = document.getElementById('connections-svg');
         if (svg) svg.innerHTML = '';
-        addNewProductLineVisual('prod-'+Date.now(), 'Product line 1');
+        addNewProductLineVisual('prod-'+Date.now(), 'Lane 1');
         syncProductDropdown();
         updateKpiStrip();
         updateEffortSummaries();
@@ -3601,7 +3837,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         updateBoardName('Untitled board');
         var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         var board = document.getElementById('strategy-board');
-        if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+        if (board) board.innerHTML = '<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
         importStrategyBoard(file);
     }
 
@@ -3624,7 +3860,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         updateBoardName('Untitled board');
         var _bc2=document.getElementById('board-breadcrumb'); if(_bc2) _bc2.style.display='none';
         var board = document.getElementById('strategy-board');
-        if (board) board.innerHTML = '<div class="board-header">Product lines</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
+        if (board) board.innerHTML = '<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
         var svg = document.getElementById('connections-svg');
         if (svg) svg.innerHTML = '';
         var overlay = document.getElementById('welcome-overlay');
@@ -3952,6 +4188,10 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                     <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">User Persona</label>
                     <textarea id="modal-user-persona" style="width:100%;height:65px;border:1px solid var(--border);border-radius:2px;padding:6px;font-size:12px;resize:vertical;box-sizing:border-box;" placeholder="Describe the primary user..."></textarea>
                 </div>
+                <div style="margin-top:8px;">
+                    <label style="font-size:11px;color:#8b7e79;display:flex;align-items:center;gap:6px;margin-bottom:6px;">User needs — why are we tackling this? <button class="un-info-btn" onclick="openUnInfo()" title="What does each category cover?" type="button">i</button></label>
+                    <div id="modal-user-needs" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+                </div>
             </div>
 
             <!-- Col 2: Sizing + Status + Score -->
@@ -4191,6 +4431,50 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             <button class="goal-modal-btn goal-modal-btn-primary" id="goal-modal-edit-btn" onclick="goalModalEnableEdit()">Edit</button>
         </div>
     </div>
+</div>
+
+<div id="un-info-overlay" onclick="if(event.target===this)closeUnInfo()">
+  <div class="un-info-panel">
+    <div class="un-info-header">
+      <span class="un-info-title">User needs — what each category covers</span>
+      <button class="un-info-close" onclick="closeUnInfo()" aria-label="Close">&times;</button>
+    </div>
+    <div style="font-size:11px;color:#8b7e79;line-height:1.6;margin-bottom:16px;padding:10px 12px;background:#f5f2f1;border-radius:6px;">
+      <strong style="color:#495a6b;">User needs</strong> describe <em>why</em> we tackle an initiative — the purpose it serves. They are separate from <strong style="color:#495a6b;">Customer Benefit</strong> (Revenue, Cost&nbsp;savings, Convenience, Clinical&nbsp;benefit), which measures <em>how strongly</em> it pays off and feeds the strategic score. Purpose vs. impact — two different lenses.
+    </div>
+    <div class="un-info-row">
+      <div class="un-info-cat">Clinical Value <span style="color:#8b7e79;font-weight:400;">→ Clinical</span></div>
+      <div class="un-info-sub">Better patient care: clinical outcomes, clinical confidence, diagnostic accuracy, decision support, early detection.</div>
+    </div>
+    <div class="un-info-row">
+      <div class="un-info-cat">Patient Safety <span style="color:#8b7e79;font-weight:400;">→ Safety</span></div>
+      <div class="un-info-sub">Minimise risk: error prevention, alarming, guideline adherence, risk reduction, therapy safety.</div>
+    </div>
+    <div class="un-info-row">
+      <div class="un-info-cat">Workflow &amp; Usability <span style="color:#8b7e79;font-weight:400;">→ Workflow</span></div>
+      <div class="un-info-sub">Make work easier: workflow efficiency, ease of use, time savings, automation, documentation, cognitive load reduction.</div>
+    </div>
+    <div class="un-info-row">
+      <div class="un-info-cat">Connectivity <span style="color:#8b7e79;font-weight:400;">→ Connectivity</span></div>
+      <div class="un-info-sub">Connect systems: EMR / PDMS / HIS integration, device connectivity, data exchange, remote access, enterprise integration.</div>
+    </div>
+    <div class="un-info-row">
+      <div class="un-info-cat">Economic Value <span style="color:#8b7e79;font-weight:400;">→ Economic</span></div>
+      <div class="un-info-sub">Improve economics: cost savings, total cost of ownership, resource utilisation, length-of-stay reduction, staff efficiency.</div>
+    </div>
+    <div class="un-info-row">
+      <div class="un-info-cat">Compliance &amp; Trust <span style="color:#8b7e79;font-weight:400;">→ Compliance</span></div>
+      <div class="un-info-sub">Regulatory certainty and trust: MDR / FDA compliance, cybersecurity, data privacy, reliability, auditability.</div>
+    </div>
+    <div class="un-info-row">
+      <div class="un-info-cat">Operational Excellence <span style="color:#8b7e79;font-weight:400;">→ Operations</span></div>
+      <div class="un-info-sub">Simplify operations: serviceability, installation, fleet management, remote service, scalability, availability.</div>
+    </div>
+    <div class="un-info-row" style="margin-bottom:0;">
+      <div class="un-info-cat">Evidence &amp; Innovation <span style="color:#8b7e79;font-weight:400;">→ Evidence</span></div>
+      <div class="un-info-sub">Build future readiness: clinical evidence, health economics, AI support, research, data analytics.</div>
+    </div>
+  </div>
 </div>
 
 </body>
