@@ -498,15 +498,17 @@
         /* Four dim panels around the spotlight (so the highlighted element stays clickable-looking) */
         .tour-dim { position:fixed; background:rgba(15,20,35,0.55); pointer-events:auto; transition:all 0.2s ease; }
         .tour-ring { position:fixed; border-radius:8px; box-shadow:0 0 0 3px #f39200, 0 0 0 9px rgba(243,146,0,0.3); pointer-events:none; transition:all 0.2s ease; z-index:5001; }
-        .tour-bubble { position:fixed; width:310px; box-sizing:border-box; background:#fff; border-radius:12px; border:0.5px solid #d4cac8; padding:16px 18px; z-index:5002; pointer-events:auto; box-shadow:0 8px 24px rgba(0,0,0,0.18); transition:all 0.2s ease; }
+        .tour-bubble { position:fixed; width:340px; box-sizing:border-box; background:#fff; border-radius:12px; border:0.5px solid #d4cac8; padding:16px 18px; z-index:5002; pointer-events:auto; box-shadow:0 8px 24px rgba(0,0,0,0.18); transition:all 0.2s ease; }
         .tour-step { font-size:11px; color:#8b7e79; font-weight:600; margin-bottom:5px; }
         .tour-title { font-size:15px; font-weight:600; color:#18274a; margin-bottom:7px; }
         .tour-body { font-size:13px; color:#595857; line-height:1.55; margin-bottom:15px; }
         .tour-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
-        .tour-dots { flex-shrink:0; }
+        .tour-dots { display:flex; flex-wrap:wrap; gap:4px; max-width:150px; flex-shrink:1; }
+        .tour-progress { flex:1; min-width:80px; height:4px; background:#ede9e8; border-radius:2px; overflow:hidden; margin-right:10px; }
+        .tour-progress-fill { height:100%; background:#18274a; border-radius:2px; transition:width 0.2s ease; width:0%; }
         .tour-actions { flex-shrink:0; margin-left:auto; }
         .tour-dots { display:flex; gap:5px; }
-        .tour-dot { width:6px; height:6px; border-radius:50%; background:#d4cac8; }
+        .tour-dot { width:5px; height:5px; border-radius:50%; background:#d4cac8; flex-shrink:0; }
         .tour-dot.on { background:#18274a; }
         .tour-actions { display:flex; gap:6px; }
         .tour-skip { font-size:12px; color:#8b7e79; background:none; border:none; padding:6px 8px; cursor:pointer; }
@@ -4223,126 +4225,114 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         }
 
     // ═══════════════════════════════════════════════════════════════════════
-    // GUIDED TOUR — a 6-step spotlight walkthrough of the main board actions.
-    // Highlights real toolbar elements; does not perform actions for the user.
+    // TOUR ENTRY — one combined tour. The toolbar "Tour" button restarts the
+    // full choreographed walkthrough on a fresh board.
     // ═══════════════════════════════════════════════════════════════════════
-    var TOUR_STEPS = [
-        { sel: '[data-tour="lane"]',
-          title: 'Start with a lane',
-          body: 'A lane is a row on your board — a product line, topic, or theme. Click New lane to add one; it is the starting point for everything else.' },
-        { sel: '[data-tour="card"]',
-          title: 'Add a project card',
-          body: 'Add project cards into a lane. Each card is a scored initiative with benefit, innovation, effort, status, and user needs.' },
-        { sel: '[data-tour="bundle"]',
-          title: 'Group cards into a bundle',
-          body: 'A bundle groups related cards into a release scope. Drag cards onto it; the bundle shows an effort-weighted quality score for the whole set.' },
-        { sel: '[data-tour="goal"]',
-          title: 'Add a strategic goal',
-          body: 'A strategic goal is a north-star card — a customer pain point or ambition. It carries no score, and you can link cards to it with connections.' },
-        { groupLabel: 'Score',
-          title: 'Filter by strategic score',
-          body: 'Show only High, Medium, or Low scoring cards. This is the first and most important filter layer — what is strategically worth pursuing.' },
-        { groupLabel: 'User Needs',
-          title: 'Filter by user need',
-          body: 'The eight user-need categories (Clinical, Safety, Workflow …). Pick several to see any card addressing at least one of them — the WHY behind each card.' },
-        { groupLabel: 'Status',
-          title: 'Filter by status',
-          body: 'Narrow to a lifecycle stage: Idea, Planned, Active, Done, or Blocked. Combine it with Score and User Needs to zero in on exactly what you want.' },
-        { groupLabel: 'Filters',
-          title: 'All on / all off',
-          body: 'The master toggle. All off clears every filter so the board is empty — then switch chips back on one layer at a time to reveal cards step by step. All on resets everything.' },
-        { groupLabel: 'View',
-          title: 'Full vs. Compact view',
-          body: 'Full shows every card detail — radars, timeline, user-need tags. Compact shrinks cards to just title, score, and status colour, so you can see the whole 10-year board at once.' },
-        { groupLabel: 'Zoom',
-          title: 'Zoom the board',
-          body: 'Zoom only the board, not the toolbar. Use Fit to size the whole board to your screen — handy on large monitors where the menus should stay full-size.' },
-        { groupLabel: 'Connections',
-          title: 'Link dependencies',
-          body: 'Draw connections between cards to show dependencies, with direction arrows. Focus mode isolates a card\'s links; Critical path traces the longest chain.' },
-        { groupLabel: 'Save & Load',
-          title: 'Save and share',
-          body: 'Export your board as JSON to share it, merge a colleague\'s board with Chase Merge, or export a high-resolution PNG.' }
-    ];
-    var _tourIdx = 0;
-
-    function _findTourTarget(step) {
-        if (step.sel) return document.querySelector(step.sel);
-        // Find a toolbar group by its exact label text, return the whole group
-        var want = (step.groupLabel || '').replace(/\s+/g,' ').trim();
-        var groups = document.querySelectorAll('.cb-group');
-        for (var i=0;i<groups.length;i++){
-            var lbl = groups[i].querySelector('.cb-group-label');
-            if (lbl && lbl.textContent.replace(/\s+/g,' ').trim() === want) {
-                return groups[i];
-            }
-        }
-        return null;
-    }
-
     function startGuidedTour() {
-        _choreoActive = false;
-        _tourIdx = 0;
-        document.getElementById('tour-overlay').classList.add('active');
-        // Build progress dots
-        var dots = document.getElementById('tour-dots');
-        dots.innerHTML = '';
-        TOUR_STEPS.forEach(function(_,i){
-            var d = document.createElement('span'); d.className = 'tour-dot' + (i===0?' on':''); d.id='tour-dot-'+i;
-            dots.appendChild(d);
-        });
-        _renderTourStep();
+        _resetBoardToEmpty();
+        _showTourButton();
+        startChoreographedDemo();
     }
 
-    function _renderTourStep() {
-        var step = TOUR_STEPS[_tourIdx];
-        var target = _findTourTarget(step);
-        if (!target) { _plainTourNext(); return; }   // skip a step whose element is absent
-        target.scrollIntoView({block:'nearest', inline:'nearest'});
-        var r = target.getBoundingClientRect();
-        var pad = 6;
-        var sx = r.left - pad, sy = r.top - pad, sw = r.width + pad*2, sh = r.height + pad*2;
-
-        // Spotlight ring
-        var ring = document.getElementById('tour-ring');
-        ring.style.left = sx+'px'; ring.style.top = sy+'px';
-        ring.style.width = sw+'px'; ring.style.height = sh+'px';
-
-        // Four dim panels around the spotlight
-        var W = window.innerWidth, H = window.innerHeight;
-        _setRect('tour-dim-top', 0, 0, W, sy);
-        _setRect('tour-dim-bottom', 0, sy+sh, W, H-(sy+sh));
-        _setRect('tour-dim-left', 0, sy, sx, sh);
-        _setRect('tour-dim-right', sx+sw, sy, W-(sx+sw), sh);
-
-        // Bubble: below the target, clamped to viewport
-        var bubble = document.getElementById('tour-bubble');
-        var bw = 310, bx = Math.min(Math.max(8, sx), W - bw - 8);
-        var by = sy + sh + 12;
-        if (by + 180 > H) by = Math.max(8, sy - 190);   // flip above if no room
-        bubble.style.left = bx+'px'; bubble.style.top = by+'px';
-
-        // Content
-        document.getElementById('tour-step-lbl').textContent = 'Step ' + (_tourIdx+1) + ' of ' + TOUR_STEPS.length;
-        document.getElementById('tour-title-lbl').textContent = step.title;
-        document.getElementById('tour-body-lbl').textContent = step.body;
-        document.getElementById('tour-next-btn').textContent = (_tourIdx === TOUR_STEPS.length-1) ? 'Done' : 'Next';
-        var backBtn = document.getElementById('tour-back-btn');
-        if (backBtn) backBtn.style.display = (_tourIdx > 0) ? '' : 'none';
-        for (var i=0;i<TOUR_STEPS.length;i++){
-            var d = document.getElementById('tour-dot-'+i);
-            if (d) d.classList.toggle('on', i <= _tourIdx);
+    // Keep the spotlight aligned if the window resizes mid-tour.
+    window.addEventListener('resize', function(){
+        if (document.getElementById('tour-overlay').classList.contains('active') && _choreoActive) {
+            _renderChoreoStep();
         }
-    }
+    });
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // CHOREOGRAPHED DEMO — builds the board in phases, guided by the tour bubble.
+    // Menus first, then lanes, first card (+ modal walkthrough), rest, connections.
+    // Skip at any point jumps straight to the finished board (state 7).
+    // ═══════════════════════════════════════════════════════════════════════
+    var _choreoActive = false;
+
+    var CHOREO_STEPS = [
+        // ═══ Phase A — Toolbar / Add actions (board empty) ═══
+        { groupLabel:'Add to board', title:'This is your toolbar',
+          body:'Everything starts here. You add lanes, cards, bundles and goals, then filter, zoom and connect. Let\'s build a board together — click Next.' },
+        { target:'[data-tour="lane"]', title:'Add a lane',
+          body:'A lane is a row on your board — a product line, topic or theme. It is the starting point; every card lives in a lane.' },
+        { target:'[data-tour="card"]', title:'Add a project card',
+          body:'Project cards are scored initiatives that sit inside a lane, positioned on the year they are planned for.' },
+        { target:'[data-tour="bundle"]', title:'Add a bundle',
+          body:'A bundle groups related cards into a release scope, with its own effort-weighted quality score.' },
+        { target:'[data-tour="goal"]', title:'Add a strategic goal',
+          body:'A strategic goal is a north-star card — a customer pain point or ambition. Cards can be linked to it with connections.' },
+        // ═══ Phase B — board builds up ═══
+        { onEnter:function(){ _demoLanes(); }, groupLabel:'Add to board', title:'First, some lanes',
+          body:'Three lanes just appeared — still empty. Next we\'ll drop in a card.' },
+        { onEnter:function(){ _demoFirstCard(); redrawAllConnections(); }, target:'firstCard', title:'Your first card',
+          body:'Here is a project card. Let\'s look at what it shows — first from the outside, then inside the editor.' },
+        // ═══ Phase C — card exterior ═══
+        { target:'firstCardHeader', title:'Title & status',
+          body:'The top of the card: its title, plus badges for Effort, Cost, the strategic Score and the current Status. The coloured head stripe echoes the status; the left stripe is always blue.' },
+        { target:'firstCardRadars', title:'Two mini radars',
+          body:'Each card carries two spider charts: Customer Benefit (how strongly it pays off) and the 10 Types of Innovation.' },
+        { target:'firstCardMilestones', title:'Milestones',
+          body:'The dotted timeline shows the card\'s milestones across the years — a quick read of its planned schedule.' },
+        { target:'firstCardTags', title:'User-need tags',
+          body:'These neutral tags show WHY we tackle this card — its user needs. They are separate from the benefit score.' },
+        { target:'firstCardPs', title:'Pre-Study tab',
+          body:'The orange tab on the left opens a lightweight pre-study — status, effort, cost and a note — without leaving the board.' },
+        { target:'firstCardSb', title:'Sub-board tab',
+          body:'The grey tab on the right attaches a whole nested board to a card, for one level of deeper planning.' },
+        { target:'firstCardDot', title:'Connection point',
+          body:'This dot is the connection point. In Connections mode you click one card\'s dot, then another\'s, to draw a dependency between them.' },
+        // ═══ Phase D — card interior (modal) ═══
+        { onEnter:function(){ _choreoOpenFirstCard(); }, target:'.modal-window', title:'Inside the card',
+          body:'Opening the card reveals the full editor — every detail lives here. Let\'s walk through it.', modal:true },
+        { target:'#modal-project-title', title:'Title',
+          body:'The card title — a short, recognisable name for the initiative.', modal:true },
+        { target:'#modal-desc-persona-group', title:'Description & persona',
+          body:'Describe the initiative and who it is for. The user persona captures the primary user and their need.', modal:true },
+        { target:'#modal-user-needs', title:'User needs',
+          body:'Pick the user-need categories this card addresses — these become the tags on the card face.', modal:true },
+        { target:'#modal-sizing-group', title:'Sizing & status',
+          body:'Size the effort and cost (they drive the score divisor) and set the lifecycle status.', modal:true },
+        { target:'#modal-score-section', title:'Strategic score',
+          body:'The heart of the tool: a 0–100 score. It combines Customer Benefit and Innovation, divided by effort and cost — so high value with low effort scores highest. High ≥45, Medium 25–44, Low below.', modal:true },
+        { target:'#b-val1', title:'Customer Benefit',
+          body:'Rate four benefit dimensions 0–10. The two highest count double — this is half of the strategic score.', modal:true },
+        { target:'#editor-milestones-zone', title:'Project roadmap',
+          body:'Add milestones with a label and target year. They render as the dotted timeline you saw on the card face.', modal:true },
+        { target:'#i-val1', title:'Innovation types',
+          body:'Rate the 10 Types of Innovation. The four highest count double — the other half of the score.', modal:true },
+        { onEnter:function(){ _choreoCloseModal(); }, target:'firstCard', title:'That\'s one card',
+          body:'Close the editor and the card shows its final score. Now let\'s fill in the rest of the board.' },
+        // ═══ Phase E — board fills + connections ═══
+        { onEnter:function(){ _demoRestCards(); _demoBundle(); redrawAllConnections(); updateEffortSummaries(); updateLaneCellLayout(); },
+          groupLabel:'Add to board', title:'A full portfolio',
+          body:'The remaining cards, a bundle and a strategic goal are now in place across all three lanes and the 10-year horizon.' },
+        { onEnter:function(){ _demoConnectionsChoreo(); }, groupLabel:'Connections', title:'Dependencies',
+          body:'Connections now link the cards — with direction arrows. Focus mode isolates a card\'s links; Critical path traces the longest chain.' },
+        // ═══ Phase F — filters (now on a full board) ═══
+        { groupLabel:'Score', title:'Filter by score',
+          body:'With a full board, filters come alive. Show only High, Medium or Low scoring cards — the first and most important layer.' },
+        { groupLabel:'User Needs', title:'Filter by user need',
+          body:'The eight user-need categories. Pick several to see any card addressing at least one of them.' },
+        { groupLabel:'Status', title:'Filter by status',
+          body:'Narrow to a lifecycle stage — Idea, Planned, Active, Done or Blocked — and combine it with the other filters.' },
+        { groupLabel:'Filters', title:'All on / all off',
+          body:'The master toggle. All off clears everything so the board is empty — then switch chips on to reveal cards layer by layer. All on resets.' },
+        { groupLabel:'View', title:'Views',
+          body:'Switch between Full cards (all detail) and Compact (title, score, status) to see the whole 10-year board at once.' },
+        { groupLabel:'Zoom', title:'Zoom',
+          body:'Zoom just the board, not the toolbar. Use Fit to size the whole board to your screen — handy on large monitors.' },
+        // ═══ Close ═══
+        { groupLabel:'Save & Load', title:'Save and share',
+          body:'Export your board as JSON to share it, merge a colleague\'s board with Chase Merge, or export a high-resolution PNG. That\'s the tour!' },
+    ];
+    var _choreoIdx = 0;
+
+    // ── Spotlight positioning (shared by the tour) ────────────────────────────
     function _setRect(id, x, y, w, h) {
         var el = document.getElementById(id);
+        if (!el) return;
         el.style.left = x+'px'; el.style.top = y+'px';
         el.style.width = Math.max(0,w)+'px'; el.style.height = Math.max(0,h)+'px';
     }
-
-    // Shared positioning for both the plain tour and the choreographed demo.
-    // Sets spotlight + bubble around `target` and wires Next/Back to the given callbacks.
     var _tourNextCb = null, _tourBackCb = null;
     function _positionTourUI(target, idx, total, title, body, nextCb, backCb) {
         _tourNextCb = nextCb; _tourBackCb = backCb;
@@ -4358,7 +4348,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         _setRect('tour-dim-left',0,sy,sx,sh);
         _setRect('tour-dim-right',sx+sw,sy,W-(sx+sw),sh);
         var bubble=document.getElementById('tour-bubble');
-        var bw=310, bx=Math.min(Math.max(8,sx), W-bw-8);
+        var bw=340, bx=Math.min(Math.max(8,sx), W-bw-8);
         var by=sy+sh+12;
         if (by+190 > H) by=Math.max(8, sy-200);
         bubble.style.left=bx+'px'; bubble.style.top=by+'px';
@@ -4368,112 +4358,53 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         document.getElementById('tour-next-btn').textContent = (idx===total-1) ? 'Done' : 'Next';
         var backBtn=document.getElementById('tour-back-btn');
         if (backBtn) backBtn.style.display = (idx>0) ? '' : 'none';
-        for (var i=0;i<total;i++){ var d=document.getElementById('tour-dot-'+i); if(d) d.classList.toggle('on', i<=idx); }
+        var pf=document.getElementById('tour-progress-fill'); if(pf) pf.style.width = Math.round((idx+1)/total*100)+'%';
     }
 
-
-    // Bubble button dispatchers — route to the choreographed demo or the plain tour.
-    function tourNext() { if (_choreoActive) { _tourNextCb && _tourNextCb(); } else { _plainTourNext(); } }
-    function tourBack() { if (_choreoActive) { _tourBackCb && _tourBackCb(); } else { _plainTourBack(); } }
-    function tourSkip() { if (_choreoActive) { _choreoSkipToEnd(); } else { endGuidedTour(); } }
-
-    function _plainTourNext() {
-        if (_tourIdx >= TOUR_STEPS.length-1) { endGuidedTour(); return; }
-        _tourIdx++;
-        _renderTourStep();
-    }
-
-    function _plainTourBack() {
-        if (_tourIdx <= 0) return;
-        _tourIdx--;
-        _renderTourStep();
-    }
-
-    function endGuidedTour() {
-        document.getElementById('tour-overlay').classList.remove('active');
-    }
-
-    // Keep the spotlight aligned if the window resizes mid-tour
-    window.addEventListener('resize', function(){
-        if (document.getElementById('tour-overlay').classList.contains('active')) _renderTourStep();
-    });
-
-    // ═══════════════════════════════════════════════════════════════════════
-    // CHOREOGRAPHED DEMO — builds the board in phases, guided by the tour bubble.
-    // Menus first, then lanes, first card (+ modal walkthrough), rest, connections.
-    // Skip at any point jumps straight to the finished board (state 7).
-    // ═══════════════════════════════════════════════════════════════════════
-    var _choreoActive = false;
-
-    var CHOREO_STEPS = [
-        // — Phase A: explain the menus (board still empty) —
-        { groupLabel:'Add to board', title:'This is your toolbar',
-          body:'Everything starts here. You add lanes, cards, bundles and goals, then filter, zoom and connect. Let\'s build a board together — click Next.' },
-        { groupLabel:'Score', title:'Filters',
-          body:'Filter what you see by Score, User Needs and Status — with an All on/off master toggle to reveal cards layer by layer.' },
-        { groupLabel:'View', title:'Views & zoom',
-          body:'Switch between Full and Compact cards, and zoom just the board (not the toolbar) to fit large screens.' },
-        // — Phase B: lanes appear —
-        { onEnter:function(){ _demoLanes(); }, groupLabel:'Add to board', title:'First, some lanes',
-          body:'Three lanes just appeared — each is a row for a product line, topic or theme. They\'re still empty. Next we\'ll add a card.' },
-        // — Phase C: first card + walk the card exterior —
-        { onEnter:function(){ _demoFirstCard(); redrawAllConnections(); }, target:'firstCard', title:'Your first project card',
-          body:'Here is a project card. The coloured head stripe shows its status; the left stripe is always blue. The badge shows its strategic score. Let\'s look closer.' },
-        { target:'firstCardRadars', title:'Two mini radars',
-          body:'Each card carries two spider charts: Customer Benefit (how strongly it pays off) and the 10 Types of Innovation.' },
-        { target:'firstCardTags', title:'User-need tags',
-          body:'These neutral tags show WHY we tackle this card — its user needs. They are separate from the benefit score.' },
-        { target:'firstCardPs', title:'Pre-Study tab',
-          body:'The orange tab on the left opens a lightweight pre-study — status, effort, cost and a note — without leaving the board.' },
-        { target:'firstCardSb', title:'Sub-board tab',
-          body:'The grey tab on the right attaches a whole nested board to a card, for one level of deeper planning.' },
-        // — Phase C2: open the card, walk the modal —
-        { onEnter:function(){ _choreoOpenFirstCard(); }, target:'.modal-window', title:'Inside the card',
-          body:'Opening the card reveals the full editor — every detail of the initiative lives here. Let\'s walk through it.', modal:true },
-        { target:'#modal-project-title', title:'Title',
-          body:'The card title — a short, recognisable name for the initiative.', modal:true },
-        { target:'#modal-desc-persona-group', title:'Description & persona',
-          body:'Describe the initiative and who it is for. The user persona captures the primary user and their need.', modal:true },
-        { target:'#modal-user-needs', title:'User needs — the why',
-          body:'Pick the user-need categories this card addresses. These become the tags you saw on the card face.', modal:true },
-        { target:'#modal-sizing-group', title:'Effort, cost & status',
-          body:'Size the effort and cost (they drive the score divisor) and set the lifecycle status — Idea, Planned, Active, Done or Blocked.', modal:true },
-        { target:'#b-val1', title:'Customer Benefit sliders',
-          body:'Rate four benefit dimensions 0–10. The two highest count double — this is half of the strategic score.', modal:true },
-        { target:'#i-val1', title:'Innovation sliders',
-          body:'Rate the 10 Types of Innovation. The four highest count double — the other half of the score.', modal:true },
-        { onEnter:function(){ _choreoCloseModal(); }, target:'firstCard', title:'That\'s one card',
-          body:'Close the editor and the card shows its final score. Now let\'s fill in the rest of the board.' },
-        // — Phase D: rest of cards + bundle + goal —
-        { onEnter:function(){ _demoRestCards(); _demoBundle(); redrawAllConnections(); updateEffortSummaries(); updateLaneCellLayout(); },
-          groupLabel:'Add to board', title:'A full portfolio',
-          body:'The remaining cards, a bundle (grouped release) and a strategic goal are now in place across all three lanes and the 10-year horizon.' },
-        // — Phase E: connections —
-        { onEnter:function(){ _demoConnectionsChoreo(); }, groupLabel:'Connections', title:'Dependencies',
-          body:'Finally, connections link the cards — with direction arrows. Use Focus mode and Critical path to trace them. Your board is ready!' },
-    ];
-    var _choreoIdx = 0;
+    // Bubble button handlers — only one tour now (the combined choreographed demo).
+    function tourNext() { _choreoNext(); }
+    function tourBack() { _choreoBack(); }
+    function tourSkip() { _choreoSkipToEnd(); }
 
     function startChoreographedDemo() {
         _showTourButton();
         _choreoActive = true;
         _choreoIdx = 0;
         document.getElementById('tour-overlay').classList.add('active');
-        var dots = document.getElementById('tour-dots');
-        dots.innerHTML = '';
-        CHOREO_STEPS.forEach(function(_,i){
-            var d=document.createElement('span'); d.className='tour-dot'+(i===0?' on':''); d.id='tour-dot-'+i; dots.appendChild(d);
-        });
+        // progress bar initialised in _positionTourUI
         _renderChoreoStep();
+    }
+
+    // Build a pseudo-target whose bounding box spans several elements (for multi-element
+    // spotlights like title + badges). scrollTarget is a real element used for scrolling.
+    function _spanTarget(els, scrollTarget) {
+        return {
+            scrollIntoView: function(o){ try { (scrollTarget||els[0]).scrollIntoView(o); } catch(e){} },
+            getBoundingClientRect: function(){
+                var L=Infinity,T=Infinity,R=-Infinity,B=-Infinity;
+                els.forEach(function(e){ var r=e.getBoundingClientRect();
+                    L=Math.min(L,r.left); T=Math.min(T,r.top); R=Math.max(R,r.right); B=Math.max(B,r.bottom); });
+                return { left:L, top:T, right:R, bottom:B, width:R-L, height:B-T };
+            }
+        };
     }
 
     function _choreoFindTarget(step) {
         if (step.target === 'firstCard') return _choreoFirstCardEl();
         if (step.target === 'firstCardRadars') { var c=_choreoFirstCardEl(); return c ? (c.querySelector('.card-radar-row') || c.querySelector('[class*=radar]') || c) : null; }
         if (step.target === 'firstCardTags')  { var c=_choreoFirstCardEl(); return c ? (c.querySelector('.un-tag-row') || c) : null; }
+        if (step.target === 'firstCardHeader'){
+            var c=_choreoFirstCardEl(); if(!c) return null;
+            var hr=c.querySelector('.card-header-row'), bd=c.querySelector('.card-badges');
+            if (hr && bd) return _spanTarget([hr, bd], c);   // title + badges together
+            return hr || bd || c;
+        }
+        if (step.target === 'firstCardMilestones'){ var c=_choreoFirstCardEl(); return c ? (c.querySelector('.card-body-details') || c) : null; }
+        if (step.target === 'firstCardDot')   { var c=_choreoFirstCardEl(); return c ? (c.querySelector('.dependency-dot') || document.querySelector('[data-depid="card-clpm-2026"]') || c) : null; }
         if (step.target === 'firstCardPs')    { return document.getElementById('pstab-card-clpm-2026') || _choreoFirstCardEl(); }
         if (step.target === 'firstCardSb')    { return document.getElementById('sbtab-card-clpm-2026') || _choreoFirstCardEl(); }
-        if (step.target && (step.target.charAt(0) === '#' || step.target.charAt(0) === '.')) return document.querySelector(step.target);
+        if (step.target === '#editor-milestones-zone') { var z=document.getElementById('editor-milestones-zone'); return z ? (z.closest('.form-section') || z) : null; }
+        if (step.target && (step.target.charAt(0) === '#' || step.target.charAt(0) === '.' || step.target.charAt(0) === '[')) return document.querySelector(step.target);
         if (step.groupLabel) {
             var want = step.groupLabel.replace(/\s+/g,' ').trim();
             var groups = document.querySelectorAll('.cb-group');
@@ -4501,11 +4432,16 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         _demoConnections();
     }
 
+    var _choreoRAF = null;
     function _renderChoreoStep() {
         var step = CHOREO_STEPS[_choreoIdx];
         if (step.onEnter) { try { step.onEnter(); } catch(e){ console.warn('choreo onEnter', e); } }
-        // Defer targeting slightly so newly-built DOM exists
-        requestAnimationFrame(function(){
+        // Defer targeting so newly-built DOM exists; cancel any pending frame so
+        // rapid Next/Back clicks can't race and land on the wrong step.
+        if (_choreoRAF) cancelAnimationFrame(_choreoRAF);
+        var myIdx = _choreoIdx;
+        _choreoRAF = requestAnimationFrame(function(){
+            if (myIdx !== _choreoIdx) return;   // superseded by a newer navigation
             var target = _choreoFindTarget(step);
             if (!target) { _choreoNext(); return; }
             _positionTourUI(target, _choreoIdx, CHOREO_STEPS.length, step.title, step.body, _choreoNext, _choreoBack);
@@ -4522,9 +4458,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         var prev = CHOREO_STEPS[_choreoIdx], dest = CHOREO_STEPS[_choreoIdx-1];
         if (prev.modal && !dest.modal) _choreoCloseModal();
         _choreoIdx--;
-        // Skip onEnter on back (don't rebuild) — just reposition
+        // Reposition without re-running onEnter (don't rebuild the board going back).
+        if (_choreoRAF) cancelAnimationFrame(_choreoRAF);
         var step = CHOREO_STEPS[_choreoIdx];
-        requestAnimationFrame(function(){
+        var myIdx = _choreoIdx;
+        _choreoRAF = requestAnimationFrame(function(){
+            if (myIdx !== _choreoIdx) return;
             var target = _choreoFindTarget(step);
             if (!target) { _choreoBack(); return; }
             _positionTourUI(target, _choreoIdx, CHOREO_STEPS.length, step.title, step.body, _choreoNext, _choreoBack);
@@ -4762,7 +4701,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                         </select>
                     </div>
                 </div>
-                <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">
+                <div id="modal-score-section" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">
                     <div class="form-section-title" style="margin-bottom:6px;display:flex;align-items:center;gap:6px;">Strategic Score <button class="score-info-btn" onclick="openScoreInfo()" title="How is this score calculated?">i</button></div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div id="modal-score-display" style="font-size:26px;font-weight:700;color:#595857;min-width:40px;text-align:center;line-height:1;"></div>
@@ -5021,7 +4960,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         <div class="tour-title" id="tour-title-lbl">Title</div>
         <div class="tour-body" id="tour-body-lbl">Body</div>
         <div class="tour-row">
-            <div class="tour-dots" id="tour-dots"></div>
+            <div class="tour-progress"><div class="tour-progress-fill" id="tour-progress-fill"></div></div>
             <div class="tour-actions">
                 <button class="tour-skip" onclick="tourSkip()">Skip</button>
                 <button class="tour-skip" id="tour-back-btn" onclick="tourBack()" style="display:none;">Back</button>
