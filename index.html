@@ -532,6 +532,47 @@
         .dcb-desc { font-size:11px; color:#8b7e79; line-height:1.45; }
         .demo-choice-btn.primary .dcb-desc { color:rgba(255,255,255,0.8); }
 
+
+        /* ═══ COLLABORATION MODE ════════════════════════════════════════════════ */
+        .collab-only { display:none; }
+        body.collab-mode .collab-only { display:flex; }
+        body.collab-mode #modal-sizing-group .collab-only { display:block; }
+        body.collab-mode .standard-only { display:none; }
+        .participant-avatar { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; color:#fff; overflow:hidden; cursor:pointer; border:1.5px solid transparent; }
+        .participant-avatar:hover { border-color:#18274a; }
+        .participant-avatar img { width:100%; height:100%; object-fit:cover; }
+
+
+        .card-creator-avatar { width:24px; height:24px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:600; color:#fff; overflow:hidden; cursor:pointer; margin-right:6px; border:1.5px solid transparent; }
+        .card-creator-avatar:hover { border-color:#18274a; }
+        .card-creator-avatar img { width:100%; height:100%; object-fit:cover; }
+        #creator-picker-popup { position:fixed; z-index:5200; background:#fff; border:0.5px solid #d4cac8; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.18); padding:10px; display:none; }
+        #creator-picker-popup .cpp-title { font-size:11px; color:#8b7e79; margin-bottom:8px; }
+        #creator-picker-popup .cpp-list { display:flex; flex-wrap:wrap; gap:8px; max-width:220px; }
+
+
+        body.collab-mode .prestudy-tab, body.collab-mode .subboard-tab,
+        body.collab-mode .prestudy-panel { display:none !important; }
+
+
+        /* ═══ COLLAPSIBLE BARS ══════════════════════════════════════════════════ */
+        .bar-collapse-btn { align-self:center; background:none; border:none; cursor:pointer; color:#8b7e79; padding:4px 8px; border-radius:4px; flex-shrink:0; display:flex; align-items:center; gap:4px; font-size:11px; }
+        .bar-collapse-btn:hover { background:rgba(0,0,0,0.05); color:#18274a; }
+        .bar-collapse-btn svg { transition:transform 0.2s; }
+        .filter-bar.bar-collapsed .cb-group, .control-bar.bar-collapsed .cb-group { display:none; }
+        .bar-collapsed .cb-right-cluster .cb-group { display:flex !important; }
+        .filter-bar.bar-collapsed, .control-bar.bar-collapsed { padding-top:2px; padding-bottom:2px; }
+        .filter-bar.bar-collapsed .bar-collapse-btn svg, .control-bar.bar-collapsed .bar-collapse-btn svg { transform:rotate(180deg); }
+        .bar-collapsed .bar-collapsed-label { display:inline !important; }
+        .bar-collapsed-label { display:none; font-size:11px; color:#8b7e79; padding:4px 8px; }
+
+
+        .cb-right-cluster { margin-left:auto; display:flex; align-items:stretch; flex-shrink:0; }
+        .control-bar > .bar-collapse-btn { margin-left:auto; }
+
+
+        .card-desc-face { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+
 </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -576,6 +617,18 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:10px;"><path d="M8 2v12M2 8h12"/></svg>
             New project
             <span style="display:block;font-size:11px;font-weight:400;opacity:0.7;margin-top:3px;margin-left:28px;">Start with an empty board</span>
+        </button>
+
+        <!-- Collaboration Mode Button -->
+        <button onclick="welcomeCollaboration()" style="
+            display:block; width:100%; padding:16px 20px; margin-bottom:12px;
+            background:white; color:#185fa5; border:2px solid #185fa5; border-radius:6px;
+            font-size:15px; font-weight:500; cursor:pointer; text-align:left;
+            font-family:'Adelle Sans','Source Sans 3','Segoe UI',sans-serif;
+            transition:background 0.15s;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#185fa5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:10px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Collaboration mode
+            <span style="display:block;font-size:11px;font-weight:400;color:#8b7e79;margin-top:3px;margin-left:28px;">Simplified board for joint sessions with partners</span>
         </button>
 
         <!-- Import Button -->
@@ -708,7 +761,7 @@
 
         <!-- Gruppe: Score -->
         <div class="cb-group">
-            <div class="cb-group-label">Score</div>
+            <div class="cb-group-label" id="score-filter-label">Score</div>
             <div class="cb-group-content">
                 <button class="filter-chip chip-score-high active" onclick="toggleScoreFilter('high',this)">High</button>
                 <button class="filter-chip chip-score-medium active" onclick="toggleScoreFilter('medium',this)">Medium</button>
@@ -788,16 +841,19 @@
             </div>
         </div>
 
-        <!-- Gruppe: Home -->
-        <div class="cb-group" style="border-right:none;margin-left:auto;">
-            <div class="cb-group-label">Home</div>
-            <div class="cb-group-content">
-                <button onclick="showWelcomeScreen()" title="Back to start screen" style="background:none;border:1px solid var(--border);padding:4px 8px;border-radius:4px;cursor:pointer;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#18274a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:block;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                </button>
+        <!-- Right-docked cluster: Home + collapse (stays together, even when the bar wraps) -->
+        <div class="cb-right-cluster">
+            <!-- Gruppe: Home -->
+            <div class="cb-group" style="border-right:none;">
+                <div class="cb-group-label">Home</div>
+                <div class="cb-group-content">
+                    <button onclick="showWelcomeScreen()" title="Back to start screen" style="background:none;border:1px solid var(--border);padding:4px 8px;border-radius:4px;cursor:pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#18274a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:block;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    </button>
+                </div>
             </div>
+            <button class="bar-collapse-btn" onclick="toggleBar('filter-bar')" title="Collapse / expand this bar"><span class="bar-collapsed-label">Filters</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
         </div>
-
     </div>
 
     <div class="control-bar">
@@ -807,8 +863,19 @@
             <div class="cb-group-content">
                 <button class="add-btn" data-tour="lane" onclick="promptAddNewProductLine()" title="Start here — add a new lane (product line, topic or theme)"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h12M2 8h12M2 12h7"/></svg> New lane</button>
                 <button class="add-btn" data-tour="card" onclick="openNewCardDialog()" title="Add a new project card to a lane"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M8 5.5v5M5.5 8h5"/></svg> New project card</button>
-                <button class="add-btn" data-tour="bundle" onclick="createContainer()" title="Add a release bundle"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5l6-3 6 3v6l-6 3-6-3V5z"/><path d="M8 2v12M2 5l6 3 6-3"/></svg> New bundle</button>
+                <button class="add-btn standard-only" data-tour="bundle" onclick="createContainer()" title="Add a release bundle"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5l6-3 6 3v6l-6 3-6-3V5z"/><path d="M8 2v12M2 5l6 3 6-3"/></svg> New bundle</button>
                 <button class="add-btn" data-tour="goal" onclick="createStrategicGoal()" title="Add a strategic goal card"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="6" r="3"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg> New strategic goal</button>
+            </div>
+        </div>
+
+        <!-- Gruppe: Participants (collaboration mode only) -->
+        <div class="cb-group collab-only" id="participants-group">
+            <div class="cb-group-label">Participants</div>
+            <div class="cb-group-content" style="align-items:center;gap:6px;">
+                <div id="participants-avatars" style="display:flex;gap:4px;align-items:center;"></div>
+                <button class="add-btn" onclick="openParticipantModal()" title="Add a participant" style="padding:5px 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+                </button>
             </div>
         </div>
 
@@ -837,7 +904,9 @@
             </div>
         </div>
 
-        </div>
+        
+        <button class="bar-collapse-btn" onclick="toggleBar('control-bar')" title="Collapse / expand this bar"><span class="bar-collapsed-label">Menu</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></button>
+    </div>
 
     </div><div class="board-scroll-area" id="board-scroll-area">
     <div id="board-zoom-wrapper" style="position:relative; width:max-content; min-width:100%; transform-origin: top left; transition: transform 0.15s ease;">
@@ -883,7 +952,49 @@
     // ═══════════════════════════════════════════════════════════════════════
     // BOARD-IN-BOARD: navigation between master board and one sub-board level
     // ═══════════════════════════════════════════════════════════════════════
-    var boardNavStack = [];   // holds the parent snapshot while inside a sub-board (max length 1)
+    var boardNavStack = [];
+    // Which board mode is active: 'standard' (full PM board) or 'collaboration'
+    // (simplified board for joint sessions). Set on entry from the welcome screen.
+    var currentMode = 'standard';
+    // Collaboration mode: participant profiles (id → {name, role, requirements, color, initials, photo}).
+    var participantsData = {};
+    var _participantColors = ['#185fa5','#1D9E75','#D85A30','#7F77DD','#D4537E','#BA7517','#0F6E56','#993556'];
+    // Apply the active mode to the <body> so CSS can scope collaboration-only changes.
+    // Reset every filter to its default (all visible) and clear the search box.
+    // Called on each mode entry so filters never carry over between sessions.
+    function _resetAllFilters() {
+        if (typeof setAllFilters === 'function') setAllFilters(true);
+        var s = document.getElementById('filter-search'); if (s) s.value = '';
+        if (typeof _syncMasterToggle === 'function') _syncMasterToggle();
+        if (typeof applyFilters === 'function') applyFilters();
+        // Reset the view toggle (Full/Compact) and zoom too, if present.
+        if (typeof currentView !== 'undefined') { try { setView && setView('full'); } catch(e){} }
+    }
+
+    // Collapse / expand a toolbar row (session-only, not persisted).
+    function toggleBar(barClass) {
+        var bar = document.querySelector('.' + barClass);
+        if (!bar) return;
+        bar.classList.toggle('bar-collapsed');
+        // Redraw connections since the board height changes.
+        if (typeof redrawConnectionsPreserveHighlight === 'function') {
+            setTimeout(redrawConnectionsPreserveHighlight, 60);
+        }
+    }
+
+    function _setMode(mode) {
+        currentMode = mode;
+        document.body.classList.toggle('collab-mode', mode === 'collaboration');
+        var sfl = document.getElementById('score-filter-label');
+        if (sfl) sfl.textContent = (mode === 'collaboration') ? 'Priority' : 'Score';
+    }
+    // Derive up-to-2-letter initials from a name (e.g. "Daniel R." → "DR").
+    function _initialsFromName(name) {
+        var parts = (name||'').trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return '?';
+        if (parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+        return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+    }   // holds the parent snapshot while inside a sub-board (max length 1)
 
     // Rebuild the entire #strategy-board DOM from the currently active state
     // (productLines / projectsData / containersData / goalsData / connectionsList).
@@ -1503,7 +1614,7 @@
                     return;
                 }
                 var score = calcScore(d);
-                var scoreLvl = score>=45?'high':score>=25?'medium':'low';
+                var scoreLvl = (currentMode==='collaboration') ? (d.priority||'medium') : (score>=45?'high':score>=25?'medium':'low');
                 var ok = (!search || d.title.toLowerCase().indexOf(search)>=0) &&
                          activeStatusFilters.has(d.status||'idea') &&
                          activeScoreFilters.has(scoreLvl) &&
@@ -1920,6 +2031,19 @@
             }
             var sel = document.getElementById('ncc-line');
             sel.innerHTML = productLines.map(function(l){ return '<option value="'+l.id+'">'+l.title+'</option>'; }).join('');
+            // Collaboration: populate "Requested by" dropdown
+            var rbWrap = document.getElementById('ncc-requestedby-wrap');
+            var rbSel = document.getElementById('ncc-requestedby');
+            if (rbWrap && rbSel) {
+                if (currentMode === 'collaboration') {
+                    rbWrap.style.display = '';
+                    rbSel.innerHTML = '<option value="">—</option>' + Object.keys(participantsData).map(function(pid){
+                        return '<option value="'+pid+'">'+participantsData[pid].name+'</option>';
+                    }).join('');
+                } else {
+                    rbWrap.style.display = 'none';
+                }
+            }
             o.style.display = 'flex';
             var h = document.getElementById('ncc-horiz'); if (h) h.value = 'y2026';
             setTimeout(function(){ var t=document.getElementById('ncc-title'); if(t){t.value='';t.focus();} }, 60);
@@ -1933,8 +2057,19 @@
             if(!title){ var t=document.getElementById('ncc-title'); if(t) t.focus(); return; }
             var lineId=document.getElementById('ncc-line').value;
             var horiz=document.getElementById('ncc-horiz').value;
+            var creatorId = null;
+            if (currentMode === 'collaboration') {
+                var rb = document.getElementById('ncc-requestedby');
+                creatorId = rb && rb.value ? rb.value : null;
+            }
             newCardCreateCancel();
-            createProjectCard(lineId, horiz, title);
+            var newId = createProjectCard(lineId, horiz, title);
+            if (creatorId && currentMode === 'collaboration') {
+                // find the just-created card id and set creator
+                var _ids = Object.keys(projectsData);
+                var _cid = _ids[_ids.length-1];
+                if (projectsData[_cid]) { projectsData[_cid].creatorId = creatorId; updateCardUIPreview(_cid); }
+            }
         }
 
     // Projektkarte im DOM erzeugen (Wrapper + Pre-Study-Tab + Karte)
@@ -2027,6 +2162,21 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 '<span class="card-badge badge-score ' + sc + '">Score ' + score + '</span>' +
                 '<span class="card-badge badge-status" style="background:' + sm.color + ';">' + sm.label + '</span>' +
                 (currentView==='compact' ? '<span style="font-size:14px;line-height:1;margin-left:2px;" title="'+({gold:'Pioneer',silver:'Fast Follower',bronze:'Me-Too'}[d.competition||'gold'])+'">'+({gold:'\uD83E\uDD47',silver:'\uD83E\uDD48',bronze:'\uD83E\uDD49'}[d.competition||'gold'])+'</span>' : '');
+            if (currentMode === 'collaboration') {
+                var _prio = d.priority || 'medium';
+                var _prioMap = { low:{bg:'#EAF3DE',fg:'#3B6D11',lbl:'Low'}, medium:{bg:'#FAEEDA',fg:'#854F0B',lbl:'Medium'}, high:{bg:'#FCEBEB',fg:'#A32D2D',lbl:'High'} };
+                var _pm = _prioMap[_prio] || _prioMap.medium;
+                var _compMap = { gold:'Pioneer', silver:'Fast Follower', bronze:'Me-Too' };
+                var _compMedal = { gold:'\uD83E\uDD47', silver:'\uD83E\uDD48', bronze:'\uD83E\uDD49' };
+                var _compKey = d.competition || 'gold';
+                var _compLbl = _compMedal[_compKey] + ' ' + _compMap[_compKey];
+                var _psNeeded = d.preStudyNeeded ? '<span class="card-badge" style="background:#EAF0F7;color:#185fa5;">Pre-study needed</span>' : '';
+                badges.innerHTML =
+                    '<span class="card-badge" style="background:'+_pm.bg+';color:'+_pm.fg+';">Priority: '+_pm.lbl+'</span>' +
+                    '<span class="card-badge badge-status" style="background:' + sm.color + ';">' + sm.label + '</span>' +
+                    '<span class="card-badge" style="background:#f0ede8;color:#595857;">' + _compLbl + '</span>' +
+                    _psNeeded;
+            }
     
             var radarRow = document.createElement('div');
             radarRow.className = 'card-radar-row';
@@ -2046,18 +2196,42 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     
             card.innerHTML = '';
             card.appendChild(stripe);
+            // Collaboration mode: show the requester as an avatar (photo/initials) in the title row.
+            if (currentMode === 'collaboration') {
+                var cr = participantsData[d.creatorId];
+                var crAv = document.createElement('div');
+                crAv.className = 'card-creator-avatar';
+                crAv.title = cr ? ('Requested by ' + cr.name + ' — click to change') : 'Set requester';
+                if (cr && cr.photo) { crAv.innerHTML = '<img src="'+cr.photo+'" alt="">'; crAv.style.background='transparent'; crAv.style.borderColor = cr.color || '#185fa5'; }
+                else { crAv.style.background = cr ? (cr.color || '#185fa5') : '#c4bfbd'; crAv.textContent = cr ? (cr.initials || _initialsFromName(cr.name)) : '?'; }
+                crAv.onclick = function(e){ e.stopPropagation(); openCreatorPickerPopup(id, crAv); };
+                titleRow.insertBefore(crAv, titleRow.firstChild);
+            }
             card.appendChild(titleRow);
             card.appendChild(badges);
-            card.appendChild(radarRow);
-    
-            var bs = card.querySelector('#' + id + '-mini-benefit');
-            var is = card.querySelector('#' + id + '-mini-innovation');
-            if(bs) drawMiniRadar(bs, d.benefitValues||[0,0,0,0], 10);
-            if(is) drawMiniRadar(is, d.innovationValues||new Array(10).fill(0), 10);
+            if (currentMode !== 'collaboration') {
+                card.appendChild(radarRow);
+                var bs = card.querySelector('#' + id + '-mini-benefit');
+                var is = card.querySelector('#' + id + '-mini-innovation');
+                if(bs) drawMiniRadar(bs, d.benefitValues||[0,0,0,0], 10);
+                if(is) drawMiniRadar(is, d.innovationValues||new Array(10).fill(0), 10);
+            }
+
+            // Collaboration mode: show the description on the card face (up to 3 lines, then ellipsis).
+            if (currentMode === 'collaboration' && currentView !== 'compact') {
+                var descTxt = (d.description || '').trim();
+                if (descTxt) {
+                    var dDiv = document.createElement('div');
+                    dDiv.className = 'card-desc-face';
+                    dDiv.style.cssText = 'margin-top:8px;padding-top:6px;border-top:0.5px solid #e9e4e3;font-size:11px;color:#595857;line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;';
+                    dDiv.textContent = descTxt;
+                    card.appendChild(dDiv);
+                }
+            }
 
             // ── Meilenstein-Zeitstrahl (nur wenn Meilensteine vorhanden, nicht im Compact-Modus) ──
             var milestones = d.milestones || [];
-            if(milestones.length > 0 && currentView !== 'compact') {
+            if(currentMode !== 'collaboration' && milestones.length > 0 && currentView !== 'compact') {
                 var tlDiv = document.createElement('div');
                 tlDiv.className = 'card-body-details';
                 tlDiv.style.cssText = 'margin-top:8px;padding-top:6px;border-top:0.5px solid #e9e4e3;';
@@ -2537,6 +2711,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             // Snapshot für Änderungserkennung speichern
             _modalOpenSnapshot = JSON.stringify(projectsData[id]); var d=projectsData[id];
             document.getElementById('modal-project-title').value=d.title;
+            if (currentMode === 'collaboration') {
+                var pr=document.getElementById('modal-priority'); if(pr) pr.value = d.priority || 'medium';
+                var psY=document.getElementById('modal-prestudy-yes'); if(psY) psY.checked = !!d.preStudyNeeded;
+                var psN=document.querySelector('input[name="modal-prestudy-needed"][value="no"]'); if(psN) psN.checked = !d.preStudyNeeded;
+                _renderCreatorPicker(d);
+            }
             document.getElementById('modal-description').value=d.description||'';
             document.getElementById('modal-user-persona').value=d.persona||'';
             (function(){
@@ -2572,6 +2752,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             // connection type is managed per-connection
             for(var i=1;i<=4;i++) d.benefitValues[i-1]=parseInt(document.getElementById('b-val'+i).value);
             for(var i=1;i<=10;i++) d.innovationValues[i-1]=parseInt(document.getElementById('i-val'+i).value);
+            // Collaboration-mode fields
+            if (currentMode === 'collaboration') {
+                var pr = document.getElementById('modal-priority'); if (pr) d.priority = pr.value;
+                var psY = document.getElementById('modal-prestudy-yes'); if (psY) d.preStudyNeeded = psY.checked;
+                // creatorId is set via the picker clicks (stored on d.creatorId already)
+            }
             updateCardUIPreview(activeProjectId);updateEffortSummaries();updateKpiStrip();
             // Refresh any container that holds this card (name may have changed)
             Object.keys(containersData).forEach(function(cid){
@@ -3776,7 +3962,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 });
             });
             var topData = getTopLevelExportData();
-            var data={version:3,boardName:topData.boardName,projectsData:topData.projectsData,productLines:topData.productLines,connectionsList:topData.connectionsList,containersData:topData.containersData,goalsData:topData.goalsData,cardPositions:cp};
+            var data={version:3,boardType:currentMode,boardName:topData.boardName,projectsData:topData.projectsData,productLines:topData.productLines,connectionsList:topData.connectionsList,containersData:topData.containersData,goalsData:topData.goalsData,participantsData:participantsData,cardPositions:cp};
             var a=document.createElement('a');
             a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
             a.download=sanitizeFilename(topData.boardName)+".json";a.click();
@@ -3788,9 +3974,20 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             reader.onload=function(e){
                 try{
                     var data=JSON.parse(e.target.result);
+                    // Format check — refuse a file meant for the other mode so it can't
+                    // overwrite the current board with incompatible data.
+                    var fileType = data.boardType || 'standard';   // old files = standard
+                    if (fileType !== currentMode) {
+                        var want = currentMode === 'collaboration' ? 'Collaboration' : 'standard';
+                        var got  = fileType === 'collaboration' ? 'Collaboration' : 'standard';
+                        showAlert('Import failed: wrong file format for this board. This is a ' + got + ' file — open it from the ' + got + ' entry on the start screen.');
+                        return;
+                    }
                     var board=document.getElementById('strategy-board');
                     board.innerHTML='<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
-                    productLines=[];projectsData={};containersData=data.containersData||{};goalsData=data.goalsData||{};connectionsList=data.connectionsList||[];
+                    productLines=[];projectsData={};containersData=data.containersData||{};goalsData=data.goalsData||{};
+                    participantsData=data.participantsData||{};
+                    if(currentMode==='collaboration') renderParticipantsBar();connectionsList=data.connectionsList||[];
                     updateBoardName(data.boardName||'Untitled board');
                     data.productLines.forEach(function(l){addNewProductLineVisual(l.id,l.title);});
                     var cp=data.cardPositions||{};
@@ -3826,7 +4023,12 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                         renderStrategicGoalCard(g.prodLineId,g.horizonId,gid);
                     });
                     showAlert("Import successful!");
-                }catch(err){showAlert("Import failed: "+err.message);}
+                }catch(err){
+                    var msg = (err && /JSON|token|parse/i.test(err.message))
+                        ? "Import failed: wrong file format for this board."
+                        : "Import failed: " + (err ? err.message : "unknown error") + ".";
+                    showAlert(msg);
+                }
             };
             reader.readAsText(file);
         }
@@ -3941,6 +4143,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
 
     // ── Welcome Screen: Neues leeres Board starten ──
     function welcomeNewProject() {
+        if (typeof _setMode==='function') _setMode('standard');
         var overlay = document.getElementById('welcome-overlay');
         if (overlay) overlay.style.display = 'none';
         _hideTourButton();
@@ -3970,6 +4173,180 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         syncProductDropdown();
         updateKpiStrip();
         updateEffortSummaries();
+        _resetAllFilters();
+    }
+
+    // ═══ PARTICIPANTS (collaboration mode) ═══════════════════════════════════
+    var _editingParticipantId = null;
+    var _participantDraftColor = '#185fa5';
+    var _participantDraftPhoto = null;
+
+    function renderParticipantsBar() {
+        var bar = document.getElementById('participants-avatars');
+        if (!bar) return;
+        bar.innerHTML = '';
+        Object.keys(participantsData).forEach(function(pid){
+            var p = participantsData[pid];
+            var av = document.createElement('div');
+            av.className = 'participant-avatar';
+            av.style.background = p.color || '#185fa5';
+            av.title = p.name + (p.role ? ' — ' + p.role : '');
+            av.onclick = function(){ openParticipantModal(pid); };
+            if (p.photo) { av.innerHTML = '<img src="' + p.photo + '" alt="">'; av.style.background='transparent'; av.style.borderColor = p.color || '#185fa5'; }
+            else { av.textContent = p.initials || _initialsFromName(p.name); }
+            bar.appendChild(av);
+        });
+    }
+
+    function openParticipantModal(pid) {
+        _editingParticipantId = pid || null;
+        var isEdit = !!pid;
+        document.getElementById('participant-modal-title').textContent = isEdit ? 'Edit participant' : 'Add participant';
+        document.getElementById('participant-delete-btn').style.display = isEdit ? '' : 'none';
+        var p = isEdit ? participantsData[pid] : {};
+        document.getElementById('participant-name').value = p.name || '';
+        document.getElementById('participant-role').value = p.role || '';
+        document.getElementById('participant-requirements').value = p.requirements || '';
+        _participantDraftColor = p.color || '#185fa5';
+        _participantDraftPhoto = p.photo || null;
+        // Build colour dots
+        var dots = document.getElementById('participant-color-dots');
+        dots.innerHTML = '';
+        _participantColors.forEach(function(col){
+            var d = document.createElement('span');
+            d.style.cssText = 'width:18px;height:18px;border-radius:50%;cursor:pointer;background:'+col+';border:2px solid '+(col===_participantDraftColor?'#18274a':'transparent')+';';
+            d.onclick = function(){ _participantDraftColor = col; _updateParticipantPreview(); _refreshColorDots(); };
+            dots.appendChild(d);
+        });
+        _updateParticipantPreview();
+        document.getElementById('participant-modal-overlay').style.display = 'flex';
+    }
+    function _refreshColorDots() {
+        var dots = document.getElementById('participant-color-dots').children;
+        for (var i=0;i<dots.length;i++){
+            dots[i].style.borderColor = (_participantColors[i]===_participantDraftColor) ? '#18274a' : 'transparent';
+        }
+    }
+    function _updateParticipantPreview() {
+        var prev = document.getElementById('participant-avatar-preview');
+        var name = document.getElementById('participant-name').value;
+        if (_participantDraftPhoto) {
+            prev.innerHTML = '<img src="'+_participantDraftPhoto+'" alt="">';
+            prev.style.background = 'transparent';
+            prev.style.border = '3px solid ' + _participantDraftColor;   // colour becomes the ring
+        } else {
+            prev.innerHTML=''; prev.textContent = name ? _initialsFromName(name) : '?';
+            prev.style.background = _participantDraftColor;
+            prev.style.border = 'none';
+        }
+    }
+    function _onParticipantPhoto(ev) {
+        var file = ev.target.files && ev.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e){ _participantDraftPhoto = e.target.result; _updateParticipantPreview(); _refreshColorDots(); };
+        reader.readAsDataURL(file);
+    }
+    function saveParticipant() {
+        var name = document.getElementById('participant-name').value.trim();
+        if (!name) { showAlert('Please enter a name.'); return; }
+        var pid = _editingParticipantId || ('participant-' + Date.now());
+        participantsData[pid] = {
+            name: name,
+            role: document.getElementById('participant-role').value.trim(),
+            requirements: document.getElementById('participant-requirements').value.trim(),
+            color: _participantDraftColor,
+            initials: _initialsFromName(name),
+            photo: _participantDraftPhoto || null
+        };
+        renderParticipantsBar();
+        closeParticipantModal();
+    }
+    function deleteParticipant() {
+        if (!_editingParticipantId) return;
+        showConfirm('Delete participant?', 'This removes the participant. Cards created by them keep their existing avatar.', function(){
+            delete participantsData[_editingParticipantId];
+            renderParticipantsBar();
+            closeParticipantModal();
+        });
+    }
+    function closeParticipantModal() {
+        document.getElementById('participant-modal-overlay').style.display = 'none';
+        _editingParticipantId = null;
+    }
+
+    // Popup on the card face: click the creator avatar to reassign the card's creator.
+    function openCreatorPickerPopup(cardId, anchorEl) {
+        var pop = document.getElementById('creator-picker-popup');
+        var list = document.getElementById('creator-picker-list');
+        list.innerHTML = '';
+        var d = projectsData[cardId];
+        var ids = Object.keys(participantsData);
+        if (!ids.length) {
+            list.innerHTML = '<span style="font-size:12px;color:#8b7e79;">No participants yet.</span>';
+        } else {
+            ids.forEach(function(pid){
+                var p = participantsData[pid];
+                var av = document.createElement('div');
+                av.className = 'participant-avatar';
+                av.style.width='32px'; av.style.height='32px'; av.style.fontSize='11px';
+                av.style.background = p.color || '#185fa5';
+                av.style.borderColor = (d.creatorId === pid) ? '#18274a' : 'transparent';
+                av.title = p.name + (p.role ? ' — ' + p.role : '');
+                if (p.photo) av.innerHTML = '<img src="'+p.photo+'" alt="">';
+                else av.textContent = p.initials || _initialsFromName(p.name);
+                av.onclick = function(){
+                    d.creatorId = pid;
+                    updateCardUIPreview(cardId);
+                    pop.style.display = 'none';
+                };
+                list.appendChild(av);
+            });
+        }
+        var r = anchorEl.getBoundingClientRect();
+        pop.style.display = 'block';
+        var pw = pop.offsetWidth || 240, ph = pop.offsetHeight || 80;
+        var left = Math.min(r.left, window.innerWidth - pw - 8);
+        var top = r.bottom + 6;
+        if (top + ph > window.innerHeight) top = Math.max(8, r.top - ph - 6);
+        pop.style.left = left + 'px';
+        pop.style.top = top + 'px';
+    }
+    // Close the creator popup on outside click.
+    document.addEventListener('click', function(e){
+        var pop = document.getElementById('creator-picker-popup');
+        if (pop && pop.style.display === 'block' && !pop.contains(e.target) && !(e.target.classList && e.target.classList.contains('card-creator-avatar'))) {
+            pop.style.display = 'none';
+        }
+    });
+
+    // Render the creator picker inside the card modal — click an avatar to set the creator.
+    function _renderCreatorPicker(d) {
+        var sel = document.getElementById('modal-priority-requestedby');
+        if (!sel) return;
+        sel.innerHTML = '';
+        var ids = Object.keys(participantsData);
+        var optNone = document.createElement('option'); optNone.value=''; optNone.textContent = ids.length ? '—' : 'No participants yet'; sel.appendChild(optNone);
+        ids.forEach(function(pid){
+            var p = participantsData[pid];
+            var o = document.createElement('option'); o.value = pid; o.textContent = p.name;
+            if (d.creatorId === pid) o.selected = true;
+            sel.appendChild(o);
+        });
+        sel.onchange = function(){
+            d.creatorId = sel.value || null;
+            updateCardUIPreview(activeProjectId);   // update card-face avatar
+        };
+    }
+
+    // ── Welcome Screen: Collaboration mode ──
+    function welcomeCollaboration() {
+        welcomeNewProject();          // reuse the empty-board setup
+        participantsData = {};        // start with no participants
+        _setMode('collaboration');
+        updateBoardName('Collaboration session');
+        renderParticipantsBar();
+        _resetAllFilters();
     }
 
     // ── Welcome Screen: Import-Picker öffnen ──
@@ -3980,6 +4357,19 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
     // ── Welcome Screen: JSON importieren ──
     function welcomeImportFile(file) {
         if (!file) return;
+        // Peek at the file to detect its board type, then open the matching mode.
+        var _peek = new FileReader();
+        _peek.onload = function(ev){
+            var detected = 'standard';
+            try { var pd = JSON.parse(ev.target.result); detected = pd.boardType || 'standard'; }
+            catch(e){ showAlert('Import failed: this file is not a valid board file.'); return; }
+            _setMode(detected === 'collaboration' ? 'collaboration' : 'standard');
+            if (detected === 'collaboration') { participantsData = {}; }
+            _finishWelcomeImport(file);
+        };
+        _peek.readAsText(file);
+    }
+    function _finishWelcomeImport(file) {
         var overlay = document.getElementById('welcome-overlay');
         if (overlay) overlay.style.display = 'none';
         // Reset before import — Bundles zuerst
@@ -4001,6 +4391,8 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         var board = document.getElementById('strategy-board');
         if (board) board.innerHTML = '<div class="board-header">Lanes</div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2026</div></div><div class="board-header" style="background-color:#c85060;"><div class="bh-group">Short Term</div><div class="bh-year">2027</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2028</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2029</div></div><div class="board-header" style="background-color:#c07000;"><div class="bh-group">Mid Term</div><div class="bh-year">2030</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2031-33</div></div><div class="board-header" style="background-color:#6a8040;"><div class="bh-group">Long Term</div><div class="bh-year">2034-35</div></div><div class="board-header" style="background-color:#2090a0;"><div class="bh-group">BU Vision</div><div class="bh-year">2036+</div></div>';
         importStrategyBoard(file);
+        if (currentMode === 'collaboration') { renderParticipantsBar(); }
+        _resetAllFilters();
     }
 
     // ── Welcome Screen: Demo-Board laden ──
@@ -4033,6 +4425,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
 
     // Demo entry — offer a guided tour or the full board.
     function welcomeDemo() {
+        if (typeof _setMode==='function') _setMode('standard');
         _resetBoardToEmpty();
         var overlay = document.getElementById('welcome-overlay');
         if (overlay) overlay.style.display = 'none';
@@ -4216,6 +4609,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
         // Build everything at once (Full board / Skip target = state 7).
         function buildFullDemoBoard() {
             _showTourButton();
+            _resetAllFilters();
             _demoSetup();
             _demoLanes();
             _demoFirstCard();
@@ -4670,13 +5064,13 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             <div class="form-section">
                 <div class="form-section-title">Sizing &amp; Status</div>
                 <div id="modal-sizing-group" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-                    <div>
+                    <div class="standard-only">
                         <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Effort</label>
                         <select id="modal-effort" style="width:100%;margin-top:4px;" onchange="updateScoreDisplay()">
                                 <option value="XS">XS</option><option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option>
                             </select>
                     </div>
-                    <div>
+                    <div class="standard-only">
                         <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Cost</label>
                         <select id="modal-cost" style="width:100%;margin-top:4px;" onchange="updateScoreDisplay()">
                                 <option value="XS">XS</option><option value="S">S</option><option value="M" selected>M</option><option value="L">L</option><option value="XL">XL</option>
@@ -4700,8 +5094,27 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                             <option value="bronze">🥉 Me-Too — market driven</option>
                         </select>
                     </div>
+                    <div class="collab-only">
+                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;white-space:nowrap;">Requested by</label>
+                        <select id="modal-priority-requestedby" style="width:100%;box-sizing:border-box;margin-top:4px;"></select>
+                    </div>
+                    <div class="collab-only">
+                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Priority</label>
+                        <select id="modal-priority" style="width:100%;box-sizing:border-box;margin-top:4px;">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="collab-only" style="grid-column:span 2;">
+                        <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:3px;">Pre-study needed?</label>
+                        <div style="display:flex;gap:16px;margin-top:6px;">
+                            <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="modal-prestudy-needed" id="modal-prestudy-yes" value="yes"> Yes</label>
+                            <label style="font-size:13px;display:flex;align-items:center;gap:5px;cursor:pointer;"><input type="radio" name="modal-prestudy-needed" value="no" checked> No</label>
+                        </div>
+                    </div>
                 </div>
-                <div id="modal-score-section" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">
+                <div id="modal-score-section" class="standard-only" style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">
                     <div class="form-section-title" style="margin-bottom:6px;display:flex;align-items:center;gap:6px;">Strategic Score <button class="score-info-btn" onclick="openScoreInfo()" title="How is this score calculated?">i</button></div>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <div id="modal-score-display" style="font-size:26px;font-weight:700;color:#595857;min-width:40px;text-align:center;line-height:1;"></div>
@@ -4711,10 +5124,16 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                         </div>
                     </div>
                 </div>
+
+            
+
             </div>
 
+            
+
+
             <!-- Col 1: Customer Benefit -->
-            <div class="form-section">
+            <div class="form-section standard-only">
                 <div class="form-section-title">Customer Benefit</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;">
                     <div class="radar-sliders" style="display:grid;grid-template-columns:1fr;gap:4px;">
@@ -4728,7 +5147,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             </div>
 
             <!-- Col 2: Roadmap -->
-            <div class="form-section">
+            <div class="form-section standard-only">
                 <div class="form-section-title">Project Roadmap</div>
                 <div id="editor-milestones-zone" style="max-height:160px;overflow-y:auto;margin-bottom:10px;"></div>
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
@@ -4740,7 +5159,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             </div>
 
             <!-- Full width: 10 Types of Innovation -->
-            <div class="form-section full-width" style="grid-column:span 2;">
+            <div class="form-section full-width standard-only" style="grid-column:span 2;">
                 <div class="form-section-title" style="display:flex;align-items:center;gap:6px;">10 Types of Innovation <button class="score-info-btn" onclick="openInnoInfo()" title="What do these types mean?"><i>i</i></button></div>
                 <div style="display:grid;grid-template-columns:minmax(0,1fr) 1fr;gap:16px;align-items:center;">
                     <div class="radar-sliders" style="display:grid;grid-template-columns:1fr;gap:4px;">
@@ -4985,6 +5404,50 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             </div>
         </div>
     </div>
+</div>
+
+<div id="participant-modal-overlay" style="display:none;position:fixed;inset:0;z-index:4200;background:rgba(15,20,35,0.55);align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;padding:24px 26px;width:420px;max-width:92vw;box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+            <span id="participant-modal-title" style="font-size:17px;font-weight:600;color:#18274a;">Add participant</span>
+            <button onclick="closeParticipantModal()" style="background:none;border:none;font-size:22px;color:#8b7e79;cursor:pointer;line-height:1;">&times;</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+            <div id="participant-avatar-preview" class="participant-avatar" style="width:54px;height:54px;font-size:17px;background:#185fa5;">?</div>
+            <div style="flex:1;">
+                <label for="participant-photo-input" style="font-size:11px;color:#185fa5;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#185fa5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l3-3 2 2 4-4 3 3M2 4h12v9H2z"/></svg>
+                    Upload photo (optional)
+                </label>
+                <input type="file" id="participant-photo-input" accept="image/*" style="display:none;" onchange="_onParticipantPhoto(event)">
+                <div id="participant-color-dots" style="display:flex;gap:6px;margin-top:8px;"></div>
+            </div>
+        </div>
+        <div style="margin-bottom:11px;">
+            <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Name</label>
+            <input id="participant-name" type="text" oninput="_updateParticipantPreview()" style="width:100%;box-sizing:border-box;font-size:13px;padding:8px 10px;border:1px solid #d4cac8;border-radius:6px;" placeholder="Daniel R.">
+        </div>
+        <div style="margin-bottom:11px;">
+            <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Role</label>
+            <input id="participant-role" type="text" style="width:100%;box-sizing:border-box;font-size:13px;padding:8px 10px;border:1px solid #d4cac8;border-radius:6px;" placeholder="Product Manager">
+        </div>
+        <div style="margin-bottom:18px;">
+            <label style="font-size:11px;color:#8b7e79;display:block;margin-bottom:4px;">Requirements / focus</label>
+            <textarea id="participant-requirements" style="width:100%;box-sizing:border-box;font-size:13px;padding:8px 10px;border:1px solid #d4cac8;border-radius:6px;height:52px;resize:vertical;" placeholder="Scaling business, M&amp;A target implementation"></textarea>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <button id="participant-delete-btn" onclick="deleteParticipant()" style="background:none;border:none;color:#e56b78;font-size:12px;cursor:pointer;display:none;">Delete</button>
+            <div style="display:flex;gap:8px;margin-left:auto;">
+                <button onclick="closeParticipantModal()" style="background:#f5f2f1;border:1px solid #d4cac8;color:#18274a;font-size:13px;padding:8px 16px;border-radius:6px;cursor:pointer;">Cancel</button>
+                <button onclick="saveParticipant()" style="background:#18274a;border:none;color:#fff;font-size:13px;padding:8px 18px;border-radius:6px;cursor:pointer;">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="creator-picker-popup">
+    <div class="cpp-title">Created by</div>
+    <div class="cpp-list" id="creator-picker-list"></div>
 </div>
 
 </body>
