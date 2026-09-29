@@ -4135,6 +4135,7 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 newRowsXml += funnelBuildRowXml(oldMax + n, cards[idx], productLine);
             });
             var newMax = oldMax + n;
+            var newRowStart = oldMax + 1;
 
             sheetXml = sheetXml.replace('</sheetData>', newRowsXml + '</sheetData>');
 
@@ -4147,13 +4148,33 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             tryPatch(/<autoFilter ref="B1:AL\d+"/, '<autoFilter ref="B1:AL'+newMax+'"');
             tryPatch(/<sortState ref="B2:AL\d+"/, '<sortState ref="B2:AL'+newMax+'"');
             tryPatch(/<sortCondition ref="E1:E\d+"\/>/, '<sortCondition ref="E1:E'+newMax+'"/>');
-            tryPatch(/sqref="I2:I\d+"/, 'sqref="I2:I'+newMax+'"');
-            tryPatch(/sqref="J2:J\d+ K70:M71"/, 'sqref="J2:J'+newMax+' K70:M71"');
-            tryPatch(/<xm:sqref>D2:D\d+<\/xm:sqref>/, '<xm:sqref>D2:D'+newMax+'</xm:sqref>');
-            tryPatch(/<xm:sqref>G25:G\d+ G2:G23<\/xm:sqref>/, '<xm:sqref>G25:G'+newMax+' G2:G23</xm:sqref>');
-            tryPatch(/<xm:sqref>O2:O\d+<\/xm:sqref>/, '<xm:sqref>O2:O'+newMax+'</xm:sqref>');
-            tryPatch(/<xm:sqref>P2:P\d+<\/xm:sqref>/, '<xm:sqref>P2:P'+newMax+'</xm:sqref>');
-            tryPatch(/<xm:sqref>Q2:Q\d+<\/xm:sqref>/, '<xm:sqref>Q2:Q'+newMax+'</xm:sqref>');
+
+            // Root-cause fix: the original file has a broken "#REF!" validation rule
+            // (H70:H1048576 E70:E1048576 S70:S1048576) that shadows the correct rules
+            // for those columns on any row ≥70 — it declares first and wins, which is
+            // why E/H dropdowns were missing on appended rows. Narrow it so it stops
+            // exactly at the old table end, letting the real (valid) rules take over
+            // cleanly for our new rows.
+            tryPatch(/<xm:sqref>H70:H\d+ E70:E\d+ S70:S\d+ A2:A1048576<\/xm:sqref>/,
+                '<xm:sqref>H70:H'+oldMax+' E70:E'+oldMax+' S70:S'+oldMax+' A2:A1048576</xm:sqref>');
+
+            // Rather than stretching the old "*2:*69/71" ranges (fragile — depends on
+            // exact digits that may have shifted since this file was last inspected),
+            // add brand-new validation rules scoped to EXACTLY the freshly inserted
+            // rows. Same source lists as the original columns use.
+            var newClassicDV =
+                '<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="I'+newRowStart+':I'+newMax+'"><formula1>"Yes,No,TBD"</formula1></dataValidation>'
+              + '<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="J'+newRowStart+':J'+newMax+'"><formula1>"Inorganic,Organic,TBD"</formula1></dataValidation>';
+            tryPatch(/<\/dataValidations>/, newClassicDV + '</dataValidations>');
+
+            var x14ns = 'xmlns:xm="http://schemas.microsoft.com/office/excel/2006/main"';
+            var newX14DV =
+                '<x14:dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" '+x14ns+'><x14:formula1><xm:f>\'List Source Data\'!$B$2:$B$5</xm:f></x14:formula1><xm:sqref>D'+newRowStart+':D'+newMax+'</xm:sqref></x14:dataValidation>'
+              + '<x14:dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" '+x14ns+'><x14:formula1><xm:f>\'List Source Data\'!$E$2:$E$3</xm:f></x14:formula1><xm:sqref>G'+newRowStart+':G'+newMax+'</xm:sqref></x14:dataValidation>'
+              + '<x14:dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" '+x14ns+'><x14:formula1><xm:f>\'List Source Data\'!$J$2:$J$5</xm:f></x14:formula1><xm:sqref>O'+newRowStart+':O'+newMax+'</xm:sqref></x14:dataValidation>'
+              + '<x14:dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" '+x14ns+'><x14:formula1><xm:f>\'List Source Data\'!$H$2:$H$5</xm:f></x14:formula1><xm:sqref>P'+newRowStart+':P'+newMax+'</xm:sqref></x14:dataValidation>'
+              + '<x14:dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" '+x14ns+'><x14:formula1><xm:f>\'Releases\'!$A$2:$A$19</xm:f></x14:formula1><xm:sqref>Q'+newRowStart+':Q'+newMax+'</xm:sqref></x14:dataValidation>';
+            tryPatch(/<\/x14:dataValidations>/, newX14DV + '</x14:dataValidations>');
 
             var wbRe = /(<definedName name="_xlnm\._FilterDatabase" localSheetId="0" hidden="1">'Innovation Funnel'!\$B\$1:\$AL\$)(\d+)(<\/definedName>)/;
             if(wbRe.test(wbXml)){ wbXml = wbXml.replace(wbRe, '$1'+newMax+'$3'); applied++; } else { failed++; }
@@ -5528,7 +5549,11 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
                 Pulsiocare/PiCCO/ProAQT/Advanced&nbsp;Monitoring&nbsp;Service bei Treffer im Titel/Beschreibung.<br>
                 <b>Bewusst leer gelassen</b> (keine verlässliche Quelle im Board): Stage in funnel (Default
                 „1. Ideation“), Investment Intent, ACT-Kategorie, Requires Clinical Study, ProductRelease,
-                Connects-to-Vision-Haken. Bitte vor dem Product Council gegenlesen.
+                Connects-to-Vision-Haken. Bitte vor dem Product Council gegenlesen.<br><br>
+                <b>Häkchen-Spalten (K–M, R–AL):</b> Diese übernehmen exakt dieselbe Formatvorlage wie
+                die Original-Häkchen, sollten also identisch aussehen. Falls Excel bei neuen Zeilen
+                dennoch kurz ein generisches Dropdown statt des Häkchens zeigt: Datei einmal schließen
+                und neu öffnen — das behebt es in aller Regel.
             </div>
             <div style="margin-bottom:12px;">
                 <label style="font-size:12px;font-weight:600;color:#18274a;display:block;margin-bottom:4px;">1. Aktuelle Tracker-Excel hochladen</label>
