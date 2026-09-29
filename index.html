@@ -575,6 +575,7 @@
 
 </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 <!-- ══ WELCOME SCREEN OVERLAY ══ -->
@@ -901,6 +902,7 @@
                 <input type="file" id="chase-merge-file" style="display:none" accept=".json" onchange="chaseMergePromptPassword(this.files[0])">
                 <button class="util-btn" onclick="document.getElementById('chase-merge-file').click()" title="Merge a colleague&#39;s JSON into this board (password protected)"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="5" r="2"/><circle cx="11" cy="5" r="2"/><circle cx="8" cy="11" r="2"/><path d="M7 5h-1M10 5h-1M6.5 8.5l1 1.5M9.5 8.5l-1 1.5"/></svg> Chase Merge</button>
                 <button class="util-btn" onclick="exportBoardPNG()" title="Export board as high-resolution PNG"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="14" height="14" rx="2"/><circle cx="5" cy="5" r="1.5"/><path d="M1 11l4-4 3 3 2-2 5 5"/></svg> Export PNG</button>
+                <button class="util-btn" id="btn-export-funnel-xlsx" onclick="openFunnelExportModal()" title="Ausgewählte Karten als neue Zeilen in die Innovation Funnel Excel eintragen"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="#18274a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="1" width="14" height="14" rx="1"/><path d="M1 6h14M6 6v8"/></svg> Export → Innovation Funnel Excel</button>
             </div>
         </div>
 
@@ -3968,6 +3970,215 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
             a.download=sanitizeFilename(topData.boardName)+".json";a.click();
         }
 
+    // ╔══════════════════════════════════════════════════════════════════╗
+    // ║  EXPORT → INNOVATION FUNNEL EXCEL                                 ║
+    // ║  Patcht die hochgeladene "CC Innovation and Business Opportunity  ║
+    // ║  tracker.xlsx" direkt auf XML/ZIP-Ebene (kein openpyxl-Rebuild!). ║
+    // ║  Dadurch bleiben Dropdowns (inkl. x14-Extended-Validations),      ║
+    // ║  Bilder, Filter, Formatierung und alle übrigen Tabs 1:1 erhalten  ║
+    // ║  — es werden ausschließlich neue <row>-Elemente am Ende von       ║
+    // ║  "Innovation Funnel" ergänzt plus die Bereichsangaben (Dimension, ║
+    // ║  AutoFilter, FilterDatabase, betroffene Dropdown-sqrefs) erweitert.║
+    // ╚══════════════════════════════════════════════════════════════════╝
+
+    // Spalten-Layout der Ziel-Excel (Tab "Innovation Funnel", Spalte B bis AL)
+    // Style-IDs 1:1 von Zeile 69 (letzte reale Datenzeile) übernommen, damit
+    // neue Zeilen optisch nicht von bestehenden zu unterscheiden sind.
+    var FUNNEL_COL_ORDER = ['B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q',
+        'R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF','AG','AH','AI','AJ','AK','AL'];
+    var FUNNEL_COL_STYLE = {B:36,C:52,D:37,E:35,F:35,G:35,H:35,I:35,J:35,K:64,L:64,M:64,N:38,O:39,P:40,Q:40,
+        R:22,S:22,T:22,U:22,V:22,W:22,X:22,Y:22,Z:22,AA:22,AB:22,AC:22,AD:22,AE:22,AF:22,AG:22,AH:22,AI:22,AJ:22,AK:22,AL:22};
+    var FUNNEL_BOOL_COLS = {K:1,L:1,M:1,R:1,S:1,T:1,U:1,V:1,W:1,X:1,Y:1,Z:1,AA:1,AB:1,AC:1,AD:1,AE:1,AF:1,AG:1,AH:1,AI:1,AJ:1,AK:1,AL:1};
+    // Produkt-Checkbox-Spalten, für die eine simple Stichwort-Erkennung versucht wird.
+    // Alle anderen Produkt-Spalten (Ventilation/Anesthesia) bleiben immer unchecked,
+    // da dein Board dafür keine verlässliche Quelle liefert.
+    var FUNNEL_PRODUCT_KEYWORDS = { AC:/pulsiocare/i, AD:/picco/i, AE:/proaqt/i, AF:/smart module|\boem\b/i };
+
+    function funnelEscXml(s){
+        return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function funnelMapInnovationLevel(comp){
+        return comp==='gold' ? 'Transformative' : comp==='silver' ? 'Adjacent' : comp==='bronze' ? 'Core' : '';
+    }
+    function funnelMapOrganicInorganic(laneTitle){ return /m\s*&\s*a/i.test(laneTitle||'') ? 'Inorganic' : 'Organic'; }
+    function funnelMapSustainability(laneTitle){ return /sustainab/i.test(laneTitle||'') ? 'Sustainability incorporated' : ''; }
+    function funnelMapStatus(s){
+        if(s==='idea'||s==='planned') return 'Not Started';
+        if(s==='active') return 'Ongoing';
+        if(s==='done') return 'Done';
+        if(s==='blocked') return 'Paused';
+        return '';
+    }
+    function funnelMapPrio(score){
+        var cls = scoreClass(score);
+        return cls==='score-high' ? 'Now' : cls==='score-medium' ? 'Next' : 'Later';
+    }
+    function funnelProductFlags(title, desc){
+        var t = (title||'') + ' ' + (desc||'');
+        var out = {};
+        Object.keys(FUNNEL_PRODUCT_KEYWORDS).forEach(function(col){ out[col] = FUNNEL_PRODUCT_KEYWORDS[col].test(t); });
+        return out;
+    }
+
+    // Sammelt alle Karten (Top-Level + eine Ebene Sub-Boards) aus dem AKTUELLEN
+    // Board-Stand — unabhängig davon, ob gerade ein Sub-Board offen ist.
+    function funnelGatherCards(){
+        var top = getTopLevelExportData();
+        var laneMap = {}; (top.productLines||[]).forEach(function(l){ laneMap[l.id] = l.title; });
+        var cards = [];
+        Object.keys(top.projectsData||{}).forEach(function(id){
+            var p = top.projectsData[id];
+            cards.push({ title:p.title, lane:laneMap[p.prodLineId]||'', data:p, sub:false, parentTitle:null });
+            if(p.subBoard && p.subBoard.projectsData){
+                var subLaneMap = {}; (p.subBoard.productLines||[]).forEach(function(l){ subLaneMap[l.id]=l.title; });
+                Object.keys(p.subBoard.projectsData).forEach(function(sid){
+                    var sp = p.subBoard.projectsData[sid];
+                    cards.push({ title:sp.title, lane:subLaneMap[sp.prodLineId]||'', data:sp, sub:true, parentTitle:p.title });
+                });
+            }
+        });
+        return cards;
+    }
+
+    function funnelBuildRowXml(rowNum, card, productLine){
+        var d = card.data;
+        var score = calcScore(d);
+        var strVals = {
+            B: d.title || '',
+            C: d.description || '',
+            D: productLine,
+            E: '1. Ideation',                              // bewusst konservativ, siehe Hinweistext im Modal
+            F: funnelMapInnovationLevel(d.competition),
+            G: '', H: '', I: '',                            // keine Quelle im Board -> manuell zu prüfen
+            J: funnelMapOrganicInorganic(card.lane),
+            N: funnelMapSustainability(card.lane),
+            O: funnelMapStatus(d.status),
+            P: funnelMapPrio(score),
+            Q: ''
+        };
+        var pf = funnelProductFlags(d.title, d.description);
+        var boolVals = { K:false, L:false, M:false,
+            R:false,S:false,T:false,U:false,V:false,W:false,X:false,Y:false,Z:false,AA:false,AB:false,
+            AC: !!pf.AC, AD: !!pf.AD, AE: !!pf.AE, AF: !!pf.AF,
+            AG:false,AH:false,AI:false,AJ:false,AK:false,AL:false };
+        var cellsXml = FUNNEL_COL_ORDER.map(function(col){
+            var ref = col + rowNum, s = FUNNEL_COL_STYLE[col];
+            if(FUNNEL_BOOL_COLS[col]){
+                return '<c r="'+ref+'" s="'+s+'" t="b"><v>'+(boolVals[col]?1:0)+'</v></c>';
+            }
+            var v = strVals[col];
+            if(v===undefined || v===null || v==='') return '<c r="'+ref+'" s="'+s+'"/>';
+            return '<c r="'+ref+'" s="'+s+'" t="inlineStr"><is><t xml:space="preserve">'+funnelEscXml(v)+'</t></is></c>';
+        }).join('');
+        return '<row r="'+rowNum+'" spans="2:38" x14ac:dyDescent="0.25">'+cellsXml+'</row>';
+    }
+
+    // Öffnet das Auswahl-Modal mit Checkboxen für jede Karte
+    function openFunnelExportModal(){
+        var cards = funnelGatherCards();
+        window.__funnelExportCards = cards;
+        var list = document.getElementById('funnel-export-card-list');
+        if(cards.length===0){
+            list.innerHTML = '<div style="padding:10px;color:#8b7e79;">Keine Karten im Board gefunden.</div>';
+        } else {
+            list.innerHTML = cards.map(function(c, i){
+                var label = c.sub ? ('↳ ' + funnelEscXml(c.title) + ' <span style="color:#8b7e79;">(Sub-Board von: ' + funnelEscXml(c.parentTitle) + ')</span>') : funnelEscXml(c.title);
+                var laneLabel = c.lane ? (' <span style="color:#a19f9d;">— ' + funnelEscXml(c.lane) + '</span>') : '';
+                return '<label style="display:flex;align-items:flex-start;gap:8px;padding:4px 6px;font-size:13px;border-radius:3px;' + (c.sub?'margin-left:18px;':'') + '">'
+                    + '<input type="checkbox" class="funnel-card-check" data-idx="'+i+'" checked style="margin-top:3px;">'
+                    + '<span>'+label+laneLabel+'</span></label>';
+            }).join('');
+        }
+        document.getElementById('funnel-export-status').textContent = '';
+        document.getElementById('funnel-master-file').value = '';
+        document.getElementById('funnel-export-modal-overlay').style.display = 'flex';
+    }
+    function closeFunnelExportModal(){
+        document.getElementById('funnel-export-modal-overlay').style.display = 'none';
+    }
+    function funnelToggleAll(checked){
+        document.querySelectorAll('.funnel-card-check').forEach(function(cb){ cb.checked = checked; });
+    }
+
+    // Haupt-Konvertierung: liest die hochgeladene Master-Excel, patcht sie
+    // per JSZip auf XML-Ebene und stößt den Download der aktualisierten Datei an.
+    async function funnelConvertAndDownload(){
+        var statusEl = document.getElementById('funnel-export-status');
+        try {
+            var fileInput = document.getElementById('funnel-master-file');
+            if(!fileInput.files.length){ statusEl.textContent = 'Bitte zuerst die aktuelle Tracker-Excel (.xlsx) hochladen.'; return; }
+            var selectedIdx = [];
+            document.querySelectorAll('.funnel-card-check:checked').forEach(function(cb){ selectedIdx.push(parseInt(cb.getAttribute('data-idx'),10)); });
+            if(!selectedIdx.length){ statusEl.textContent = 'Bitte mindestens eine Karte auswählen.'; return; }
+            var productLine = document.getElementById('funnel-productline-select').value;
+            var cards = window.__funnelExportCards || [];
+
+            statusEl.textContent = 'Lese Excel-Datei...';
+            var buf = await fileInput.files[0].arrayBuffer();
+            var zip = await JSZip.loadAsync(buf);
+            var sheetPath = 'xl/worksheets/sheet1.xml';
+            var wbPath = 'xl/workbook.xml';
+            if(!zip.file(sheetPath) || !zip.file(wbPath)) throw new Error('Unerwartete Dateistruktur — ist das die richtige Tracker-Datei?');
+            var sheetXml = await zip.file(sheetPath).async('string');
+            var wbXml = await zip.file(wbPath).async('string');
+
+            var sdStart = sheetXml.indexOf('<sheetData>'), sdEnd = sheetXml.indexOf('</sheetData>');
+            if(sdStart<0 || sdEnd<0) throw new Error('sheetData in sheet1.xml nicht gefunden.');
+            var sheetDataBlock = sheetXml.substring(sdStart, sdEnd);
+            var rowNums = [], rowRe = /<row [^>]*r="(\d+)"/g, rm;
+            while((rm = rowRe.exec(sheetDataBlock))) rowNums.push(parseInt(rm[1],10));
+            var oldMax = rowNums.length ? Math.max.apply(null, rowNums) : 1;
+
+            var newRowsXml = '', n = 0;
+            selectedIdx.forEach(function(idx){
+                n++;
+                newRowsXml += funnelBuildRowXml(oldMax + n, cards[idx], productLine);
+            });
+            var newMax = oldMax + n;
+
+            sheetXml = sheetXml.replace('</sheetData>', newRowsXml + '</sheetData>');
+
+            var applied = 0, failed = 0;
+            function tryPatch(re, replacement){
+                if(re.test(sheetXml)){ sheetXml = sheetXml.replace(re, replacement); applied++; }
+                else { failed++; }
+            }
+            tryPatch(/<dimension ref="A1:AL\d+"\/>/, '<dimension ref="A1:AL'+newMax+'"/>');
+            tryPatch(/<autoFilter ref="B1:AL\d+"/, '<autoFilter ref="B1:AL'+newMax+'"');
+            tryPatch(/<sortState ref="B2:AL\d+"/, '<sortState ref="B2:AL'+newMax+'"');
+            tryPatch(/<sortCondition ref="E1:E\d+"\/>/, '<sortCondition ref="E1:E'+newMax+'"/>');
+            tryPatch(/sqref="I2:I\d+"/, 'sqref="I2:I'+newMax+'"');
+            tryPatch(/sqref="J2:J\d+ K70:M71"/, 'sqref="J2:J'+newMax+' K70:M71"');
+            tryPatch(/<xm:sqref>D2:D\d+<\/xm:sqref>/, '<xm:sqref>D2:D'+newMax+'</xm:sqref>');
+            tryPatch(/<xm:sqref>G25:G\d+ G2:G23<\/xm:sqref>/, '<xm:sqref>G25:G'+newMax+' G2:G23</xm:sqref>');
+            tryPatch(/<xm:sqref>O2:O\d+<\/xm:sqref>/, '<xm:sqref>O2:O'+newMax+'</xm:sqref>');
+            tryPatch(/<xm:sqref>P2:P\d+<\/xm:sqref>/, '<xm:sqref>P2:P'+newMax+'</xm:sqref>');
+            tryPatch(/<xm:sqref>Q2:Q\d+<\/xm:sqref>/, '<xm:sqref>Q2:Q'+newMax+'</xm:sqref>');
+
+            var wbRe = /(<definedName name="_xlnm\._FilterDatabase" localSheetId="0" hidden="1">'Innovation Funnel'!\$B\$1:\$AL\$)(\d+)(<\/definedName>)/;
+            if(wbRe.test(wbXml)){ wbXml = wbXml.replace(wbRe, '$1'+newMax+'$3'); applied++; } else { failed++; }
+
+            zip.file(sheetPath, sheetXml);
+            zip.file(wbPath, wbXml);
+
+            statusEl.textContent = 'Erzeuge Datei...';
+            var blob = await zip.generateAsync({ type:'blob' });
+            var url = URL.createObjectURL(blob);
+            var origName = fileInput.files[0].name.replace(/\.xlsx$/i,'');
+            var a = document.createElement('a');
+            a.href = url; a.download = origName + '_updated.xlsx';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function(){ URL.revokeObjectURL(url); }, 5000);
+
+            statusEl.innerHTML = '✅ ' + n + ' Zeile(n) angehängt (ab Zeile ' + (oldMax+1) + '). '
+                + applied + ' von ' + (applied+failed) + ' Bereichs-/Dropdown-Erweiterungen erfolgreich.'
+                + (failed ? ' <b>Achtung:</b> ' + failed + ' Anpassung(en) fehlgeschlagen — vermutlich hat sich die Dateistruktur seit der letzten Prüfung geändert. Bitte Filter/Dropdowns für die neuen Zeilen in Excel stichprobenartig kontrollieren.' : ' Alle Dropdowns/Filter wurden mit erweitert.');
+        } catch(err){
+            console.error(err);
+            statusEl.textContent = 'Fehler: ' + err.message;
+        }
+    }
+
     // JSON-Datei importieren und Board vollständig neu aufbauen
         function importStrategyBoard(file){
             var reader=new FileReader();
@@ -5299,6 +5510,56 @@ var par=tw.parentElement;var dpar=dw.parentElement;if(par&&dpar){var twNext=tw.n
 </div>
 
 <!-- v22: Strategic Goal read/edit popup -->
+<div id="funnel-export-modal-overlay" style="display:none;position:fixed;inset:0;z-index:4300;background:rgba(15,20,35,0.55);align-items:center;justify-content:center;">
+    <div style="background:#fff;width:640px;max-width:92vw;max-height:88vh;border-radius:6px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.35);display:flex;flex-direction:column;overflow:hidden;">
+        <div style="padding:14px 20px;background:rgba(73,90,107,0.15);border-bottom:1px solid #d4cac8;display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-weight:700;color:#18274a;font-size:15px;">Export → Innovation Funnel Excel</div>
+            <button class="secondary" onclick="closeFunnelExportModal()" style="padding:4px 8px;">&times;</button>
+        </div>
+        <div style="padding:16px 20px;overflow-y:auto;flex:1;min-height:0;">
+            <div style="background:#fff8e6;border:1px solid #f0d78c;border-radius:4px;padding:10px 12px;font-size:12px;color:#5a4a1a;margin-bottom:14px;line-height:1.5;">
+                <b>Wie das funktioniert:</b> Die hochgeladene Tracker-Excel wird nicht neu gebaut, sondern
+                direkt gepatcht — ausgewählte Karten werden als neue Zeilen ans Ende des Tabs
+                <b>„Innovation Funnel“</b> angehängt. Alle anderen Tabs, Bilder, Dropdowns und Formatierungen
+                bleiben unverändert.<br><br>
+                <b>Automatisch befüllt:</b> Topic, Description, ProductLine (siehe Auswahl unten), Status,
+                Prio (aus Strategic Score), Innovation Level (aus Pioneer/Fast Follower/Me-Too),
+                Organic/Inorganic (aus Lane „M&amp;A“), Sustainability (aus Lane-Namen), sowie die Produkt-Haken
+                Pulsiocare/PiCCO/ProAQT/Advanced&nbsp;Monitoring&nbsp;Service bei Treffer im Titel/Beschreibung.<br>
+                <b>Bewusst leer gelassen</b> (keine verlässliche Quelle im Board): Stage in funnel (Default
+                „1. Ideation“), Investment Intent, ACT-Kategorie, Requires Clinical Study, ProductRelease,
+                Connects-to-Vision-Haken. Bitte vor dem Product Council gegenlesen.
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="font-size:12px;font-weight:600;color:#18274a;display:block;margin-bottom:4px;">1. Aktuelle Tracker-Excel hochladen</label>
+                <input type="file" id="funnel-master-file" accept=".xlsx" style="font-size:13px;">
+            </div>
+            <div style="margin-bottom:12px;">
+                <label style="font-size:12px;font-weight:600;color:#18274a;display:block;margin-bottom:4px;">2. ProductLine für alle ausgewählten Zeilen</label>
+                <select id="funnel-productline-select" style="font-size:13px;padding:4px 8px;border:1px solid #d4cac8;border-radius:4px;">
+                    <option value="Advanced Monitoring" selected>Advanced Monitoring</option>
+                    <option value="Ventilation">Ventilation</option>
+                    <option value="Anesthesia">Anesthesia</option>
+                    <option value="Common/Other">Common/Other</option>
+                </select>
+            </div>
+            <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+                <label style="font-size:12px;font-weight:600;color:#18274a;">3. Karten auswählen</label>
+                <span>
+                    <button class="util-btn" style="font-size:11px;padding:3px 8px;" onclick="funnelToggleAll(true)">Alle</button>
+                    <button class="util-btn" style="font-size:11px;padding:3px 8px;" onclick="funnelToggleAll(false)">Keine</button>
+                </span>
+            </div>
+            <div id="funnel-export-card-list" style="border:1px solid #d4cac8;border-radius:4px;max-height:260px;overflow-y:auto;padding:6px;background:#f5f2f1;"></div>
+            <div id="funnel-export-status" style="margin-top:12px;font-size:12px;color:#18274a;min-height:16px;"></div>
+        </div>
+        <div style="padding:12px 20px;border-top:1px solid #d4cac8;display:flex;justify-content:flex-end;gap:8px;">
+            <button class="secondary" onclick="closeFunnelExportModal()">Abbrechen</button>
+            <button onclick="funnelConvertAndDownload()" style="background:#18274a;color:#fff;border:none;padding:7px 16px;border-radius:4px;font-weight:600;cursor:pointer;">Konvertieren &amp; herunterladen</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="goal-modal-overlay">
     <div class="goal-modal-window">
         <div class="goal-modal-head">
